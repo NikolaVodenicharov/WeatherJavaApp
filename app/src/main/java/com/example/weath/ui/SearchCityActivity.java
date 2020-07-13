@@ -27,8 +27,8 @@ public class SearchCityActivity extends AppCompatActivity {
     }
 
     private void initializeBindings() {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_search_city);
         viewModel = new ViewModelProvider(this).get(SearchCityViewModel.class);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_search_city);
         binding.setViewModel(viewModel);
     }
 
