@@ -1,9 +1,9 @@
 package com.example.weath.businessLogic.viewModels;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.weath.App;
 import com.example.weath.data.Repository;
 import com.example.weath.data.models.Weather;
 
@@ -20,10 +20,32 @@ public class DisplayWeatherViewModel extends ViewModel {
     }
 
 
-    public void getWeather(String searchedCity){
+/*    public void getWeather(String searchedCity){
         if (!isGetWeatherStarted){
             weather = repository.getWeatherByCityName(searchedCity);
+
+            //Todo potential bug if i want to find weather in another city ?
             isGetWeatherStarted = true;
         }
+    }*/
+
+    public void getWeather(String searchedCity){
+        if (isGetWeatherStarted){
+            return;
+        }
+
+        // Sofia (BG) contains ")"
+        boolean canSearchById = searchedCity.contains(")");
+
+        if (canSearchById){
+            String cityId = App.citiesNameId.get(searchedCity);
+            weather = repository.getWeatherByCityId(cityId);
+        }
+        else{
+            weather = repository.getWeatherByCityName(searchedCity);
+        }
+
+        //Todo potential bug if i want to find weather in another city ?
+        isGetWeatherStarted = true;
     }
 }

@@ -43,15 +43,15 @@ public class RestService {
         requestQueue = Volley.newRequestQueue(appContext);
     }
 
-    public void getWeatherById(String id, ResponseListener listener){
+    public void requestWeatherByCityId(String id, ResponseListener listener){
         String url = BASE_PATH + BY_CITY_ID + id + API_KEY + METRIC_UNIT;
         initializeRequest(listener, url);
     }
-    public void getWeatherByCityName(String cityName, ResponseListener listener){
+    public void requestWeatherByCityName(String cityName, ResponseListener listener){
         String url = BASE_PATH + BY_CITY_NAME + cityName + API_KEY + METRIC_UNIT;
         initializeRequest(listener, url);
     }
-    public void getWeatherByLocation(double latitude, double longitude, ResponseListener listener){
+    public void requestWeatherByLocation(double latitude, double longitude, ResponseListener listener){
         String url = BASE_PATH + BY_LATITUDE + latitude + AMPERSAND + BY_LONGITUDE + longitude + API_KEY + METRIC_UNIT;
         initializeRequest(listener, url);
     }

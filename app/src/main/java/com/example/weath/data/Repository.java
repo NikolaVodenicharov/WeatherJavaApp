@@ -2,7 +2,6 @@ package com.example.weath.data;
 
 import android.content.Context;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.weath.data.models.Weather;
@@ -31,41 +30,51 @@ public class Repository {
         return instance;
     }
 
-    public MutableLiveData<Weather> getWeatherById(String id, ResponseListener listener){
-        return null;
+    public MutableLiveData<Weather> getWeatherByCityId(String cityId){
+        final MutableLiveData<Weather> weather = new MutableLiveData<>(new Weather());
+
+        restService.requestWeatherByCityId(
+            cityId,
+            createResponseListener(weather));
+
+        return weather;
     }
     public MutableLiveData<Weather> getWeatherByCityName(final String cityName){
         final MutableLiveData<Weather> weather = new MutableLiveData<>(new Weather());
 
-        restService.getWeatherByCityName(
+        restService.requestWeatherByCityName(
             cityName,
-            new ResponseListener() {
-                @Override
-                public void onSuccess(JSONObject response) {
-                    try {
-                        JSONObject main = response.getJSONObject("main");
-
-                        Weather result = new Weather();
-                        result.cityName = response.getString("name");
-                        result.temperature = main.getString("temp");
-
-                        weather.setValue(result);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onError(String message) {
-
-                }
-            });
+            createResponseListener(weather));
 
         return weather;
     }
     public MutableLiveData<Weather> getWeatherByLocation(double latitude, double longitude, ResponseListener listener){
         return null;
+    }
+
+    private ResponseListener createResponseListener(final MutableLiveData<Weather> weather) {
+        return new ResponseListener() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                try {
+                    JSONObject main = response.getJSONObject("main");
+
+                    Weather result = new Weather();
+                    result.cityName = response.getString("name");
+                    result.temperature = main.getString("temp");
+
+                    weather.setValue(result);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+
+            }
+        };
     }
 
 /*    private DateTime UnixTimeConverter(long seconds)
