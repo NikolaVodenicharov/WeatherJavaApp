@@ -14,6 +14,7 @@ public class DisplayWeatherViewModel extends ViewModel {
     public MutableLiveData<Weather> weather;
 
     public DisplayWeatherViewModel() {
+        // i already give app context to the repository in the App class
         this.repository = Repository.getInstance(null);
 
     }

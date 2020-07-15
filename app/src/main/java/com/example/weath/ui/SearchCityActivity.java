@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
+import com.example.weath.App;
 import com.example.weath.R;
 import com.example.weath.businessLogic.viewModels.SearchCityViewModel;
 import com.example.weath.databinding.ActivitySearchCityBinding;
@@ -24,6 +27,8 @@ public class SearchCityActivity extends AppCompatActivity {
 
         initializeBindings();
         observeForDisplayWeather();
+
+        initializeAutoComplete();
     }
 
     private void initializeBindings() {
@@ -43,5 +48,15 @@ public class SearchCityActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void initializeAutoComplete() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                App.cities);
+        AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
+        autoCompleteTextView.setAdapter(adapter);
+        autoCompleteTextView.setThreshold(2);
     }
 }
