@@ -54,11 +54,11 @@ public class RestService {
         requestQueue = Volley.newRequestQueue(appContext);
     }
 
-    public MutableLiveData<CurrentWeatherAndForecast> getWeatherForecastByLocationAsync(String cityName, Coordinates coordinates){
+    public MutableLiveData<CurrentWeatherAndForecast> getWeatherForecastByLocationAsync(Coordinates coordinates){
         final MutableLiveData<CurrentWeatherAndForecast> weather = new MutableLiveData<>(new CurrentWeatherAndForecast());
 
         String url = createUrl(coordinates);
-        ResponseListener listener = createResponseListener(cityName, weather);
+        ResponseListener listener = createResponseListener(weather);
         JsonObjectRequest request = createRequest(url, listener);
         requestQueue.add(request);
 
@@ -74,12 +74,12 @@ public class RestService {
                 AMPERSAND + METRIC_UNIT;
     }
 
-    private ResponseListener createResponseListener(final String cityName, final MutableLiveData<CurrentWeatherAndForecast> weather) {
+    private ResponseListener createResponseListener(final MutableLiveData<CurrentWeatherAndForecast> weather) {
         return new ResponseListener() {
             @Override
             public void onSuccess(JSONObject response) {
                 try {
-                    CurrentWeatherAndForecast result = createWeatherFromOneCall(cityName, response);
+                    CurrentWeatherAndForecast result = createWeatherFromOneCall(response);
                     weather.setValue(result);
 
                 } catch (JSONException e) {
@@ -93,14 +93,14 @@ public class RestService {
             }
         };
     }
-    private CurrentWeatherAndForecast createWeatherFromOneCall(String cityName, JSONObject response) throws JSONException {
+    private CurrentWeatherAndForecast createWeatherFromOneCall(JSONObject response) throws JSONException {
         CurrentWeatherAndForecast weather = new CurrentWeatherAndForecast();
-        weather.currentWeather = getCurrentWeather(cityName, response);
+        weather.currentWeather = getCurrentWeather(response);
         weather.forecast = getForecast(response);
 
         return weather;
     }
-    private CurrentWeather getCurrentWeather(String cityName, JSONObject response) throws JSONException {
+    private CurrentWeather getCurrentWeather(JSONObject response) throws JSONException {
         JSONObject current = response.getJSONObject("current");
         String temp = current.getString("temp");
         String humidity = current.getString("humidity"); // + " %" ?
@@ -117,7 +117,6 @@ public class RestService {
         String skyId = weatherArrayFirst.getString("id");
 
         CurrentWeather currentWeather = new CurrentWeather();
-        currentWeather.name = cityName;
         currentWeather.temperature = temp;
         currentWeather.humidity = humidity;
         currentWeather.sunrise = sunrise;

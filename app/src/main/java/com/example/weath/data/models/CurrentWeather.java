@@ -3,7 +3,6 @@ package com.example.weath.data.models;
 import java.util.Date;
 
 public class CurrentWeather {
-    public String name;
     public String temperature;
     public String skyId;
     public String humidity;
