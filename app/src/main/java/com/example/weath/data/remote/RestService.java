@@ -2,28 +2,35 @@ package com.example.weath.data.remote;
 
 import android.content.Context;
 
+import androidx.lifecycle.MutableLiveData;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.weath.data.models.Coordinates;
+import com.example.weath.data.models.CurrentWeather;
+import com.example.weath.data.models.CurrentWeatherAndForecast;
+import com.example.weath.data.models.ForecastDay;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class RestService {
     private static RestService instance;
 
-    private final String BASE_PATH = "https://api.openweathermap.org/data/2.5/weather?";
-    private final String BY_CITY_NAME = "q=";
-    private final String BY_CITY_ID = "id=";
     private final String BY_LATITUDE = "lat=";
     private final String BY_LONGITUDE = "lon=";
     private final char AMPERSAND = '&';
     private final String API_KEY = "APPID=a19463a4a4aa7bf6878d97455fa05d1a";
     private final String METRIC_UNIT = "units=metric";
-
-// "https://api.openweathermap.org/data/2.5/onecall?lat=42.26667&lon=24.83333&exclude=minutely&exclude=hourly&appid=a19463a4a4aa7bf6878d97455fa05d1a&units=metric";
     private final String BASE_ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall?";
     private final String EXCLUDE_MINUTELY_AND_HOURLY = "exclude=minutely,hourly";
 
@@ -47,51 +54,136 @@ public class RestService {
         requestQueue = Volley.newRequestQueue(appContext);
     }
 
-    public void requestWeatherByCityId(String id, ResponseListener listener){
-        String url = BASE_PATH + BY_CITY_ID + id + AMPERSAND + API_KEY + AMPERSAND + METRIC_UNIT;
-        initializeRequest(listener, url);
-    }
-    public void requestWeatherByCityName(String cityName, ResponseListener listener){
-        String url = BASE_PATH + BY_CITY_NAME + cityName + AMPERSAND + API_KEY + AMPERSAND + METRIC_UNIT;
-        initializeRequest(listener, url);
-    }
-    public void requestWeatherByLocation(String latitude, String longitude, ResponseListener listener){
-        String url =
-            BASE_ONE_CALL +
-            BY_LATITUDE + latitude +
-            AMPERSAND + BY_LONGITUDE + longitude +
-            AMPERSAND + EXCLUDE_MINUTELY_AND_HOURLY +
-            AMPERSAND + API_KEY +
-            AMPERSAND + METRIC_UNIT;
-        initializeRequest(listener, url);
+    public MutableLiveData<CurrentWeatherAndForecast> getWeatherForecastByLocationAsync(String cityName, Coordinates coordinates){
+        final MutableLiveData<CurrentWeatherAndForecast> weather = new MutableLiveData<>(new CurrentWeatherAndForecast());
+
+        String url = createUrl(coordinates);
+        ResponseListener listener = createResponseListener(cityName, weather);
+        JsonObjectRequest request = createRequest(url, listener);
+        requestQueue.add(request);
+
+        return weather;
     }
 
-    private void initializeRequest(ResponseListener listener, String url) {
-        JsonObjectRequest request = createRequest(url, listener);
-        addToRequestQueue(request);
+    private String createUrl(Coordinates coordinates) {
+        return BASE_ONE_CALL +
+                BY_LATITUDE + coordinates.latitude +
+                AMPERSAND + BY_LONGITUDE + coordinates.longitude +
+                AMPERSAND + EXCLUDE_MINUTELY_AND_HOURLY +
+                AMPERSAND + API_KEY +
+                AMPERSAND + METRIC_UNIT;
     }
-    private JsonObjectRequest createRequest(String url, final ResponseListener listener){
-        JsonObjectRequest request = new JsonObjectRequest(
-            Request.Method.GET,
-            url,
-            null,
-            new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    listener.onSuccess(response);
-                }
-            },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    listener.onError(error.getMessage());
+
+    private ResponseListener createResponseListener(final String cityName, final MutableLiveData<CurrentWeatherAndForecast> weather) {
+        return new ResponseListener() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                try {
+                    CurrentWeatherAndForecast result = createWeatherFromOneCall(cityName, response);
+                    weather.setValue(result);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
+
+            @Override
+            public void onError(String message) {
+
+            }
+        };
+    }
+    private CurrentWeatherAndForecast createWeatherFromOneCall(String cityName, JSONObject response) throws JSONException {
+        CurrentWeatherAndForecast weather = new CurrentWeatherAndForecast();
+        weather.currentWeather = getCurrentWeather(cityName, response);
+        weather.forecast = getForecast(response);
+
+        return weather;
+    }
+    private CurrentWeather getCurrentWeather(String cityName, JSONObject response) throws JSONException {
+        JSONObject current = response.getJSONObject("current");
+        String temp = current.getString("temp");
+        String humidity = current.getString("humidity"); // + " %" ?
+
+        String sunriseUnix = current.getString("sunrise");
+        Date sunrise = unixTimeConverter(sunriseUnix);
+
+        String sunsetUnix = current.getString("sunset");
+        Date sunset = unixTimeConverter(sunsetUnix);
+
+        // Sky
+        JSONArray weatherArray = current.getJSONArray("weather");
+        JSONObject weatherArrayFirst = weatherArray.getJSONObject(0);
+        String skyId = weatherArrayFirst.getString("id");
+
+        CurrentWeather currentWeather = new CurrentWeather();
+        currentWeather.name = cityName;
+        currentWeather.temperature = temp;
+        currentWeather.humidity = humidity;
+        currentWeather.sunrise = sunrise;
+        currentWeather.sunset = sunset;
+        currentWeather.skyId = skyId;
+        return currentWeather;
+    }
+    private List<ForecastDay> getForecast(JSONObject response) throws JSONException {
+        JSONArray daily = response.getJSONArray("daily");
+        int dailyLength = daily.length();
+        List<ForecastDay> forecastSevenDays = new ArrayList<>(7);
+
+        // i = 1 to start from tomorrow, not today
+        for (int i = 1; i < dailyLength; i++) {
+            JSONObject dayForecast = daily.getJSONObject(i);
+
+            String dateUnix = dayForecast.getString("dt");
+            Date date = unixTimeConverter(dateUnix);
+
+            JSONObject tempForecast = dayForecast.getJSONObject("temp");
+            String minTemp = tempForecast.getString("min");
+            String maxTemp = tempForecast.getString("max");
+
+            // Sky ?
+            JSONArray weatherForecastArray = dayForecast.getJSONArray("weather");
+            JSONObject weatherForecastArrayFirst = weatherForecastArray.getJSONObject(0);
+            String skyIdForecast = weatherForecastArrayFirst.getString("id");
+
+            ForecastDay day = new ForecastDay();
+            day.date = date;
+            day.maximumTemperature = maxTemp;
+            day.minimumTemperature = minTemp;
+            day.skyId = skyIdForecast;
+
+            forecastSevenDays.add(day);
+        }
+        return forecastSevenDays;
+    }
+    private Date unixTimeConverter(String secondsUnix) {
+        // if cant parse ?
+        long seconds = Long.parseLong(secondsUnix);
+        long milliseconds = seconds * 1000;
+        Date date = new Date(milliseconds);
+
+        return date;
+    }
+
+    private JsonObjectRequest createRequest(String url, final ResponseListener listener){
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        listener.onSuccess(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        listener.onError(error.getMessage());
+                    }
+                }
         );
 
         return request;
-    }
-    private <T> void addToRequestQueue(Request<T> request){
-        requestQueue.add(request);
     }
 }

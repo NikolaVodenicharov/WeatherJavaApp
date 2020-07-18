@@ -4,5 +4,5 @@ import java.util.List;
 
 public class CurrentWeatherAndForecast {
     public CurrentWeather currentWeather;
-    public List<ForecastDay> forecastDays;
+    public List<ForecastDay> forecast;
 }

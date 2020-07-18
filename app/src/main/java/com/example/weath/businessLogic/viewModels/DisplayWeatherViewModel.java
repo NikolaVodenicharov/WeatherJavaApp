@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.weath.App;
 import com.example.weath.data.Repository;
+import com.example.weath.data.models.Coordinates;
 import com.example.weath.data.models.CurrentWeather;
 import com.example.weath.data.models.CurrentWeatherAndForecast;
 
@@ -34,10 +35,12 @@ public class DisplayWeatherViewModel extends ViewModel {
 
             String idAndCoordinate = App.cities.get(searchedCity);
             String[] data = idAndCoordinate.split(" ");
-            String longitude = data[1].substring(4);
-            String latitude = data[2].substring(4);
 
-            weather = repository.getWeatherByLocation(name, latitude, longitude);
+            Coordinates coordinates = new Coordinates();
+            coordinates.longitude = data[1].substring(4);
+            coordinates.latitude = data[2].substring(4);
+
+            weather = repository.getWeatherForecastByLocationAsync(name, coordinates);
         }
         else{
             // weather = repository.getWeatherByCityName(searchedCity);
