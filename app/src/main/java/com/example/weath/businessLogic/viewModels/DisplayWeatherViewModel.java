@@ -5,29 +5,20 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.weath.App;
 import com.example.weath.data.Repository;
-import com.example.weath.data.models.Weather;
+import com.example.weath.data.models.CurrentWeather;
+import com.example.weath.data.models.CurrentWeatherAndForecast;
 
 public class DisplayWeatherViewModel extends ViewModel {
     private Repository repository;
     private Boolean isGetWeatherStarted = false;
 
-    public MutableLiveData<Weather> weather;
+    public MutableLiveData<CurrentWeatherAndForecast> weather;
 
     public DisplayWeatherViewModel() {
-        // i already give app context to the repository in the App class
+        // I already give app context to the repository in the App class
         this.repository = Repository.getInstance(null);
 
     }
-
-
-/*    public void getWeather(String searchedCity){
-        if (!isGetWeatherStarted){
-            weather = repository.getWeatherByCityName(searchedCity);
-
-            //Todo potential bug if i want to find weather in another city ?
-            isGetWeatherStarted = true;
-        }
-    }*/
 
     public void getWeather(String searchedCity){
         if (isGetWeatherStarted){
@@ -35,14 +26,21 @@ public class DisplayWeatherViewModel extends ViewModel {
         }
 
         // Sofia (BG) contains ")"
-        boolean canSearchById = searchedCity.contains(")");
+        boolean canSearchFromCities = searchedCity.contains(")");
 
-        if (canSearchById){
-            String cityId = App.citiesNameId.get(searchedCity);
-            weather = repository.getWeatherByCityId(cityId);
+        if (canSearchFromCities){
+            int nameEndIndex = searchedCity.indexOf('(') - 1;
+            String name = searchedCity.substring(0, nameEndIndex);
+
+            String idAndCoordinate = App.cities.get(searchedCity);
+            String[] data = idAndCoordinate.split(" ");
+            String longitude = data[1].substring(4);
+            String latitude = data[2].substring(4);
+
+            weather = repository.getWeatherByLocation(name, latitude, longitude);
         }
         else{
-            weather = repository.getWeatherByCityName(searchedCity);
+            // weather = repository.getWeatherByCityName(searchedCity);
         }
 
         //Todo potential bug if i want to find weather in another city ?

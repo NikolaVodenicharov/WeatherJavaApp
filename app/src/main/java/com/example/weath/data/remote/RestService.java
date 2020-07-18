@@ -20,8 +20,12 @@ public class RestService {
     private final String BY_LATITUDE = "lat=";
     private final String BY_LONGITUDE = "lon=";
     private final char AMPERSAND = '&';
-    private final String API_KEY = "&APPID=a19463a4a4aa7bf6878d97455fa05d1a";
-    private final String METRIC_UNIT = "&units=metric";
+    private final String API_KEY = "APPID=a19463a4a4aa7bf6878d97455fa05d1a";
+    private final String METRIC_UNIT = "units=metric";
+
+// "https://api.openweathermap.org/data/2.5/onecall?lat=42.26667&lon=24.83333&exclude=minutely&exclude=hourly&appid=a19463a4a4aa7bf6878d97455fa05d1a&units=metric";
+    private final String BASE_ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall?";
+    private final String EXCLUDE_MINUTELY_AND_HOURLY = "exclude=minutely,hourly";
 
     private RequestQueue requestQueue;
 
@@ -44,15 +48,21 @@ public class RestService {
     }
 
     public void requestWeatherByCityId(String id, ResponseListener listener){
-        String url = BASE_PATH + BY_CITY_ID + id + API_KEY + METRIC_UNIT;
+        String url = BASE_PATH + BY_CITY_ID + id + AMPERSAND + API_KEY + AMPERSAND + METRIC_UNIT;
         initializeRequest(listener, url);
     }
     public void requestWeatherByCityName(String cityName, ResponseListener listener){
-        String url = BASE_PATH + BY_CITY_NAME + cityName + API_KEY + METRIC_UNIT;
+        String url = BASE_PATH + BY_CITY_NAME + cityName + AMPERSAND + API_KEY + AMPERSAND + METRIC_UNIT;
         initializeRequest(listener, url);
     }
-    public void requestWeatherByLocation(double latitude, double longitude, ResponseListener listener){
-        String url = BASE_PATH + BY_LATITUDE + latitude + AMPERSAND + BY_LONGITUDE + longitude + API_KEY + METRIC_UNIT;
+    public void requestWeatherByLocation(String latitude, String longitude, ResponseListener listener){
+        String url =
+            BASE_ONE_CALL +
+            BY_LATITUDE + latitude +
+            AMPERSAND + BY_LONGITUDE + longitude +
+            AMPERSAND + EXCLUDE_MINUTELY_AND_HOURLY +
+            AMPERSAND + API_KEY +
+            AMPERSAND + METRIC_UNIT;
         initializeRequest(listener, url);
     }
 

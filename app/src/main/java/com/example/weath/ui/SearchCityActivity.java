@@ -28,7 +28,6 @@ public class SearchCityActivity extends AppCompatActivity {
         initializeBindings();
         observeForDisplayWeather();
 
-        //initializeAutoCompleteFromList();
         initializeAutoCompleteFromHashMap();
     }
 
@@ -51,19 +50,9 @@ public class SearchCityActivity extends AppCompatActivity {
         });
     }
 
-    private void initializeAutoCompleteFromList() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                App.cities);
-        AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
-        autoCompleteTextView.setAdapter(adapter);
-        autoCompleteTextView.setThreshold(2);
-    }
-
     private void initializeAutoCompleteFromHashMap() {
         String[] a = new String[2];
-        String[] testCollection2 = App.citiesNameId.keySet().toArray(a);
+        String[] testCollection2 = App.cities.keySet().toArray(a);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
