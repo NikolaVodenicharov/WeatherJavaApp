@@ -74,18 +74,19 @@ public class RestService {
                 AMPERSAND + METRIC_UNIT;
     }
 
-    private ResponseListener createResponseListener(final MutableLiveData<CurrentWeatherAndForecast> weather) {
-        return new ResponseListener() {
-            @Override
-            public void onSuccess(JSONObject response) {
-                try {
-                    CurrentWeatherAndForecast result = createWeatherFromOneCall(response);
-                    weather.setValue(result);
+    // Create response listener and attach MutableLiveData weather object for the response of request.
+    private ResponseListener createResponseListener(final MutableLiveData<CurrentWeatherAndForecast> attachWeather) {
+                return new ResponseListener() {
+                    @Override
+                    public void onSuccess(JSONObject response) {
+                        try {
+                            CurrentWeatherAndForecast responseWeather = createWeatherFromOneCall(response);
+                            attachWeather.setValue(responseWeather);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
             @Override
             public void onError(String message) {

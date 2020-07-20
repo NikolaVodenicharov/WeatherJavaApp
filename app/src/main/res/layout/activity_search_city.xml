@@ -2,53 +2,40 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
         <variable
             name="viewModel"
             type="com.example.weath.businessLogic.viewModels.SearchCityViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/sky"
         tools:context=".ui.SearchCityActivity">
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView"
-            android:layout_width="232dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="68dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/search_margin"
+            android:padding="@dimen/search_padding"
+            android:background="@drawable/input_shape"
             android:hint="@string/search_city"
-            android:text="@={viewModel.searchedCity}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.265"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textColorHint="@color/white"
+            android:textColor="@color/white"
+            android:text="@={viewModel.searchedCity}" />
 
         <ImageButton
             android:id="@+id/imageButton"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="44dp"
+            android:background="@drawable/input_shape"
+            android:layout_marginLeft="@dimen/search_margin"
+            android:layout_marginRight="@dimen/search_margin"
             android:onClick="@{() -> viewModel.onSearchedCityClick()}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.1"
-            app:srcCompat="@android:drawable/ic_menu_search" />
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="124dp"
-            android:layout_height="122dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.54"
-            app:srcCompat="@android:drawable/star_big_on" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:srcCompat="@android:drawable/ic_search_category_default" />
+    </LinearLayout>
 </layout>

@@ -27,9 +27,9 @@ public class DisplayWeatherViewModel extends ViewModel {
         }
 
         // Sofia (BG) contains ")"
-        boolean canSearchFromCities = searchedCity.contains(")");
+        boolean canSearchByCoordinates = searchedCity.contains(")");
 
-        if (canSearchFromCities){
+        if (canSearchByCoordinates){
             // start of (BG)
             cityName = getName(searchedCity);
             Coordinates coordinates = getCoordinates(searchedCity);
