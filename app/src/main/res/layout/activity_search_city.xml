@@ -13,29 +13,47 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:gravity="center_horizontal"
         android:background="@drawable/sky"
         tools:context=".ui.SearchCityActivity">
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/search_width"
             android:layout_height="wrap_content"
+
             android:layout_margin="@dimen/search_margin"
-            android:padding="@dimen/search_padding"
+
+            android:padding="@dimen/city_name_padding"
+
             android:background="@drawable/input_shape"
+
+            android:textAlignment="center"
             android:hint="@string/search_city"
             android:textColorHint="@color/white"
             android:textColor="@color/white"
             android:text="@={viewModel.searchedCity}" />
 
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <Button
+            android:id="@+id/button"
+
+            android:text="@string/search"
+            android:textColor="@color/white"
+
             android:background="@drawable/input_shape"
-            android:layout_marginLeft="@dimen/search_margin"
+
+            android:layout_width="@dimen/search_width"
+            android:layout_height="wrap_content"
+
             android:layout_marginRight="@dimen/search_margin"
-            android:onClick="@{() -> viewModel.onSearchedCityClick()}"
-            app:srcCompat="@android:drawable/ic_search_category_default" />
+            android:layout_marginLeft="@dimen/search_margin"
+
+            android:paddingStart="75dp"
+            android:paddingEnd="75dp"
+
+            android:drawableEnd="@drawable/search_icon_cloud_30"
+            android:drawableTint="@color/white"
+
+            android:onClick="@{() -> viewModel.onSearchedCityClick()}"/>
     </LinearLayout>
 </layout>
