@@ -6,5 +6,5 @@ public class ForecastDay {
     public Date date;
     public String minimumTemperature;
     public String maximumTemperature;
-    public String skyId;
+    public SkyCondition skyCondition;
 }

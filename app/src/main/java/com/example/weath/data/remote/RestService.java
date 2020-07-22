@@ -14,6 +14,7 @@ import com.example.weath.data.models.Coordinates;
 import com.example.weath.data.models.CurrentWeather;
 import com.example.weath.data.models.CurrentWeatherAndForecast;
 import com.example.weath.data.models.ForecastDay;
+import com.example.weath.data.models.SkyCondition;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +34,8 @@ public class RestService {
     private final String METRIC_UNIT = "units=metric";
     private final String BASE_ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall?";
     private final String EXCLUDE_MINUTELY_AND_HOURLY = "exclude=minutely,hourly";
+
+    private String CELSIUS = "\u2103";
 
     private RequestQueue requestQueue;
 
@@ -115,15 +118,40 @@ public class RestService {
         // Sky
         JSONArray weatherArray = current.getJSONArray("weather");
         JSONObject weatherArrayFirst = weatherArray.getJSONObject(0);
-        String skyId = weatherArrayFirst.getString("id");
+        String weatherCode = weatherArrayFirst.getString("id");
 
         CurrentWeather currentWeather = new CurrentWeather();
-        currentWeather.temperature = temp;
+        currentWeather.temperature = createDisplayableTemp(temp);
         currentWeather.humidity = humidity;
         currentWeather.sunrise = sunrise;
         currentWeather.sunset = sunset;
-        currentWeather.skyId = skyId;
+        currentWeather.skyCondition = getSkyCondition(weatherCode);
         return currentWeather;
+    }
+    private String createDisplayableTemp(String temp){
+        String[] data = temp.split("\\.");
+        String nonDecimal = data[0];
+        String result = nonDecimal + " " + CELSIUS;
+
+        return result;
+    }
+    private SkyCondition getSkyCondition(String skyId){
+
+        if (skyId.startsWith("2")){
+            return SkyCondition.THUNDERSTORM;
+        }
+        else if (skyId.startsWith("3") || skyId.startsWith("5")){
+            return SkyCondition.RAIN;
+        }
+        else if (skyId.startsWith("6")){
+            return SkyCondition.SNOW;
+        }
+        else if (skyId.contains("800")){
+            return SkyCondition.CLEAR;
+        }
+        else{                           // skyId.startsWith("7") || skyId.startsWith("8")
+            return SkyCondition.CLOUDS;
+        }
     }
     private List<ForecastDay> getForecast(JSONObject response) throws JSONException {
         JSONArray daily = response.getJSONArray("daily");
@@ -144,13 +172,13 @@ public class RestService {
             // Sky ?
             JSONArray weatherForecastArray = dayForecast.getJSONArray("weather");
             JSONObject weatherForecastArrayFirst = weatherForecastArray.getJSONObject(0);
-            String skyIdForecast = weatherForecastArrayFirst.getString("id");
+            String weatherCode = weatherForecastArrayFirst.getString("id");
 
             ForecastDay day = new ForecastDay();
             day.date = date;
             day.maximumTemperature = maxTemp;
             day.minimumTemperature = minTemp;
-            day.skyId = skyIdForecast;
+            day.skyCondition= getSkyCondition(weatherCode);
 
             forecastSevenDays.add(day);
         }

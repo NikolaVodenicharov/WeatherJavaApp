@@ -4,4 +4,5 @@
     <dimen name="city_name_padding">15dp</dimen>
     <dimen name="search_padding">10dp</dimen>
     <dimen name="search_width">250dp</dimen>
+    <dimen name="text_size_big">50sp</dimen>
 </resources>
