@@ -8,10 +8,11 @@
             type="com.example.weath.businessLogic.viewModels.DisplayWeatherViewModel" />
     </data>
     
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:gravity="center_horizontal"
         android:background="@drawable/calm_unsplash"
         tools:context=".ui.DisplayWeatherActivity">
 
@@ -19,40 +20,40 @@
             android:id="@+id/city_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
-            android:hint="Plovdiv"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+            android:hint="Sofia"
             android:text="@{viewModel.cityName}"
-            android:textSize="@dimen/text_size_big"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textSize="@dimen/current_day_text_size_50dp" />
 
-        <TextView
-            android:id="@+id/current_temperature"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="25 \u2103"
-            android:text="@{viewModel.weather.currentWeather.temperature}"
-            android:textSize="@dimen/text_size_big"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.197"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.263" />
+            android:layout_marginBottom="@dimen/current_day_text_size_50dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="69dp"
-            android:layout_height="81dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.785"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.254"
-            app:srcCompat="@drawable/sun" />
+            <TextView
+                android:id="@+id/current_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="100dp"
+                android:hint="25\u2103"
+                android:text="@{viewModel.weather.currentWeather.temperature}"
+                android:textSize="@dimen/current_day_text_size_50dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="69dp"
+                android:layout_height="81dp"
+                app:srcCompat="@drawable/sun" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewForecast"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="-16dp" />
+    </LinearLayout>
 </layout>

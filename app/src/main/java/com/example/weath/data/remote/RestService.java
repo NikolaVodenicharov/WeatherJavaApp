@@ -131,7 +131,7 @@ public class RestService {
     private String createDisplayableTemp(String temp){
         String[] data = temp.split("\\.");
         String nonDecimal = data[0];
-        String result = nonDecimal + " " + CELSIUS;
+        String result = nonDecimal + CELSIUS;
 
         return result;
     }
@@ -176,8 +176,8 @@ public class RestService {
 
             ForecastDay day = new ForecastDay();
             day.date = date;
-            day.maximumTemperature = maxTemp;
-            day.minimumTemperature = minTemp;
+            day.maximumTemperature = createDisplayableTemp(maxTemp);
+            day.minimumTemperature = createDisplayableTemp(minTemp);
             day.skyCondition= getSkyCondition(weatherCode);
 
             forecastSevenDays.add(day);

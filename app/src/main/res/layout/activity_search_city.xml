@@ -45,9 +45,6 @@
             android:layout_width="@dimen/search_width"
             android:layout_height="wrap_content"
 
-            android:layout_marginRight="@dimen/search_margin"
-            android:layout_marginLeft="@dimen/search_margin"
-
             android:paddingStart="75dp"
             android:paddingEnd="75dp"
 

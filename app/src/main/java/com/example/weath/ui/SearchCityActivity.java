@@ -50,6 +50,7 @@ public class SearchCityActivity extends AppCompatActivity {
         });
     }
 
+    //Todo extract somewhere else ?
     private void initializeAutoCompleteFromHashMap() {
         String[] a = new String[2];
         String[] testCollection2 = App.cities.keySet().toArray(a);
