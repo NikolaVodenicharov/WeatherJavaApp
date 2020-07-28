@@ -21,6 +21,8 @@ public class SearchCityActivity extends AppCompatActivity {
     private ActivitySearchCityBinding binding;
     private SearchCityViewModel viewModel;
 
+    //Todo what if city name is too long ? Will it be displayed correctly in the layouts - search weather and display weather
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

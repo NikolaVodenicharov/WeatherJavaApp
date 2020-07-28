@@ -7,4 +7,5 @@
     <dimen name="current_day_text_size_50dp">50sp</dimen>
     <dimen name="forecast_day_text_size">20sp</dimen>
     <dimen name="forecast_day_padding_5dp">5dp</dimen>
+    <dimen name="current_day_margin">30dp</dimen>
 </resources>
