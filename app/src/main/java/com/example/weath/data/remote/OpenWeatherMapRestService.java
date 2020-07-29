@@ -12,7 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.weath.data.models.Coordinates;
 import com.example.weath.data.models.CurrentWeather;
-import com.example.weath.data.models.CurrentWeatherAndForecast;
+import com.example.weath.data.models.Weather;
 import com.example.weath.data.models.ForecastDay;
 import com.example.weath.data.models.SkyCondition;
 
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class RestService {
-    private static RestService instance;
+public class OpenWeatherMapRestService implements WeatherRestService {
+    private static OpenWeatherMapRestService instance;
 
     private final String BY_LATITUDE = "lat=";
     private final String BY_LONGITUDE = "lon=";
@@ -39,9 +39,9 @@ public class RestService {
 
     private RequestQueue requestQueue;
 
-    public static synchronized RestService getInstance(Context appContext){
+    public static synchronized OpenWeatherMapRestService getInstance(Context appContext){
         if (instance == null){
-            instance = new RestService(
+            instance = new OpenWeatherMapRestService(
                     ensureAppContext(appContext));
         }
 
@@ -50,15 +50,15 @@ public class RestService {
     private static Context ensureAppContext(Context context){
         return context.getApplicationContext();
     }
-    private RestService(Context appContext){
+    private OpenWeatherMapRestService(Context appContext){
         initializeRequestQueue(appContext);
     }
     private void initializeRequestQueue(Context appContext){
         requestQueue = Volley.newRequestQueue(appContext);
     }
 
-    public MutableLiveData<CurrentWeatherAndForecast> getWeatherForecastByLocationAsync(Coordinates coordinates){
-        final MutableLiveData<CurrentWeatherAndForecast> weather = new MutableLiveData<>(new CurrentWeatherAndForecast());
+    public MutableLiveData<Weather> getWeatherForecastByLocationAsync(Coordinates coordinates){
+        final MutableLiveData<Weather> weather = new MutableLiveData<>(new Weather());
 
         String url = createUrl(coordinates);
         ResponseListener listener = createResponseListener(weather);
@@ -78,12 +78,12 @@ public class RestService {
     }
 
     // Create response listener and attach MutableLiveData weather object for the response of request.
-    private ResponseListener createResponseListener(final MutableLiveData<CurrentWeatherAndForecast> attachWeather) {
+    private ResponseListener createResponseListener(final MutableLiveData<Weather> attachWeather) {
                 return new ResponseListener() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
-                            CurrentWeatherAndForecast responseWeather = createWeatherFromOneCall(response);
+                            Weather responseWeather = createWeatherFromOneCall(response);
                             attachWeather.setValue(responseWeather);
 
                         } catch (JSONException e) {
@@ -97,8 +97,8 @@ public class RestService {
             }
         };
     }
-    private CurrentWeatherAndForecast createWeatherFromOneCall(JSONObject response) throws JSONException {
-        CurrentWeatherAndForecast weather = new CurrentWeatherAndForecast();
+    private Weather createWeatherFromOneCall(JSONObject response) throws JSONException {
+        Weather weather = new Weather();
         weather.currentWeather = getCurrentWeather(response);
         weather.forecast = getForecast(response);
 

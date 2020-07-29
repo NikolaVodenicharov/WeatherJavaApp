@@ -6,14 +6,14 @@ import androidx.lifecycle.ViewModel;
 import com.example.weath.App;
 import com.example.weath.data.Repository;
 import com.example.weath.data.models.Coordinates;
-import com.example.weath.data.models.CurrentWeatherAndForecast;
+import com.example.weath.data.models.Weather;
 
 public class DisplayWeatherViewModel extends ViewModel {
     private Repository repository;
     private Boolean isGetWeatherStarted = false;
 
     public String cityName;
-    public MutableLiveData<CurrentWeatherAndForecast> weather;
+    public MutableLiveData<Weather> weather;
 
     public DisplayWeatherViewModel() {
         // I already give app context to the repository in the App class

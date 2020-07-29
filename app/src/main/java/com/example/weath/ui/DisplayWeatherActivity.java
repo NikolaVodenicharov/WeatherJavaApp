@@ -13,13 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weath.R;
 import com.example.weath.businessLogic.viewModels.DisplayWeatherViewModel;
-import com.example.weath.data.models.CurrentWeatherAndForecast;
+import com.example.weath.data.models.Weather;
 import com.example.weath.data.models.ForecastDay;
 import com.example.weath.data.models.SkyCondition;
 import com.example.weath.databinding.ActivityDisplayWeatherBinding;
 
 import java.util.List;
-import java.util.Objects;
 
 public class DisplayWeatherActivity extends AppCompatActivity {
     private ActivityDisplayWeatherBinding binding;
@@ -55,15 +54,15 @@ public class DisplayWeatherActivity extends AppCompatActivity {
     }
 
     private void observeSkyCondition() {
-        viewModel.weather.observe(this, new Observer<CurrentWeatherAndForecast>() {
+        viewModel.weather.observe(this, new Observer<Weather>() {
             @Override
-            public void onChanged(CurrentWeatherAndForecast currentWeatherAndForecast) {
-                boolean shouldDisplayCurrentSkyCondition = currentWeatherAndForecast.currentWeather != null;
+            public void onChanged(Weather weather) {
+                boolean shouldDisplayCurrentSkyCondition = weather.currentWeather != null;
                 if (!shouldDisplayCurrentSkyCondition){
                     return;
                 }
 
-                SkyCondition skyCondition = currentWeatherAndForecast.currentWeather.skyCondition;
+                SkyCondition skyCondition = weather.currentWeather.skyCondition;
                 int drawableId = findSkyConditionDrawableId(skyCondition);
                 ImageView imageView = findViewById(R.id.imageView);
                 imageView.setImageResource(drawableId);
@@ -72,17 +71,17 @@ public class DisplayWeatherActivity extends AppCompatActivity {
     }
 
     private void observeForecast() {
-        viewModel.weather.observe(this, new Observer<CurrentWeatherAndForecast>() {
+        viewModel.weather.observe(this, new Observer<Weather>() {
             @Override
-            public void onChanged(CurrentWeatherAndForecast currentWeatherAndForecast) {
-                boolean shouldDisplayForecast = currentWeatherAndForecast.forecast != null &&
-                        currentWeatherAndForecast.forecast.size() > 0;
+            public void onChanged(Weather weather) {
+                boolean shouldDisplayForecast = weather.forecast != null &&
+                        weather.forecast.size() > 0;
 
                 if (!shouldDisplayForecast){
                     return;
                 }
 
-                List<ForecastDay> forecast = currentWeatherAndForecast.forecast;
+                List<ForecastDay> forecast = weather.forecast;
                 ForecastAdapter adapter = new ForecastAdapter(forecast);
 
                 RecyclerView recyclerView = findViewById(R.id.recyclerViewForecast);

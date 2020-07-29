@@ -5,26 +5,16 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.weath.data.models.Coordinates;
-import com.example.weath.data.models.CurrentWeather;
-import com.example.weath.data.models.CurrentWeatherAndForecast;
-import com.example.weath.data.models.ForecastDay;
-import com.example.weath.data.remote.ResponseListener;
-import com.example.weath.data.remote.RestService;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.example.weath.data.models.Weather;
+import com.example.weath.data.remote.OpenWeatherMapRestService;
+import com.example.weath.data.remote.WeatherRestService;
 
 public class Repository {
     private static Repository instance;
-    private final RestService restService;
+    private final WeatherRestService restService;
 
     private Repository(Context appContext){
-        this.restService = RestService.getInstance(appContext);
+        this.restService = OpenWeatherMapRestService.getInstance(appContext);
     }
 
     public static Repository getInstance(Context appContext){
@@ -35,7 +25,7 @@ public class Repository {
         return instance;
     }
 
-    public MutableLiveData<CurrentWeatherAndForecast> getWeatherForecastByLocationAsync(Coordinates coordinates){
+    public MutableLiveData<Weather> getWeatherForecastByLocationAsync(Coordinates coordinates){
         return restService.getWeatherForecastByLocationAsync(coordinates);
     }
 }
