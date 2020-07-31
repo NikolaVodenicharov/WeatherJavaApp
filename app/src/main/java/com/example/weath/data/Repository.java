@@ -25,7 +25,7 @@ public class Repository {
         return instance;
     }
 
-    public MutableLiveData<Weather> getWeatherForecastByLocationAsync(Coordinates coordinates){
-        return restService.getWeatherForecastByLocationAsync(coordinates);
+    public MutableLiveData<Weather> getWeatherByLocationAsync(Coordinates coordinates){
+        return restService.getWeatherByLocationAsync(coordinates);
     }
 }

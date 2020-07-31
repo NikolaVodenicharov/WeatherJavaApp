@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
+<layout>
     <data>
         <variable
             name="viewModel"
-            type="com.example.weath.businessLogic.viewModels.SearchCityViewModel" />
+            type="com.example.weath.businessLogic.viewModels.StartViewModel" />
     </data>
 
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:background="@drawable/sky"
-        tools:context=".ui.SearchCityActivity">
+        tools:context=".ui.SearchFragment">
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView"
@@ -32,7 +29,7 @@
             android:hint="@string/search_city"
             android:textColorHint="@color/white"
             android:textColor="@color/white"
-            android:text="@={viewModel.searchedCity}" />
+            android:text="@={viewModel.searchedCity}"/>
 
         <Button
             android:id="@+id/button"
@@ -50,7 +47,8 @@
 
             android:drawableEnd="@drawable/search_icon_cloud_30"
             android:drawableTint="@color/white"
+            android:onClick="@{()->viewModel.getWeather()}"/>
 
-            android:onClick="@{() -> viewModel.onSearchedCityClick()}"/>
     </LinearLayout>
 </layout>
+

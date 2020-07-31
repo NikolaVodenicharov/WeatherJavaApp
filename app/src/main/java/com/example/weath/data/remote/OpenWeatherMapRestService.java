@@ -57,7 +57,7 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         requestQueue = Volley.newRequestQueue(appContext);
     }
 
-    public MutableLiveData<Weather> getWeatherForecastByLocationAsync(Coordinates coordinates){
+    public MutableLiveData<Weather> getWeatherByLocationAsync(Coordinates coordinates){
         final MutableLiveData<Weather> weather = new MutableLiveData<>(new Weather());
 
         String url = createUrl(coordinates);

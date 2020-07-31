@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout>
     <data>
         <variable
             name="viewModel"
-            type="com.example.weath.businessLogic.viewModels.DisplayWeatherViewModel" />
+            type="com.example.weath.businessLogic.viewModels.StartViewModel" />
     </data>
-    
-    <LinearLayout
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:background="@drawable/calm_unsplash"
-        tools:context=".ui.DisplayWeatherActivity">
+        android:gravity="center"
+        tools:context=".ui.WeatherFragment">
 
         <TextView
             android:id="@+id/city_name"
@@ -23,7 +22,7 @@
             android:layout_marginTop="@dimen/current_day_margin"
             android:layout_marginBottom="@dimen/current_day_margin"
             android:hint="Sofia"
-            android:text="@{viewModel.cityName}"
+            android:text="@={viewModel.cityName}"
             android:textSize="@dimen/current_day_text_size_50dp" />
 
         <LinearLayout
@@ -56,3 +55,4 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </LinearLayout>
 </layout>
+

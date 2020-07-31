@@ -5,22 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weath.R;
-import com.example.weath.businessLogic.viewModels.DisplayWeatherViewModel;
 import com.example.weath.data.models.ForecastDay;
 
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -54,7 +47,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
         String minMaxTemperature = forecastDay.minimumTemperature + "/" +  forecastDay.maximumTemperature;
         holder.minMaxTemperature.setText(minMaxTemperature);
 
-        int drawableId = DisplayWeatherActivity.findSkyConditionDrawableId(forecastDay.skyCondition);
+        int drawableId = WeatherFragment.findSkyConditionDrawableId(forecastDay.skyCondition);
         holder.skyCondition.setImageResource(drawableId);
     }
 

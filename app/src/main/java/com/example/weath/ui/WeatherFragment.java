@@ -1,56 +1,53 @@
 package com.example.weath.ui;
 
-import android.content.Intent;
+import android.app.Activity;
 import android.os.Bundle;
-import android.widget.ImageView;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
+
 import com.example.weath.R;
-import com.example.weath.businessLogic.viewModels.DisplayWeatherViewModel;
-import com.example.weath.data.models.Weather;
+import com.example.weath.businessLogic.viewModels.StartViewModel;
 import com.example.weath.data.models.ForecastDay;
 import com.example.weath.data.models.SkyCondition;
-import com.example.weath.databinding.ActivityDisplayWeatherBinding;
+import com.example.weath.data.models.Weather;
+import com.example.weath.databinding.FragmentWeatherBinding;
 
 import java.util.List;
 
-public class DisplayWeatherActivity extends AppCompatActivity {
-    private ActivityDisplayWeatherBinding binding;
-    private DisplayWeatherViewModel viewModel;
+public class WeatherFragment extends Fragment {
+    private FragmentWeatherBinding binding;
+    StartViewModel viewModel;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_weather);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentWeatherBinding.inflate(inflater, container, false);
+        binding.setLifecycleOwner(this);
 
-        initializeBinding();
+        viewModel = new ViewModelProvider(getActivity()).get(StartViewModel.class);
+        binding.setViewModel(viewModel);
 
-        String searchedCity = extractSearchedCity();
-        viewModel.getWeather(searchedCity);
+        View view = binding.getRoot();
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         observeSkyCondition();
         observeForecast();
-    }
-
-
-
-    //Todo: this code is repeated in activities, may be i can extract it in base activity, but i need viewModel in the child activity
-    private void initializeBinding() {
-        viewModel = new ViewModelProvider(this).get(DisplayWeatherViewModel.class);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_display_weather);
-        binding.setViewModel(viewModel);
-        binding.setLifecycleOwner(this);
-    }
-
-    private String extractSearchedCity() {
-        Intent intent = getIntent();
-        return intent.getStringExtra(SearchCityActivity.SEARCHED_CITY);
     }
 
     private void observeSkyCondition() {
@@ -64,7 +61,7 @@ public class DisplayWeatherActivity extends AppCompatActivity {
 
                 SkyCondition skyCondition = weather.currentWeather.skyCondition;
                 int drawableId = findSkyConditionDrawableId(skyCondition);
-                ImageView imageView = findViewById(R.id.imageView);
+                ImageView imageView = getView().findViewById(R.id.imageView);
                 imageView.setImageResource(drawableId);
             }
         });
@@ -84,9 +81,9 @@ public class DisplayWeatherActivity extends AppCompatActivity {
                 List<ForecastDay> forecast = weather.forecast;
                 ForecastAdapter adapter = new ForecastAdapter(forecast);
 
-                RecyclerView recyclerView = findViewById(R.id.recyclerViewForecast);
+                RecyclerView recyclerView = getView().findViewById(R.id.recyclerViewForecast);
                 recyclerView.setAdapter(adapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getParent()));
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             }
         });
     }
