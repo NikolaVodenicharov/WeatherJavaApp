@@ -26,6 +26,7 @@ import com.example.weath.databinding.FragmentWeatherBinding;
 
 import java.util.List;
 
+//ToDo if there is no internet or permission is denied, also if location permission is denied, what will this fragment display ?
 public class WeatherFragment extends Fragment {
     private FragmentWeatherBinding binding;
     StartViewModel viewModel;

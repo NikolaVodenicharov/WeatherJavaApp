@@ -6,21 +6,37 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.weath.App;
 import com.example.weath.data.Repository;
+import com.example.weath.data.models.City;
 import com.example.weath.data.models.Coordinates;
 import com.example.weath.data.models.Weather;
 
 public class StartViewModel extends ViewModel {
     private Repository repository;
 
-    public String searchedCity;
-    public MutableLiveData<Weather> weather = new MutableLiveData<>(); // ToDo make it private and use getter with LiveData object ?
+    private City defaultCity = new City("New York City", "US", new Coordinates("40.714272", "-74.005966"));
+    private Coordinates currentLocation;
 
-    public MutableLiveData<String> cityName = new MutableLiveData<>(); // ToDo make it private and use getter with LiveData object ?
     public MutableLiveData<Boolean> isSearchCityClicked = new MutableLiveData<>(false); // ToDo make it private and use getter with LiveData object ?
 
+    public String searchedCity;
+    public MutableLiveData<String> cityName = new MutableLiveData<>(); // ToDo make it private and use getter with LiveData object ?
+
+    public MutableLiveData<Weather> weather = new MutableLiveData<>(); // ToDo make it private and use getter with LiveData object ?
+
     public StartViewModel() {
-        // I already give app context to the repository in the App class
+        // ToDo I already give app context to the repository in the App class, may be some change ?
         this.repository = Repository.getInstance(null);
+
+        // get current location
+        // if weather is empty (not if it is null, i should check if it null and fields inside are also null), use current location to create weather
+    }
+
+    public StartViewModel(Coordinates currentLocation){
+        // get instance of repository ?
+
+        // ToDo if device position is changed and the app is not close, but only minimized, the current location will be wrong
+        this.currentLocation = currentLocation;
+
     }
 
     private void searchCityClickedSignal(){
@@ -29,53 +45,60 @@ public class StartViewModel extends ViewModel {
     }
 
     public void getWeather(){
+        Coordinates cityCoordinates = null;
 
-        // Sofia (BG) contains ")"
-        boolean canSearchByCoordinates = searchedCity.contains(")");
+        boolean canUseSearchedCityField = searchedCity != null && !searchedCity.isEmpty();
 
-        if (canSearchByCoordinates){
-            // start of (BG)
-            String extractedName = extractCityName(searchedCity);
-            cityName.setValue(extractedName);
+        if (canUseSearchedCityField){
+            // Sofia (BG) contains ")"
+            boolean isSearchedCityAutoCompleted = searchedCity.contains(")");
 
-            Coordinates coordinates = getCoordinates(searchedCity);
-            MutableLiveData<Weather> result = repository.getWeatherByLocationAsync(coordinates);
+            if (isSearchedCityAutoCompleted){
+                cityCoordinates = App.citiesCollection.getCityCoordinates(searchedCity);
 
-            result.observeForever(new Observer<Weather>() {
-                @Override
-                public void onChanged(Weather updatedWeather) {
-                    boolean shouldUpdate = updatedWeather.currentWeather != null || updatedWeather.forecast != null;
-                    if (!shouldUpdate){
-                        return;
-                    }
+                String extractedName = extractCityName(searchedCity);
+                cityName.setValue(extractedName);
+            }
+            else{
+                // searched city is not from autocomplete. look for ambiguous data
+            }
+        }
+        else {
+            boolean canUseCurrentLocation = currentLocation != null;
+            if (canUseCurrentLocation){
+                cityCoordinates = currentLocation;
+            }
+            else{
+                cityCoordinates = defaultCity.location;
+            }
+        }
 
-                    weather.setValue(updatedWeather);
+        MutableLiveData<Weather> result = repository.getWeatherByLocationAsync(cityCoordinates);
+
+        result.observeForever(new Observer<Weather>() {
+            @Override
+            public void onChanged(Weather updatedWeather) {
+                boolean shouldUpdate = updatedWeather.currentWeather != null || updatedWeather.forecast != null;
+                if (!shouldUpdate){
+                    return;
                 }
-            });
 
-            //weather = repository.getWeatherForecastByLocationAsync(coordinates);
-        }
-        else{
-            // fill cityName field ?
+                weather.setValue(updatedWeather);
+            }
+        });
 
-            //try to find the city name in to the cities ?
-        }
 
+        // fill cityName field ?
+        //try to find the city name in to the cities ?
+
+
+        // this will do the work when the getWeather() method is started from clicking "Search" button (get searched city weather button)
+        // but if the method is not started from the button, but from constructor ?
         searchCityClickedSignal();
-
     }
     private String extractCityName(String searchedCity) {
         int nameIndexEnd = searchedCity.indexOf('(') - 1;
         return searchedCity.substring(0, nameIndexEnd);
-    }
-    private Coordinates getCoordinates(String searchedCity) {
-        String idAndCoordinate = App.cities.get(searchedCity);
-        String[] data = idAndCoordinate.split(" ");
-
-        Coordinates coordinates = new Coordinates();
-        coordinates.longitude = data[1].substring(4);
-        coordinates.latitude = data[2].substring(4);
-        return coordinates;
     }
 }
 

@@ -22219,7 +22219,6 @@ Toding (CN) 1279865 lon:79.833328 lat:31.533331
 Todireni (RO) 664865 lon:27.116671 lat:47.616669
 Todireşti (RO) 664860 lon:27.366671 lat:46.849998
 Todmorden (GB) 2635744 lon:-2.09701 lat:53.71434
-Todo (ID) 7554615 lon:116.1819 lat:-8.3718
 Todolella (ES) 6357062 lon:-0.26372 lat:40.646431
 Todoque (ES) 2510413 lon:-17.90242 lat:28.609739
 Todorovo (BA) 3301568 lon:15.93083 lat:45.088329
