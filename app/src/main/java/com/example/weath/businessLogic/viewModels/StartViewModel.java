@@ -1,5 +1,6 @@
 package com.example.weath.businessLogic.viewModels;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
@@ -19,9 +20,9 @@ public class StartViewModel extends ViewModel {
     public MutableLiveData<Boolean> isSearchCityClicked = new MutableLiveData<>(false); // ToDo make it private and use getter with LiveData object ?
 
     public String searchedCity;
-    public MutableLiveData<String> cityName = new MutableLiveData<>(); // ToDo make it private and use getter with LiveData object ?
+    private MutableLiveData<City> city = new MutableLiveData<>();
 
-    public MutableLiveData<Weather> weather = new MutableLiveData<>(); // ToDo make it private and use getter with LiveData object ?
+    private MutableLiveData<Weather> weather = new MutableLiveData<>(); // ToDo make it private and use getter with LiveData object ?
 
     public StartViewModel() {
         // ToDo I already give app context to the repository in the App class, may be some change ?
@@ -29,8 +30,9 @@ public class StartViewModel extends ViewModel {
 
         // get current location
         // if weather is empty (not if it is null, i should check if it null and fields inside are also null), use current location to create weather
-    }
 
+        requestWeather();
+    }
     public StartViewModel(Coordinates currentLocation){
         // get instance of repository ?
 
@@ -39,14 +41,20 @@ public class StartViewModel extends ViewModel {
 
     }
 
+    public LiveData<City> getCity() {
+        return city;
+    }
+
+    public LiveData<Weather> getWeather() {
+        return weather;
+    }
+
     private void searchCityClickedSignal(){
         isSearchCityClicked.setValue(true);
         isSearchCityClicked.setValue(false);
     }
 
-    public void getWeather(){
-        Coordinates cityCoordinates = null;
-
+    public void requestWeather(){
         boolean canUseSearchedCityField = searchedCity != null && !searchedCity.isEmpty();
 
         if (canUseSearchedCityField){
@@ -54,10 +62,12 @@ public class StartViewModel extends ViewModel {
             boolean isSearchedCityAutoCompleted = searchedCity.contains(")");
 
             if (isSearchedCityAutoCompleted){
-                cityCoordinates = App.citiesCollection.getCityCoordinates(searchedCity);
-
+                Coordinates cityCoordinates  = App.citiesCollection.getCityCoordinates(searchedCity);
                 String extractedName = extractCityName(searchedCity);
-                cityName.setValue(extractedName);
+                String extractedCountry = extractCountry(searchedCity);
+
+                City resultCity = new City(extractedName, extractedCountry, cityCoordinates);
+                city.setValue(resultCity);
             }
             else{
                 // searched city is not from autocomplete. look for ambiguous data
@@ -66,14 +76,19 @@ public class StartViewModel extends ViewModel {
         else {
             boolean canUseCurrentLocation = currentLocation != null;
             if (canUseCurrentLocation){
-                cityCoordinates = currentLocation;
+                String cityNameAndCountry = App.citiesCollection.getCityNameAndCountry(currentLocation);
+                String extractedName = extractCityName(cityNameAndCountry);
+                String extractedCountry = extractCountry(cityNameAndCountry);
+                City currentLocationCity = new City(extractedName, extractedCountry, currentLocation);
+
+                city.setValue(currentLocationCity);
             }
             else{
-                cityCoordinates = defaultCity.location;
+                city.setValue(defaultCity);
             }
         }
 
-        MutableLiveData<Weather> result = repository.getWeatherByLocationAsync(cityCoordinates);
+        MutableLiveData<Weather> result = repository.getWeatherByLocationAsync(city.getValue().location);
 
         result.observeForever(new Observer<Weather>() {
             @Override
@@ -99,6 +114,10 @@ public class StartViewModel extends ViewModel {
     private String extractCityName(String searchedCity) {
         int nameIndexEnd = searchedCity.indexOf('(') - 1;
         return searchedCity.substring(0, nameIndexEnd);
+    }
+    private String extractCountry(String searchedCity) {
+        int countryIndexStart = searchedCity.indexOf('(') + 1;
+        return searchedCity.substring(countryIndexStart, countryIndexStart + 2);
     }
 }
 

@@ -17,13 +17,14 @@ public class OpenWeatherMapCities implements CitiesCollection {
     private final int citiesInitialCapacity = 170000;
 
     // Key is city name with country code. Value is coordinate.
-    // The txt files were ordered by name, but in the collection they are not ordered.
     private Map<String, String> citiesByNameAndCountry;
 
     // Key is coordinate city name with country code. Value is city city name with country code.
     private Map<String, String> citiesByCoordinates ;
 
-    public OpenWeatherMapCities(@NonNull List<InputStream> streams) throws IOException {
+    // the stream should contain lines in format "CityName CountryCode ID Longitude Latitude"
+    // for example Aabenraa Kommune (DK) 2625068 lon:9.41667 lat:55.033329
+    public OpenWeatherMapCities(@NonNull List<InputStream> streams) {
         citiesByNameAndCountry = new HashMap<>(citiesInitialCapacity);
 
         //ToDo if location permission is denied this collection is unnecessary
@@ -66,33 +67,38 @@ public class OpenWeatherMapCities implements CitiesCollection {
         return name;
     }
 
-    private void loadAllCities(List<InputStream> streams) throws IOException {
+    private void loadAllCities(List<InputStream> streams){
         for (InputStream stream : streams) {
             loadCities(stream);
         }
     }
-    private void loadCities(InputStream stream) throws IOException {
+    private void loadCities(InputStream stream){
         InputStreamReader inputStreamReader = new InputStreamReader(stream);
         BufferedReader reader = new BufferedReader(inputStreamReader);
 
         String line = null;
 
         while(true){
-            line = reader.readLine();
+            try {
+                line = reader.readLine();
 
-            if (line == null){
-                break;
+                if (line == null){
+                    break;
+                }
+
+                // Todorovo (BA) 3301568 lon:15.93083 lat:45.088329
+
+                int cityNameAndCountryEndIndex = line.indexOf(')');
+
+                String nameAndCountry = extractCityNameWithCountry(line, cityNameAndCountryEndIndex);
+                String coordinates = extractCityCoordinates(line, cityNameAndCountryEndIndex);
+
+                citiesByNameAndCountry.put(nameAndCountry, coordinates);
+                citiesByCoordinates.put(coordinates, nameAndCountry);
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            // Todorovo (BA) 3301568 lon:15.93083 lat:45.088329
-
-            int cityNameAndCountryEndIndex = line.indexOf(')');
-
-            String nameAndCountry = extractCityNameWithCountry(line, cityNameAndCountryEndIndex);
-            String coordinates = extractCityCoordinates(line, cityNameAndCountryEndIndex);
-
-            citiesByNameAndCountry.put(nameAndCountry, coordinates);
-            citiesByCoordinates.put(coordinates, nameAndCountry);
         }
     }
     private String extractCityNameWithCountry(String line, int endIndex) {

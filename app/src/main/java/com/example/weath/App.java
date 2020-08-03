@@ -37,10 +37,6 @@ public class App extends Application {
         streams.add(getResources().openRawResource(R.raw.mr));
         streams.add(getResources().openRawResource(R.raw.sz));
 
-        try {
-            citiesCollection = new OpenWeatherMapCities(streams);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        citiesCollection = new OpenWeatherMapCities(streams);
     }
 }

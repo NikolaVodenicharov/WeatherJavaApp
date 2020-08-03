@@ -52,7 +52,7 @@ public class WeatherFragment extends Fragment {
     }
 
     private void observeSkyCondition() {
-        viewModel.weather.observe(this, new Observer<Weather>() {
+        viewModel.getWeather().observe(this, new Observer<Weather>() {
             @Override
             public void onChanged(Weather weather) {
                 boolean shouldDisplayCurrentSkyCondition = weather.currentWeather != null;
@@ -69,7 +69,7 @@ public class WeatherFragment extends Fragment {
     }
 
     private void observeForecast() {
-        viewModel.weather.observe(this, new Observer<Weather>() {
+        viewModel.getWeather().observe(this, new Observer<Weather>() {
             @Override
             public void onChanged(Weather weather) {
                 boolean shouldDisplayForecast = weather.forecast != null &&

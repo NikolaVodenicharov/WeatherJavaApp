@@ -47,7 +47,7 @@
 
             android:drawableEnd="@drawable/search_icon_cloud_30"
             android:drawableTint="@color/white"
-            android:onClick="@{()->viewModel.getWeather()}"/>
+            android:onClick="@{()->viewModel.requestWeather()}"/>
 
     </LinearLayout>
 </layout>

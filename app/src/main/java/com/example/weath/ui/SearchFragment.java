@@ -37,7 +37,6 @@ public class SearchFragment extends Fragment {
 
         View view = binding.getRoot();
         return view;
-        // return inflater.inflate(R.layout.fragment_search, container, false);
     }
 
     @Override
