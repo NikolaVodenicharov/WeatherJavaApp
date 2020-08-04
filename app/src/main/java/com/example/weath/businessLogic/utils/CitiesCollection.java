@@ -8,6 +8,5 @@ import java.util.Map;
 
 public interface CitiesCollection {
     Map<String, String> getCitiesByNameAndCountry();
-    String getCityNameAndCountry(@NonNull Coordinates coordinates);
     Coordinates getCityCoordinates(@NonNull String cityNameAndCountry);
 }

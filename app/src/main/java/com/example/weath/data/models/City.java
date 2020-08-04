@@ -5,6 +5,10 @@ public class City {
     public String country;
     public Coordinates location;
 
+    public City(){
+
+    }
+
     public City(String name, String country, Coordinates location) {
         this.name = name;
         this.country = country;

@@ -2,15 +2,11 @@ package com.example.weath.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.weath.App;
 import com.example.weath.R;
 import com.example.weath.businessLogic.viewModels.StartViewModel;
 import com.example.weath.data.models.Coordinates;
@@ -37,10 +34,9 @@ import com.google.android.material.tabs.TabLayoutMediator;
 public class StartActivity extends AppCompatActivity {
     public static final int WEATHER_FRAGMENT_POSITION = 1;
 
-    private Coordinates currentLocation;
     private static final int REQUEST_LOCATION_CODE = 5;
-    private static final String NEED_LOCATION_PERMISSION = "To get the coordinate we need access to your location.";
-    private static final String LOCATION_PERMISSION_GRANTED = "Permission granted, you can get coordinate.";
+    private static final String NEED_LOCATION_PERMISSION = "To get the weather of your current location we need location permission.";
+    private static final String LOCATION_PERMISSION_GRANTED = "Permission granted, you can get the weather of your current location.";
 
     private ViewPager2 pager;
     private StartViewModel viewModel;
@@ -50,12 +46,12 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setAppCurrentLocation();
         initializeBindings();
         initializePager();
         initializeTabLayoutMediator();
         displayWeatherOnSearchCityClicked();
 
-        //setCurrentLocation();
     }
 
     private void initializePager() {
@@ -88,7 +84,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void displayWeatherOnSearchCityClicked(){
-        viewModel.isSearchCityClicked.observe(this, new Observer<Boolean>() {
+        viewModel.getIsSearchCityClicked().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isClicked) {
                 if (isClicked){
@@ -98,10 +94,9 @@ public class StartActivity extends AppCompatActivity {
         });
     }
 
-
     // Current location
     @SuppressLint("MissingPermission")
-    private void setCurrentLocation() {
+    private void setAppCurrentLocation() {
         boolean isLocationPermissionGranted = checkPermissionGranted(this, Manifest.permission.ACCESS_COARSE_LOCATION);
         if (!isLocationPermissionGranted){
             askLocationPermission();
@@ -122,9 +117,7 @@ public class StartActivity extends AppCompatActivity {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
 
-                currentLocation = new Coordinates(
-                        Double.toString(latitude),
-                        Double.toString(longitude));
+                App.currentLocation = new Coordinates(latitude, longitude);
             }
         });
     }
@@ -186,17 +179,6 @@ public class StartActivity extends AppCompatActivity {
 
             boolean areGrantResultsEmpty = grantResults.length == 0;
             if (areGrantResultsEmpty){
-                return;
-            }
-
-            boolean isLocationPermissionGranted = checkPermissionGranted(grantResults[0]);
-            if (!isLocationPermissionGranted){
-                if (!shouldRationaleLocationPermission()){
-
-                    //ToDo should i remove the get location button if permissions is denied with don't ask me again ?
-                    Toast.makeText(this, NEED_LOCATION_PERMISSION, Toast.LENGTH_LONG).show();
-                }
-
                 return;
             }
 
