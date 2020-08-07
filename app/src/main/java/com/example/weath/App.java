@@ -4,18 +4,16 @@ import android.app.Application;
 
 import com.example.weath.businessLogic.utils.CitiesCollection;
 import com.example.weath.businessLogic.utils.OpenWeatherMapCities;
-import com.example.weath.data.Repository;
-import com.example.weath.data.models.Coordinates;
+import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.data.remote.OpenWeatherMapRestService;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Application {
     public static CitiesCollection citiesCollection;
-    public static Coordinates currentLocation;
+    public static Coordinate currentLocation;
 
     @Override
     public void onCreate() {

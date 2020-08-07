@@ -1,4 +1,4 @@
-package com.example.weath.data.models;
+package com.example.weath.data.domainModels;
 
 public enum SkyCondition {
     CLEAR,

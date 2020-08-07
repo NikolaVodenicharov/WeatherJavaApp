@@ -1,13 +1,10 @@
 package com.example.weath.data;
 
-import android.content.Context;
-
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
-import com.example.weath.data.models.City;
-import com.example.weath.data.models.Coordinates;
-import com.example.weath.data.models.Weather;
+import com.example.weath.data.domainModels.City;
+import com.example.weath.data.domainModels.Coordinate;
+import com.example.weath.data.domainModels.Weather;
 import com.example.weath.data.remote.OpenWeatherMapRestService;
 import com.example.weath.data.remote.WeatherRestService;
 
@@ -27,11 +24,11 @@ public class Repository {
         return instance;
     }
 
-    public LiveData<Weather> getWeatherByLocationAsync(Coordinates coordinates){
-        return restService.getWeatherByLocationAsync(coordinates);
+    public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
+        return restService.getWeatherByLocationAsync(coordinate);
     }
 
-    public LiveData<City> getCityByLocationAsync(Coordinates coordinates){
-        return restService.getCityByLocationAsync(coordinates);
+    public LiveData<City> getCityByLocationAsync(Coordinate coordinate){
+        return restService.getCityByLocationAsync(coordinate);
     }
 }

@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weath.R;
-import com.example.weath.data.models.ForecastDay;
+import com.example.weath.data.domainModels.ForecastDay;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

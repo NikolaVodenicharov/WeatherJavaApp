@@ -17,9 +17,9 @@ import android.widget.ImageView;
 
 import com.example.weath.R;
 import com.example.weath.businessLogic.viewModels.StartViewModel;
-import com.example.weath.data.models.ForecastDay;
-import com.example.weath.data.models.SkyCondition;
-import com.example.weath.data.models.Weather;
+import com.example.weath.data.domainModels.ForecastDay;
+import com.example.weath.data.domainModels.SkyCondition;
+import com.example.weath.data.domainModels.Weather;
 import com.example.weath.databinding.FragmentWeatherBinding;
 
 import java.util.List;

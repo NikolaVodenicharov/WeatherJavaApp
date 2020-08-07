@@ -1,13 +1,12 @@
 package com.example.weath.data.remote;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
-import com.example.weath.data.models.City;
-import com.example.weath.data.models.Coordinates;
-import com.example.weath.data.models.Weather;
+import com.example.weath.data.domainModels.City;
+import com.example.weath.data.domainModels.Coordinate;
+import com.example.weath.data.domainModels.Weather;
 
 public interface WeatherRestService {
-    LiveData<Weather> getWeatherByLocationAsync(Coordinates coordinates);
-    LiveData<City> getCityByLocationAsync(Coordinates coordinates);
+    LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate);
+    LiveData<City> getCityByLocationAsync(Coordinate coordinate);
 }

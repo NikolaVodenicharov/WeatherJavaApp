@@ -7,14 +7,14 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.weath.App;
 import com.example.weath.data.Repository;
-import com.example.weath.data.models.City;
-import com.example.weath.data.models.Coordinates;
-import com.example.weath.data.models.Weather;
+import com.example.weath.data.domainModels.City;
+import com.example.weath.data.domainModels.Coordinate;
+import com.example.weath.data.domainModels.Weather;
 
 public class StartViewModel extends ViewModel {
     private Repository repository;
 
-    private City defaultCity = new City("New York City", "US", new Coordinates(40.71, -74.00));
+    private City defaultCity = new City("New York City", "US", new Coordinate(40.71, -74.00));
     private MutableLiveData<Boolean> isSearchCityClicked = new MutableLiveData<>(false);
 
     public String searchedCity;
@@ -87,11 +87,11 @@ public class StartViewModel extends ViewModel {
         setWeatherByLocationAsync(city.getValue().location);
     }
     private City createCity() {
-        Coordinates cityCoordinates = App.citiesCollection.getCityCoordinates(searchedCity);
+        Coordinate cityCoordinate = App.citiesCollection.getCityCoordinates(searchedCity);
         String extractedName = extractCityName(searchedCity);
         String extractedCountry = extractCountry(searchedCity);
 
-        return new City(extractedName, extractedCountry, cityCoordinates);
+        return new City(extractedName, extractedCountry, cityCoordinate);
     }
     private String extractCityName(String searchedCity) {
         int nameIndexEnd = searchedCity.indexOf('(') - 1;
@@ -111,7 +111,7 @@ public class StartViewModel extends ViewModel {
             }
         });
     }
-    private void setWeatherByLocationAsync(Coordinates location) {
+    private void setWeatherByLocationAsync(Coordinate location) {
         LiveData<Weather> result = repository.getWeatherByLocationAsync(location);
 
         // ToDo is observe forever making memory leak ?

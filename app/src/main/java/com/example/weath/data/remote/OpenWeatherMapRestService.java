@@ -11,12 +11,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.weath.data.models.City;
-import com.example.weath.data.models.Coordinates;
-import com.example.weath.data.models.CurrentWeather;
-import com.example.weath.data.models.Weather;
-import com.example.weath.data.models.ForecastDay;
-import com.example.weath.data.models.SkyCondition;
+import com.example.weath.data.domainModels.City;
+import com.example.weath.data.domainModels.Coordinate;
+import com.example.weath.data.domainModels.CurrentWeather;
+import com.example.weath.data.domainModels.Weather;
+import com.example.weath.data.domainModels.ForecastDay;
+import com.example.weath.data.domainModels.SkyCondition;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,10 +70,10 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         requestQueue = Volley.newRequestQueue(appContext);
     }
 
-    public LiveData<Weather> getWeatherByLocationAsync(Coordinates coordinates){
+    public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
         final MutableLiveData<Weather> weather = new MutableLiveData<>(new Weather());
 
-        String url = createOneCallUrl(coordinates);
+        String url = createOneCallUrl(coordinate);
         ResponseListener listener = createWeatherResponseListener(weather);
         JsonObjectRequest request = createRequest(url, listener);
         requestQueue.add(request);
@@ -81,10 +81,10 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         return weather;
     }
 
-    public LiveData<City> getCityByLocationAsync(Coordinates coordinates){
+    public LiveData<City> getCityByLocationAsync(Coordinate coordinate){
         final MutableLiveData<City> city = new MutableLiveData<>();
 
-        String url = createCurrentWeatherURL(coordinates);
+        String url = createCurrentWeatherURL(coordinate);
         ResponseListener listener = createCityResponseListener(city);
         JsonObjectRequest request = createRequest(url, listener);
         requestQueue.add(request);
@@ -92,18 +92,18 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         return city;
     }
 
-    private String createOneCallUrl(Coordinates coordinates) {
+    private String createOneCallUrl(Coordinate coordinate) {
         return BASE_ONE_CALL +
-                BY_LATITUDE + coordinates.latitude.toString() + AMPERSAND +
-                BY_LONGITUDE + coordinates.longitude.toString() + AMPERSAND +
+                BY_LATITUDE + coordinate.getLatitude().toString() + AMPERSAND +
+                BY_LONGITUDE + coordinate.getLongitude().toString() + AMPERSAND +
                 EXCLUDE_MINUTELY_AND_HOURLY + AMPERSAND +
                 API_KEY + AMPERSAND +
                 METRIC_UNIT;
     }
-    private String createCurrentWeatherURL (Coordinates coordinates){
+    private String createCurrentWeatherURL (Coordinate coordinate){
         return BASE_CURRENT_WEATHER +
-                BY_LATITUDE + coordinates.latitude.toString() + AMPERSAND +
-                BY_LONGITUDE + coordinates.longitude.toString() + AMPERSAND +
+                BY_LATITUDE + coordinate.getLatitude().toString() + AMPERSAND +
+                BY_LONGITUDE + coordinate.getLongitude().toString() + AMPERSAND +
                 API_KEY + AMPERSAND +
                 METRIC_UNIT;
     }
@@ -272,14 +272,14 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         JSONObject coord = response.getJSONObject("coord");
         String longitude = coord.getString("lon");
         String latitude = coord.getString("lat");
-        Coordinates coordinates = new Coordinates(Double.parseDouble(latitude), Double.parseDouble(longitude));
+        Coordinate coordinate = new Coordinate(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
         JSONObject sys = response.getJSONObject("sys");
         String countryCode = sys.getString("country");
 
         String cityName = response.getString("name");
 
-        City city = new City(cityName, countryCode, coordinates);
+        City city = new City(cityName, countryCode, coordinate);
 
         return city;
     }

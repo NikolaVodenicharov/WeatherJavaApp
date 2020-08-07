@@ -2,8 +2,7 @@ package com.example.weath.businessLogic.utils;
 
 import androidx.annotation.NonNull;
 
-import com.example.weath.App;
-import com.example.weath.data.models.Coordinates;
+import com.example.weath.data.domainModels.Coordinate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +31,7 @@ public class OpenWeatherMapCities implements CitiesCollection {
         return citiesByNameAndCountry;
     }
 
-    public Coordinates getCityCoordinates(@NonNull String cityNameAndCountry){
+    public Coordinate getCityCoordinates(@NonNull String cityNameAndCountry){
         String line = citiesByNameAndCountry.get(cityNameAndCountry);
 
         if (line == null || line.isEmpty()){
@@ -45,8 +44,8 @@ public class OpenWeatherMapCities implements CitiesCollection {
         Double longitude = Double.parseDouble(data[0].substring(4));
         Double latitude = Double.parseDouble(data[1].substring(4));
 
-        Coordinates coordinates = new Coordinates(latitude, longitude);
-        return coordinates;
+        Coordinate coordinate = new Coordinate(latitude, longitude);
+        return coordinate;
     }
 
     private void loadAllCities(List<InputStream> streams){

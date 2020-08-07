@@ -22,7 +22,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.weath.App;
 import com.example.weath.R;
 import com.example.weath.businessLogic.viewModels.StartViewModel;
-import com.example.weath.data.models.Coordinates;
+import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.databinding.ActivityStartBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -45,6 +45,8 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // ToDo check for internet. If there is not....
 
         setAppCurrentLocation();
         initializeBindings();
@@ -117,7 +119,7 @@ public class StartActivity extends AppCompatActivity {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
 
-                App.currentLocation = new Coordinates(latitude, longitude);
+                App.currentLocation = new Coordinate(latitude, longitude);
             }
         });
     }
