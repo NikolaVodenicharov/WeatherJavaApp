@@ -2,11 +2,11 @@ package com.example.weath.data.remote;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.weath.data.domainModels.City;
 import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.data.domainModels.Weather;
+import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 
 public interface WeatherRestService {
     LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate);
-    LiveData<City> getCityByLocationAsync(Coordinate coordinate);
+    LiveData<CityFullDto> getCityByLocationAsync(Coordinate coordinate);
 }

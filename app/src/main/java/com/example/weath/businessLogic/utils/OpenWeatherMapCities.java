@@ -1,6 +1,8 @@
 package com.example.weath.businessLogic.utils;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.weath.data.domainModels.Coordinate;
 
@@ -18,6 +20,12 @@ public class OpenWeatherMapCities implements CitiesCollection {
     // Key is city name with country code. Value is coordinate.
     // Coordinates are with maximum 2 digits after floating point.
     private Map<String, String> citiesByNameAndCountry;
+
+    // this is for making the class able to load asynchronously
+    private MutableLiveData<Boolean> isLoaded = new MutableLiveData<>(false);
+    public LiveData<Boolean> getIsLoaded() {
+        return isLoaded;
+    }
 
     public OpenWeatherMapCities(@NonNull List<InputStream> streams) {
         // the stream should contain lines in format "CityName CountryCode ID Longitude Latitude"
@@ -52,6 +60,8 @@ public class OpenWeatherMapCities implements CitiesCollection {
         for (InputStream stream : streams) {
             loadCities(stream);
         }
+
+        isLoaded.setValue(true);
     }
     private void loadCities(InputStream stream){
         InputStreamReader inputStreamReader = new InputStreamReader(stream);

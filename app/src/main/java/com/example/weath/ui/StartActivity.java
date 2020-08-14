@@ -1,11 +1,9 @@
 package com.example.weath.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -22,12 +20,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.weath.App;
 import com.example.weath.R;
 import com.example.weath.businessLogic.viewModels.StartViewModel;
-import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.databinding.ActivityStartBinding;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -36,7 +29,7 @@ public class StartActivity extends AppCompatActivity {
 
     private static final int REQUEST_LOCATION_CODE = 5;
     private static final String NEED_LOCATION_PERMISSION = "To get the weather of your current location we need location permission.";
-    private static final String LOCATION_PERMISSION_GRANTED = "Permission granted, you can get the weather of your current location.";
+    private static final String MESSAGE_LOCATION_PERMISSION_GRANTED = "Permission granted, you can get the weather of your current location.";
 
     private ViewPager2 pager;
     private StartViewModel viewModel;
@@ -48,7 +41,7 @@ public class StartActivity extends AppCompatActivity {
 
         // ToDo check for internet. If there is not....
 
-        setAppCurrentLocation();
+        askCurrentLocationAsync();
         initializeBindings();
         initializePager();
         initializeTabLayoutMediator();
@@ -96,51 +89,22 @@ public class StartActivity extends AppCompatActivity {
         });
     }
 
-    // Current location
-    @SuppressLint("MissingPermission")
-    private void setAppCurrentLocation() {
-        boolean isLocationPermissionGranted = checkPermissionGranted(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-        if (!isLocationPermissionGranted){
-            askLocationPermission();
+    // ToDo may be i should move all of location permissions in App class
+    private void askCurrentLocationAsync() {
+        boolean isLocationPermissionGranted = App.checkPermissionGranted(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (isLocationPermissionGranted){
             return;
         }
 
-        FusedLocationProviderClient fusedLocation = LocationServices.getFusedLocationProviderClient(this);
-
-        fusedLocation.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-
-                if (location == null){
-                    return;
-                }
-
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-
-                App.currentLocation = new Coordinate(latitude, longitude);
-            }
-        });
-    }
-    private void askLocationPermission() {
         if (shouldRationaleLocationPermission()){
             alertDialogRationale();
         }
         else{
-            requestLocationPermission();
+            requestLocationPermissionAsync();
         }
     }
     private boolean shouldRationaleLocationPermission() {
         return ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-    }
-    private boolean checkPermissionGranted(Context context, String permission){
-        int permissionResult = ActivityCompat.checkSelfPermission(context, permission);
-        boolean isPermissionGranted = checkPermissionGranted(permissionResult);
-        return isPermissionGranted;
-    }
-    private boolean checkPermissionGranted(int permissionResult){
-        return permissionResult == PackageManager.PERMISSION_GRANTED;
     }
     private void alertDialogRationale() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -150,7 +114,7 @@ public class StartActivity extends AppCompatActivity {
         builder.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                requestLocationPermission();
+                requestLocationPermissionAsync();
             }
         });
 
@@ -163,7 +127,7 @@ public class StartActivity extends AppCompatActivity {
 
         builder.show();
     }
-    private void requestLocationPermission() {
+    private void requestLocationPermissionAsync() {
         ActivityCompat.requestPermissions(
                 StartActivity.this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -184,7 +148,9 @@ public class StartActivity extends AppCompatActivity {
                 return;
             }
 
-            Toast.makeText(this, LOCATION_PERMISSION_GRANTED, Toast.LENGTH_LONG).show();
+            App.initializeCurrentLocation(getApplicationContext());
+
+            Toast.makeText(this, MESSAGE_LOCATION_PERMISSION_GRANTED, Toast.LENGTH_LONG).show();
         }
         else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

@@ -50,12 +50,12 @@ public class SearchFragment extends Fragment {
     //Todo extract somewhere else ?
     private void initializeAutoCompleteFromHashMap(AutoCompleteTextView autocomplete) {
         String[] a = new String[2];
-        String[] testCollection2 = App.citiesCollection.getCitiesByNameAndCountry().keySet().toArray(a);
+        String[] cities = App.citiesCollection.getCitiesByNameAndCountry().keySet().toArray(a);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
-                testCollection2
+                cities
         );
 
         autocomplete.setAdapter(adapter);

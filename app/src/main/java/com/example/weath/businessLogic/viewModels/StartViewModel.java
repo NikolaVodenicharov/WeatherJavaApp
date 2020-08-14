@@ -10,6 +10,7 @@ import com.example.weath.data.Repository;
 import com.example.weath.data.domainModels.City;
 import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.data.domainModels.Weather;
+import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 
 public class StartViewModel extends ViewModel {
     private Repository repository;
@@ -23,12 +24,7 @@ public class StartViewModel extends ViewModel {
     private MutableLiveData<Weather> weather = new MutableLiveData<>();
 
     public StartViewModel() {
-        // ToDo  ?
-        try {
-            this.repository = Repository.getInstance();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+       this.repository = App.repository;
     }
 
     public LiveData<Boolean> getIsSearchCityClicked() {
@@ -102,12 +98,19 @@ public class StartViewModel extends ViewModel {
         return searchedCity.substring(countryIndexStart, countryIndexStart + 2);
     }
     private void setCityByLocationAsync() {
-        LiveData<City> cityResult = repository.getCityByLocationAsync(App.currentLocation);
+        LiveData<CityFullDto> cityResult = repository.getCityByLocationAsync(App.currentLocation);
 
-        cityResult.observeForever(new Observer<City>() {
+        cityResult.observeForever(new Observer<CityFullDto>() {
             @Override
-            public void onChanged(City responseCity) {
-                city.setValue(responseCity);
+            public void onChanged(CityFullDto responseCity) {
+                City convertedCity = new City(
+                        responseCity.name,
+                        responseCity.country,
+                        new Coordinate(
+                                responseCity.location.latitude,
+                                responseCity.location.longitude));
+
+                city.setValue(convertedCity);
             }
         });
     }

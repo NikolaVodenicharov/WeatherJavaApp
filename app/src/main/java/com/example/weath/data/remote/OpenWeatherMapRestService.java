@@ -17,6 +17,8 @@ import com.example.weath.data.domainModels.CurrentWeather;
 import com.example.weath.data.domainModels.Weather;
 import com.example.weath.data.domainModels.ForecastDay;
 import com.example.weath.data.domainModels.SkyCondition;
+import com.example.weath.data.local.dataTransferObjects.CityFullDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,34 +42,23 @@ public class OpenWeatherMapRestService implements WeatherRestService {
     private static final String BASE_ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall?";
     private static final String BASE_CURRENT_WEATHER = "https://api.openweathermap.org/data/2.5/weather?";
     private static final String EXCLUDE_MINUTELY_AND_HOURLY = "exclude=minutely,hourly";
-
     private String CELSIUS = "\u2103";
 
     private RequestQueue requestQueue;
 
-    public static void initialize(Context appContext){
-        if (instance == null){
-            instance = new OpenWeatherMapRestService(
-                    ensureAppContext(appContext));
-        }
-    }
-
-    public static synchronized OpenWeatherMapRestService getInstance() throws IllegalAccessException {
-        if (instance == null){
-            String message = OpenWeatherMapRestService.class.getName().toString() + " Repository is not initialized";
-            throw new IllegalAccessException(message);
-        }
-
-        return instance;
-    }
-    private static Context ensureAppContext(Context context){
-        return context.getApplicationContext();
-    }
     private OpenWeatherMapRestService(Context appContext){
         initializeRequestQueue(appContext);
     }
     private void initializeRequestQueue(Context appContext){
         requestQueue = Volley.newRequestQueue(appContext);
+    }
+
+    public static synchronized OpenWeatherMapRestService getInstance(Context appContext) {
+        if (instance == null){
+            instance = new OpenWeatherMapRestService(appContext);
+        }
+
+        return instance;
     }
 
     public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
@@ -81,8 +72,8 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         return weather;
     }
 
-    public LiveData<City> getCityByLocationAsync(Coordinate coordinate){
-        final MutableLiveData<City> city = new MutableLiveData<>();
+    public LiveData<CityFullDto> getCityByLocationAsync(Coordinate coordinate){
+        final MutableLiveData<CityFullDto> city = new MutableLiveData<>();
 
         String url = createCurrentWeatherURL(coordinate);
         ResponseListener listener = createCityResponseListener(city);
@@ -247,14 +238,14 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         return request;
     }
     
-    private ResponseListener createCityResponseListener(final MutableLiveData<City> city){
+    private ResponseListener createCityResponseListener(final MutableLiveData<CityFullDto> city){
         // Create response listener and set new value to method parameter (MutableLiveData city object) when there is response of the request.
 
         return new ResponseListener() {
             @Override
             public void onSuccess(JSONObject response) {
                 try {
-                    City responseCity = createCityFromCurrentWeather(response);
+                    CityFullDto responseCity = createCityFromCurrentWeather(response);
                     city.setValue(responseCity);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -267,19 +258,26 @@ public class OpenWeatherMapRestService implements WeatherRestService {
             }
         };
     }
-
-    private City createCityFromCurrentWeather(JSONObject response) throws JSONException {
+    private CityFullDto createCityFromCurrentWeather(JSONObject response) throws JSONException {
         JSONObject coord = response.getJSONObject("coord");
-        String longitude = coord.getString("lon");
-        String latitude = coord.getString("lat");
-        Coordinate coordinate = new Coordinate(Double.parseDouble(latitude), Double.parseDouble(longitude));
+        String latitudeString = coord.getString("lat");
+        String longitudeString = coord.getString("lon");
+        double parsedLatitude = Double.parseDouble(latitudeString);
+        double parsedLongitude = Double.parseDouble(longitudeString);
+
+        CoordinateEntity coordinate = new CoordinateEntity();
+        coordinate.latitude = parsedLatitude;
+        coordinate.longitude = parsedLongitude;
 
         JSONObject sys = response.getJSONObject("sys");
-        String countryCode = sys.getString("country");
+        final String countryCode = sys.getString("country");
 
-        String cityName = response.getString("name");
+        final String cityName = response.getString("name");
 
-        City city = new City(cityName, countryCode, coordinate);
+        CityFullDto city = new CityFullDto();
+        city.name = cityName;
+        city.country = countryCode;
+        city.location = coordinate;
 
         return city;
     }
