@@ -8,19 +8,19 @@ import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.data.domainModels.Weather;
 import com.example.weath.data.local.DatabaseManager;
 import com.example.weath.data.local.dataTransferObjects.CityFullDto;
-import com.example.weath.data.remote.WeatherRestService;
+import com.example.weath.data.remote.RemoteDataSource;
 
 public class Repository {
-    private final WeatherRestService restService;
+    private final RemoteDataSource remoteDataSource;
     private DatabaseManager databaseManager;
 
-    public Repository(WeatherRestService restService, DatabaseManager databaseManager) {
-        this.restService = restService;
+    public Repository(RemoteDataSource remoteDataSource, DatabaseManager databaseManager) {
+        this.remoteDataSource = remoteDataSource;
         this.databaseManager = databaseManager;
     }
 
     public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
-        return restService.getWeatherByLocationAsync(coordinate);
+        return remoteDataSource.getWeatherByLocationAsync(coordinate);
     }
 
     public LiveData<CityFullDto> getCityByLocationAsync(final Coordinate coordinate){
@@ -62,7 +62,7 @@ public class Repository {
         });
     }
     private void setCityFromRestServiceAndSaveInInDatabase(Coordinate coordinate, final MutableLiveData<CityFullDto> cityResult) {
-        final LiveData<CityFullDto> cityFromRestService = restService.getCityByLocationAsync(coordinate);
+        final LiveData<CityFullDto> cityFromRestService = remoteDataSource.getCityByLocationAsync(coordinate);
 
         cityFromRestService.observeForever(new Observer<CityFullDto>() {
             @Override

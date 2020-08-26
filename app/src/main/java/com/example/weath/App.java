@@ -10,6 +10,7 @@ import android.location.Location;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import com.android.volley.toolbox.Volley;
 import com.example.weath.businessLogic.utils.CitiesCollection;
 import com.example.weath.businessLogic.utils.OpenWeatherMapCities;
 import com.example.weath.data.Repository;
@@ -17,8 +18,10 @@ import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.data.local.AppDatabase;
 import com.example.weath.data.local.DatabaseManager;
 import com.example.weath.data.local.DatabaseManagerImpl;
-import com.example.weath.data.remote.OpenWeatherMapRestService;
-import com.example.weath.data.remote.WeatherRestService;
+import com.example.weath.data.remote.OpenWeatherMapDataSource;
+import com.example.weath.data.remote.RemoteDataSource;
+import com.example.weath.data.remote.VolleyWebService;
+import com.example.weath.data.remote.WebService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -55,7 +58,11 @@ public class App extends Application {
     }
 
     private void initializeRepository() {
-        WeatherRestService restService = OpenWeatherMapRestService.getInstance(getApplicationContext());
+        WebService webService = new VolleyWebService(
+                Volley.newRequestQueue(
+                    getApplicationContext()));
+
+        RemoteDataSource restService = new OpenWeatherMapDataSource(webService);
 
         DatabaseManager databaseManager = new DatabaseManagerImpl(
                 AppDatabase.getInstance(getApplicationContext()),

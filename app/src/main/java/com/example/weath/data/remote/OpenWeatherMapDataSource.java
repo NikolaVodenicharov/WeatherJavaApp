@@ -1,22 +1,14 @@
 package com.example.weath.data.remote;
 
-import android.content.Context;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.example.weath.data.domainModels.City;
 import com.example.weath.data.domainModels.Coordinate;
 import com.example.weath.data.domainModels.CurrentWeather;
-import com.example.weath.data.domainModels.Weather;
 import com.example.weath.data.domainModels.ForecastDay;
 import com.example.weath.data.domainModels.SkyCondition;
+import com.example.weath.data.domainModels.Weather;
 import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
 
@@ -28,11 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OpenWeatherMapRestService implements WeatherRestService {
-    // Need to be initialize before being use
+public class OpenWeatherMapDataSource implements RemoteDataSource{
     // there are request to OneCallApi and CurrentWeatherApi
-
-    private static OpenWeatherMapRestService instance;
 
     private static final String BY_LATITUDE = "lat=";
     private static final String BY_LONGITUDE = "lon=";
@@ -44,30 +33,32 @@ public class OpenWeatherMapRestService implements WeatherRestService {
     private static final String EXCLUDE_MINUTELY_AND_HOURLY = "exclude=minutely,hourly";
     private String CELSIUS = "\u2103";
 
-    private RequestQueue requestQueue;
+    private WebService webService;
 
-    private OpenWeatherMapRestService(Context appContext){
-        initializeRequestQueue(appContext);
-    }
-    private void initializeRequestQueue(Context appContext){
-        requestQueue = Volley.newRequestQueue(appContext);
-    }
-
-    public static synchronized OpenWeatherMapRestService getInstance(Context appContext) {
-        if (instance == null){
-            instance = new OpenWeatherMapRestService(appContext);
-        }
-
-        return instance;
+    public OpenWeatherMapDataSource(WebService webService){
+        this.webService = webService;
     }
 
     public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
         final MutableLiveData<Weather> weather = new MutableLiveData<>(new Weather());
 
         String url = createOneCallUrl(coordinate);
-        ResponseListener listener = createWeatherResponseListener(weather);
-        JsonObjectRequest request = createRequest(url, listener);
-        requestQueue.add(request);
+
+        final LiveData<JSONObject> response = webService.getResponse(url);
+        response.observeForever(new Observer<JSONObject>() {
+            @Override
+            public void onChanged(JSONObject jsonObject) {
+                response.removeObserver(this);
+
+                try {
+                    Weather responseWeather = createWeatherFromOneCall(jsonObject);
+                    weather.setValue(responseWeather);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         return weather;
     }
@@ -76,9 +67,22 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         final MutableLiveData<CityFullDto> city = new MutableLiveData<>();
 
         String url = createCurrentWeatherURL(coordinate);
-        ResponseListener listener = createCityResponseListener(city);
-        JsonObjectRequest request = createRequest(url, listener);
-        requestQueue.add(request);
+
+        final LiveData<JSONObject> response = webService.getResponse(url);
+        response.observeForever(new Observer<JSONObject>() {
+            @Override
+            public void onChanged(JSONObject jsonObject) {
+                response.removeObserver(this);
+
+                try {
+                    CityFullDto responseCity = createCityFromCurrentWeather(jsonObject);
+                    city.setValue(responseCity);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         return city;
     }
@@ -99,27 +103,6 @@ public class OpenWeatherMapRestService implements WeatherRestService {
                 METRIC_UNIT;
     }
 
-    private ResponseListener createWeatherResponseListener(final MutableLiveData<Weather> attachWeather) {
-        // Create response listener and set new value to method parameter (MutableLiveData weather object) when there is response of the request.
-
-        return new ResponseListener() {
-            @Override
-            public void onSuccess(JSONObject response) {
-                try {
-                    Weather responseWeather = createWeatherFromOneCall(response);
-                    attachWeather.setValue(responseWeather);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(String message) {
-                // ToDo what to do if there is error in the request ?
-            }
-        };
-    }
     private Weather createWeatherFromOneCall(JSONObject response) throws JSONException {
         Weather weather = new Weather();
         weather.currentWeather = createCurrentWeatherFromOneCall(response);
@@ -216,48 +199,6 @@ public class OpenWeatherMapRestService implements WeatherRestService {
         return date;
     }
 
-    private JsonObjectRequest createRequest(String url, final ResponseListener listener){
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        listener.onSuccess(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        listener.onError(error.getMessage());
-                    }
-                }
-        );
-
-        return request;
-    }
-    
-    private ResponseListener createCityResponseListener(final MutableLiveData<CityFullDto> city){
-        // Create response listener and set new value to method parameter (MutableLiveData city object) when there is response of the request.
-
-        return new ResponseListener() {
-            @Override
-            public void onSuccess(JSONObject response) {
-                try {
-                    CityFullDto responseCity = createCityFromCurrentWeather(response);
-                    city.setValue(responseCity);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(String message) {
-
-            }
-        };
-    }
     private CityFullDto createCityFromCurrentWeather(JSONObject response) throws JSONException {
         JSONObject coord = response.getJSONObject("coord");
         String latitudeString = coord.getString("lat");

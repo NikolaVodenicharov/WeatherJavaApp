@@ -1,9 +1,7 @@
 package com.example.weath.ui;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -28,8 +26,8 @@ public class StartActivity extends AppCompatActivity {
     public static final int WEATHER_FRAGMENT_POSITION = 1;
 
     private static final int REQUEST_LOCATION_CODE = 5;
-    private static final String NEED_LOCATION_PERMISSION = "To get the weather of your current location we need location permission.";
-    private static final String MESSAGE_LOCATION_PERMISSION_GRANTED = "Permission granted, you can get the weather of your current location.";
+    private static final String NEED_LOCATION_PERMISSION_MESSAGE = "To get the weather of your current location we need location permission.";
+    private static final String LOCATION_PERMISSION_GRANTED_MESSAGE = "Permission granted, you can get the weather of your current location.";
 
     private ViewPager2 pager;
     private StartViewModel viewModel;
@@ -46,7 +44,6 @@ public class StartActivity extends AppCompatActivity {
         initializePager();
         initializeTabLayoutMediator();
         displayWeatherOnSearchCityClicked();
-
     }
 
     private void initializePager() {
@@ -109,7 +106,7 @@ public class StartActivity extends AppCompatActivity {
     private void alertDialogRationale() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage(NEED_LOCATION_PERMISSION);
+        builder.setMessage(NEED_LOCATION_PERMISSION_MESSAGE);
 
         builder.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
             @Override
@@ -130,7 +127,7 @@ public class StartActivity extends AppCompatActivity {
     private void requestLocationPermissionAsync() {
         ActivityCompat.requestPermissions(
                 StartActivity.this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                 REQUEST_LOCATION_CODE);
     }
     @Override
@@ -150,7 +147,7 @@ public class StartActivity extends AppCompatActivity {
 
             App.initializeCurrentLocation(getApplicationContext());
 
-            Toast.makeText(this, MESSAGE_LOCATION_PERMISSION_GRANTED, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
         }
         else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
