@@ -1,9 +1,8 @@
-package com.example.weath.ui;
+package com.example.weath.ui.activities;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModel;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 public class StartPagerAdapter extends FragmentStateAdapter {

@@ -1,9 +1,9 @@
-package com.example.weath.businessLogic.utils;
+package com.example.weath.domain.utils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
-import com.example.weath.data.domainModels.Coordinate;
+import com.example.weath.domain.domainModels.Coordinate;
 
 import java.util.Map;
 

@@ -11,13 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.android.volley.toolbox.Volley;
-import com.example.weath.businessLogic.utils.CitiesCollection;
-import com.example.weath.businessLogic.utils.OpenWeatherMapCities;
-import com.example.weath.data.Repository;
-import com.example.weath.data.domainModels.Coordinate;
+import com.example.weath.domain.Repository;
+import com.example.weath.domain.utils.CitiesCollection;
+import com.example.weath.domain.utils.OpenWeatherMapCities;
+import com.example.weath.data.RepositoryImpl;
+import com.example.weath.domain.domainModels.Coordinate;
 import com.example.weath.data.local.AppDatabase;
+import com.example.weath.data.local.LocalDataSource;
 import com.example.weath.data.local.DatabaseManager;
-import com.example.weath.data.local.DatabaseManagerImpl;
 import com.example.weath.data.remote.OpenWeatherMapDataSource;
 import com.example.weath.data.remote.RemoteDataSource;
 import com.example.weath.data.remote.VolleyWebService;
@@ -35,7 +36,7 @@ import java.util.concurrent.Executors;
 public class App extends Application {
     public static CitiesCollection citiesCollection;
     public static Coordinate currentLocation;
-    public static Repository repository;
+    public static Repository Repository;
 
     @Override
     public void onCreate() {
@@ -50,9 +51,9 @@ public class App extends Application {
     private void initializeCitiesCollection() {
         List<InputStream> streams = new ArrayList<>(4);
         streams.add(getResources().openRawResource(R.raw.ad));
-//        streams.add(getResources().openRawResource(R.raw.ek));
-//        streams.add(getResources().openRawResource(R.raw.mr));
-//        streams.add(getResources().openRawResource(R.raw.sz));
+        streams.add(getResources().openRawResource(R.raw.ek));
+        streams.add(getResources().openRawResource(R.raw.mr));
+        streams.add(getResources().openRawResource(R.raw.sz));
 
         citiesCollection = new OpenWeatherMapCities(streams);
     }
@@ -64,12 +65,12 @@ public class App extends Application {
 
         RemoteDataSource restService = new OpenWeatherMapDataSource(webService);
 
-        DatabaseManager databaseManager = new DatabaseManagerImpl(
+        LocalDataSource databaseManager = new DatabaseManager(
                 AppDatabase.getInstance(getApplicationContext()),
                 Executors.newFixedThreadPool(4)
         );
 
-        repository = new Repository(restService, databaseManager);
+        Repository = new RepositoryImpl(restService, databaseManager);
     }
 
 

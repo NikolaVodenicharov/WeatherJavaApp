@@ -4,29 +4,32 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.weath.data.domainModels.Coordinate;
-import com.example.weath.data.domainModels.Weather;
-import com.example.weath.data.local.DatabaseManager;
+import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.domainModels.Weather;
+import com.example.weath.data.local.LocalDataSource;
 import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 import com.example.weath.data.remote.RemoteDataSource;
+import com.example.weath.domain.Repository;
 
-public class Repository {
+public class RepositoryImpl implements Repository {
     private final RemoteDataSource remoteDataSource;
-    private DatabaseManager databaseManager;
+    private LocalDataSource localDataSource;
 
-    public Repository(RemoteDataSource remoteDataSource, DatabaseManager databaseManager) {
+    public RepositoryImpl(RemoteDataSource remoteDataSource, LocalDataSource localDataSource) {
         this.remoteDataSource = remoteDataSource;
-        this.databaseManager = databaseManager;
+        this.localDataSource = localDataSource;
     }
 
+    @Override
     public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
         return remoteDataSource.getWeatherByLocationAsync(coordinate);
     }
 
+    @Override
     public LiveData<CityFullDto> getCityByLocationAsync(final Coordinate coordinate){
         final MutableLiveData<CityFullDto> cityResult = new MutableLiveData<>();
 
-        final LiveData<Boolean> isCityExist = databaseManager.isExisting(coordinate);
+        final LiveData<Boolean> isCityExist = localDataSource.isExisting(coordinate);
 
         isCityExist.observeForever(new Observer<Boolean>() {
             @Override
@@ -45,7 +48,7 @@ public class Repository {
         return cityResult;
     }
     private void setCityFromDatabase(Coordinate coordinate, final MutableLiveData<CityFullDto> cityResult) {
-        final LiveData<CityFullDto> cityFromDatabase = databaseManager.getCityFull(coordinate);
+        final LiveData<CityFullDto> cityFromDatabase = localDataSource.getCityFull(coordinate);
 
         cityFromDatabase.observeForever(new Observer<CityFullDto>() {
             @Override
@@ -69,7 +72,7 @@ public class Repository {
             public void onChanged(CityFullDto city) {
                 if (city != null){
                     cityResult.setValue(city);
-                    databaseManager.insertCity(city);
+                    localDataSource.insertCity(city);
                 }
                 else{
                     // ToDo error ? no data in rest service ?

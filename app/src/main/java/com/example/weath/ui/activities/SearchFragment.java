@@ -1,11 +1,10 @@
-package com.example.weath.ui;
+package com.example.weath.ui.activities;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
@@ -16,7 +15,7 @@ import android.widget.AutoCompleteTextView;
 
 import com.example.weath.App;
 import com.example.weath.R;
-import com.example.weath.businessLogic.viewModels.StartViewModel;
+import com.example.weath.ui.viewModels.StartViewModel;
 import com.example.weath.databinding.FragmentSearchBinding;
 
 public class SearchFragment extends Fragment {

@@ -1,4 +1,4 @@
-package com.example.weath.data.domainModels;
+package com.example.weath.domain.domainModels;
 
 public class City {
     public String name;

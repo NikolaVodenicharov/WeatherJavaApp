@@ -1,4 +1,4 @@
-package com.example.weath.businessLogic.viewModels;
+package com.example.weath.ui.viewModels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -6,14 +6,14 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.example.weath.App;
-import com.example.weath.data.Repository;
-import com.example.weath.data.domainModels.City;
-import com.example.weath.data.domainModels.Coordinate;
-import com.example.weath.data.domainModels.Weather;
+import com.example.weath.domain.Repository;
+import com.example.weath.domain.domainModels.City;
+import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.domainModels.Weather;
 import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 
 public class StartViewModel extends ViewModel {
-    private Repository repository;
+    private Repository Repository;
 
     private City defaultCity = new City("New York City", "US", new Coordinate(40.71, -74.00));
     private MutableLiveData<Boolean> isSearchCityClicked = new MutableLiveData<>(false);
@@ -24,7 +24,7 @@ public class StartViewModel extends ViewModel {
     private MutableLiveData<Weather> weather = new MutableLiveData<>();
 
     public StartViewModel() {
-       this.repository = App.repository;
+       this.Repository = App.Repository;
     }
 
     public LiveData<Boolean> getIsSearchCityClicked() {
@@ -98,7 +98,7 @@ public class StartViewModel extends ViewModel {
         return searchedCity.substring(countryIndexStart, countryIndexStart + 2);
     }
     private void setCityByLocationAsync() {
-        LiveData<CityFullDto> cityResult = repository.getCityByLocationAsync(App.currentLocation);
+        LiveData<CityFullDto> cityResult = Repository.getCityByLocationAsync(App.currentLocation);
 
         cityResult.observeForever(new Observer<CityFullDto>() {
             @Override
@@ -115,7 +115,7 @@ public class StartViewModel extends ViewModel {
         });
     }
     private void setWeatherByLocationAsync(Coordinate location) {
-        LiveData<Weather> result = repository.getWeatherByLocationAsync(location);
+        LiveData<Weather> result = Repository.getWeatherByLocationAsync(location);
 
         // ToDo is observe forever making memory leak ?
         result.observeForever(new Observer<Weather>() {

@@ -1,6 +1,10 @@
-package com.example.weath.ui;
+package com.example.weath.ui.activities;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,17 +14,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-
 import com.example.weath.R;
-import com.example.weath.businessLogic.viewModels.StartViewModel;
-import com.example.weath.data.domainModels.ForecastDay;
-import com.example.weath.data.domainModels.SkyCondition;
-import com.example.weath.data.domainModels.Weather;
+import com.example.weath.domain.domainModels.ForecastDay;
+import com.example.weath.domain.domainModels.SkyCondition;
+import com.example.weath.domain.domainModels.Weather;
 import com.example.weath.databinding.FragmentWeatherBinding;
+import com.example.weath.ui.viewModels.StartViewModel;
 
 import java.util.List;
 

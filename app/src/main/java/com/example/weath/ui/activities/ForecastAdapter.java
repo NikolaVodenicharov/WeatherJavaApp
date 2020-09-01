@@ -1,4 +1,4 @@
-package com.example.weath.ui;
+package com.example.weath.ui.activities;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weath.R;
-import com.example.weath.data.domainModels.ForecastDay;
+import com.example.weath.domain.domainModels.ForecastDay;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

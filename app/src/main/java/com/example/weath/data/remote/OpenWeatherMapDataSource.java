@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.weath.data.domainModels.Coordinate;
-import com.example.weath.data.domainModels.CurrentWeather;
-import com.example.weath.data.domainModels.ForecastDay;
-import com.example.weath.data.domainModels.SkyCondition;
-import com.example.weath.data.domainModels.Weather;
+import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.domainModels.CurrentWeather;
+import com.example.weath.domain.domainModels.ForecastDay;
+import com.example.weath.domain.domainModels.SkyCondition;
+import com.example.weath.domain.domainModels.Weather;
 import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
 
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OpenWeatherMapDataSource implements RemoteDataSource{
+public class OpenWeatherMapDataSource implements RemoteDataSource {
     // there are request to OneCallApi and CurrentWeatherApi
 
     private static final String BY_LATITUDE = "lat=";

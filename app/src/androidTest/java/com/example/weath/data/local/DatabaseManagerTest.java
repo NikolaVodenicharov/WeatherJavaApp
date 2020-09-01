@@ -6,7 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.weath.LiveDataUtil;
-import com.example.weath.data.domainModels.Coordinate;
+import com.example.weath.domain.domainModels.Coordinate;
 import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -21,9 +21,9 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
-public class DatabaseManagerImplTest {
+public class DatabaseManagerTest {
     AppDatabase database;
-    private DatabaseManager databaseManager;
+    private LocalDataSource databaseManager;
     Coordinate dummyCoordinate = new Coordinate(11.22, 33.44);
 
     @Rule
@@ -39,7 +39,7 @@ public class DatabaseManagerImplTest {
                 .build();
 
 
-        this.databaseManager = new DatabaseManagerImpl(
+        this.databaseManager = new DatabaseManager(
                 database,
                 MoreExecutors.newDirectExecutorService());
     }
@@ -114,20 +114,20 @@ public class DatabaseManagerImplTest {
 
     @Test
     public void getFullCityGiveObjectWithTheSameData_whenIsAddedBeforeThat() throws InterruptedException {
-        CityFullDto cityFullDto = createCityFullDto();
-        databaseManager.insertCity(cityFullDto);
+        CityFullDto expectedCityFullDto = createCityFullDto();
+        databaseManager.insertCity(expectedCityFullDto);
 
         Coordinate coordinate = new Coordinate(
-                cityFullDto.location.latitude,
-                cityFullDto.location.longitude);
+                expectedCityFullDto.location.latitude,
+                expectedCityFullDto.location.longitude);
 
         CityFullDto cityResult = LiveDataUtil.getValue(
                 databaseManager.getCityFull(coordinate));
 
-        Assert.assertEquals(cityFullDto.name, cityResult.name);
-        Assert.assertEquals(cityFullDto.country, cityResult.country);
-        Assert.assertEquals(cityFullDto.location.latitude, cityResult.location.latitude);
-        Assert.assertEquals(cityFullDto.location.longitude, cityResult.location.longitude);
+        Assert.assertEquals(expectedCityFullDto.name, cityResult.name);
+        Assert.assertEquals(expectedCityFullDto.country, cityResult.country);
+        Assert.assertEquals(expectedCityFullDto.location.latitude, cityResult.location.latitude);
+        Assert.assertEquals(expectedCityFullDto.location.longitude, cityResult.location.longitude);
     }
 
     @Test

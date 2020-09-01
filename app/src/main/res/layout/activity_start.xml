@@ -5,14 +5,14 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.weath.businessLogic.viewModels.StartViewModel" />
+            type="com.example.weath.ui.viewModels.StartViewModel" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.StartActivity"
+        tools:context=".ui.activities.StartActivity"
         android:background="@drawable/sky">
         <!--    android:background="@drawable/sky"-->
 
