@@ -2,8 +2,8 @@ package com.example.weath.data.local;
 
 import androidx.lifecycle.LiveData;
 
+import com.example.weath.data.dataTransferObjects.CityDto;
 import com.example.weath.domain.domainModels.Coordinate;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 import com.example.weath.data.local.entities.CityEntity;
 import com.example.weath.data.local.entities.CoordinateEntity;
 
@@ -20,7 +20,7 @@ public class DatabaseManager implements LocalDataSource {
     }
 
     @Override
-    public void insertCity(final CityFullDto city) {
+    public void insertCity(final CityDto city) {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -41,14 +41,14 @@ public class DatabaseManager implements LocalDataSource {
     }
 
     @Override
-    public LiveData<CityFullDto> getCityFull(Coordinate coordinate) {
+    public LiveData<CityDto> getCityFull(Coordinate coordinate) {
         double latitude = trimTwoDigitsPrecision(
                 coordinate.getLatitude());
 
         double longitude = trimTwoDigitsPrecision(
                 coordinate.getLongitude());
 
-        LiveData<CityFullDto> city = database
+        LiveData<CityDto> city = database
                 .cityDao()
                 .getFull(latitude, longitude);
 
@@ -69,7 +69,7 @@ public class DatabaseManager implements LocalDataSource {
     }
 
     @Override
-    public LiveData<List<CityFullDto>> getAll() {
+    public LiveData<List<CityDto>> getAll() {
         return database.cityDao().getAll();
     }
 

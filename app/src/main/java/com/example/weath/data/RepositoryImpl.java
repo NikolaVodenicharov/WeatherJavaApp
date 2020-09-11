@@ -4,30 +4,55 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.example.weath.data.dataTransferObjects.CityDto;
+import com.example.weath.data.dataTransferObjects.WeatherDto;
+import com.example.weath.data.local.LocalDataSource;
+import com.example.weath.data.remote.RemoteDataSource;
+import com.example.weath.data.utils.CityMapper;
+import com.example.weath.data.utils.WeatherMapper;
+import com.example.weath.domain.Repository;
+import com.example.weath.domain.domainModels.City;
 import com.example.weath.domain.domainModels.Coordinate;
 import com.example.weath.domain.domainModels.Weather;
-import com.example.weath.data.local.LocalDataSource;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
-import com.example.weath.data.remote.RemoteDataSource;
-import com.example.weath.domain.Repository;
 
 public class RepositoryImpl implements Repository {
     private final RemoteDataSource remoteDataSource;
     private LocalDataSource localDataSource;
+    private CityMapper cityMapper;
+    private WeatherMapper weatherMapper;
 
-    public RepositoryImpl(RemoteDataSource remoteDataSource, LocalDataSource localDataSource) {
+    public RepositoryImpl(RemoteDataSource remoteDataSource,
+                          LocalDataSource localDataSource,
+                          CityMapper cityMapper,
+                          WeatherMapper weatherMapper) {
         this.remoteDataSource = remoteDataSource;
         this.localDataSource = localDataSource;
+        this.cityMapper = cityMapper;
+        this.weatherMapper = weatherMapper;
     }
 
     @Override
     public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
-        return remoteDataSource.getWeatherByLocationAsync(coordinate);
+        final MutableLiveData<Weather> result = new MutableLiveData<>();
+
+        final LiveData<WeatherDto> dto = remoteDataSource.getWeatherByLocationAsync(coordinate);
+
+        dto.observeForever(new Observer<WeatherDto>() {
+            @Override
+            public void onChanged(WeatherDto weatherDto) {
+                dto.removeObserver(this);
+
+                Weather weatherDomain = weatherMapper.mapToWeather(weatherDto);
+                result.setValue(weatherDomain);
+            }
+        });
+
+        return result;
     }
 
     @Override
-    public LiveData<CityFullDto> getCityByLocationAsync(final Coordinate coordinate){
-        final MutableLiveData<CityFullDto> cityResult = new MutableLiveData<>();
+    public LiveData<City> getCityByLocationAsync(final Coordinate coordinate){
+        final MutableLiveData<City> cityResult = new MutableLiveData<>();
 
         final LiveData<Boolean> isCityExist = localDataSource.isExisting(coordinate);
 
@@ -47,13 +72,15 @@ public class RepositoryImpl implements Repository {
 
         return cityResult;
     }
-    private void setCityFromDatabase(Coordinate coordinate, final MutableLiveData<CityFullDto> cityResult) {
-        final LiveData<CityFullDto> cityFromDatabase = localDataSource.getCityFull(coordinate);
 
-        cityFromDatabase.observeForever(new Observer<CityFullDto>() {
+    private void setCityFromDatabase(Coordinate coordinate, final MutableLiveData<City> cityResult) {
+        final LiveData<CityDto> cityFromDatabase = localDataSource.getCityFull(coordinate);
+
+        cityFromDatabase.observeForever(new Observer<CityDto>() {
             @Override
-            public void onChanged(CityFullDto city) {
-                if (city != null){
+            public void onChanged(CityDto cityDto) {
+                if (cityDto != null){
+                    City city = cityMapper.mapToCity(cityDto);
                     cityResult.setValue(city);
                 }
                 else{
@@ -64,15 +91,17 @@ public class RepositoryImpl implements Repository {
             }
         });
     }
-    private void setCityFromRestServiceAndSaveInInDatabase(Coordinate coordinate, final MutableLiveData<CityFullDto> cityResult) {
-        final LiveData<CityFullDto> cityFromRestService = remoteDataSource.getCityByLocationAsync(coordinate);
+    private void setCityFromRestServiceAndSaveInInDatabase(Coordinate coordinate, final MutableLiveData<City> cityResult) {
+        final LiveData<CityDto> cityFromRestService = remoteDataSource.getCityByLocationAsync(coordinate);
 
-        cityFromRestService.observeForever(new Observer<CityFullDto>() {
+        cityFromRestService.observeForever(new Observer<CityDto>() {
             @Override
-            public void onChanged(CityFullDto city) {
-                if (city != null){
+            public void onChanged(CityDto cityDto) {
+                if (cityDto != null){
+                    City city = cityMapper.mapToCity(cityDto);
+
                     cityResult.setValue(city);
-                    localDataSource.insertCity(city);
+                    localDataSource.insertCity(cityDto);
                 }
                 else{
                     // ToDo error ? no data in rest service ?

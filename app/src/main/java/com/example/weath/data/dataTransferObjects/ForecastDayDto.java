@@ -1,14 +1,14 @@
-package com.example.weath.domain.domainModels;
+package com.example.weath.data.dataTransferObjects;
 
 import java.util.Date;
 
-public class ForecastDay {
+public class ForecastDayDto {
     private Date date;
     private String minimumTemperature;
     private String maximumTemperature;
-    private SkyCondition skyCondition;
+    private SkyConditionDto skyCondition;
 
-    public ForecastDay(Date date, String minimumTemperature, String maximumTemperature, SkyCondition skyCondition) {
+    public ForecastDayDto(Date date, String minimumTemperature, String maximumTemperature, SkyConditionDto skyCondition) {
         this.date = date;
         this.minimumTemperature = minimumTemperature;
         this.maximumTemperature = maximumTemperature;
@@ -27,7 +27,7 @@ public class ForecastDay {
         return maximumTemperature;
     }
 
-    public SkyCondition getSkyCondition() {
+    public SkyConditionDto getSkyCondition() {
         return skyCondition;
     }
 }

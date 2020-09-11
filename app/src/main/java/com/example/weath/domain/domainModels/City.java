@@ -1,17 +1,25 @@
 package com.example.weath.domain.domainModels;
 
 public class City {
-    public String name;
-    public String country;
-    public Coordinate location;
-
-    public City(){
-
-    }
+    private String name;
+    private String country;
+    private Coordinate location;
 
     public City(String name, String country, Coordinate location) {
         this.name = name;
         this.country = country;
         this.location = location;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public Coordinate getLocation() {
+        return location;
     }
 }

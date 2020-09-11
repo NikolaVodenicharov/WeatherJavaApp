@@ -39,15 +39,15 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     public void onBindViewHolder(@NonNull ForecastDayViewHolder holder, int position) {
         ForecastDay forecastDay = forecastDays.get(position);
 
-        Date date = forecastDay.date;
+        Date date = forecastDay.getDate();
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE");
         String dayOfWeek = formatter.format(date);
         holder.weekDay.setText(dayOfWeek);
 
-        String minMaxTemperature = forecastDay.minimumTemperature + "/" +  forecastDay.maximumTemperature;
+        String minMaxTemperature = forecastDay.getMinimumTemperature() + "/" +  forecastDay.getMaximumTemperature();
         holder.minMaxTemperature.setText(minMaxTemperature);
 
-        int drawableId = WeatherFragment.findSkyConditionDrawableId(forecastDay.skyCondition);
+        int drawableId = WeatherFragment.findSkyConditionDrawableId(forecastDay.getSkyCondition());
         holder.skyCondition.setImageResource(drawableId);
     }
 

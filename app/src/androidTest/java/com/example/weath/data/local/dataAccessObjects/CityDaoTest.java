@@ -6,8 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.weath.LiveDataUtil;
+import com.example.weath.data.dataTransferObjects.CityDto;
 import com.example.weath.data.local.AppDatabase;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 import com.example.weath.data.local.entities.CityEntity;
 import com.example.weath.data.local.entities.CoordinateEntity;
 
@@ -88,7 +88,7 @@ public class CityDaoTest {
 
     @Test
     public void getFullCityReturnNull_whenIsNotExisting() throws InterruptedException {
-        CityFullDto city = LiveDataUtil.getValue(
+        CityDto city = LiveDataUtil.getValue(
                 database
                     .cityDao()
                     .getFull(11.22, 33.44));
@@ -101,7 +101,7 @@ public class CityDaoTest {
         CityEntity cityEntity = createCityEntity();
         database.cityDao().insert(cityEntity);
 
-        CityFullDto city = LiveDataUtil.getValue(
+        CityDto city = LiveDataUtil.getValue(
                 database
                     .cityDao()
                     .getFull(cityEntity.location.latitude, cityEntity.location.longitude));
@@ -114,7 +114,7 @@ public class CityDaoTest {
         CityEntity cityEntity = createCityEntity();
         database.cityDao().insert(cityEntity);
 
-        CityFullDto cityDto = LiveDataUtil.getValue(
+        CityDto cityDto = LiveDataUtil.getValue(
                 database
                         .cityDao()
                         .getFull(cityEntity.location.latitude, cityEntity.location.longitude));
@@ -127,7 +127,7 @@ public class CityDaoTest {
 
     @Test
     public void getAllCitiesIsEmpty_whenNoCitiesAreInserted() throws InterruptedException {
-        List<CityFullDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
 
         Assert.assertEquals(cities.size(), 0);
     }
@@ -137,7 +137,7 @@ public class CityDaoTest {
         CityEntity city = createCityEntity();
         database.cityDao().insert(city);
 
-        List<CityFullDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
 
         Assert.assertEquals(cities.size(), 1);
     }
@@ -150,7 +150,7 @@ public class CityDaoTest {
         CityEntity city2 = createSecondCityEntity();
         database.cityDao().insert(city2);
 
-        List<CityFullDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
 
         Assert.assertEquals(cities.size(), 2);
     }
@@ -160,7 +160,7 @@ public class CityDaoTest {
         CityEntity city = createCityEntity();
         database.cityDao().insert(city);
 
-        List<CityFullDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(database.cityDao().getAll());
 
         Assert.assertNotEquals(cities.size(), 0);
     }

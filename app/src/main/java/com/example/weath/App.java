@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.android.volley.toolbox.Volley;
+import com.example.weath.data.utils.CityMapperImpl;
+import com.example.weath.data.utils.WeatherMapperImpl;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.utils.CitiesCollection;
 import com.example.weath.domain.utils.OpenWeatherMapCities;
@@ -70,7 +72,7 @@ public class App extends Application {
                 Executors.newFixedThreadPool(4)
         );
 
-        Repository = new RepositoryImpl(restService, databaseManager);
+        Repository = new RepositoryImpl(restService, databaseManager, CityMapperImpl.getInstance(), WeatherMapperImpl.getInstance());
     }
 
 

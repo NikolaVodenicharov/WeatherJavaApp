@@ -4,10 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.weath.data.dataTransferObjects.CityDto;
+import com.example.weath.data.dataTransferObjects.WeatherDto;
 import com.example.weath.domain.domainModels.Coordinate;
 import com.example.weath.domain.domainModels.SkyCondition;
-import com.example.weath.domain.domainModels.Weather;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +38,7 @@ public class OpenWeatherMapDataSourceTest {
         OpenWeatherMapDataSource mockDataSource = createMockDataSourceWithMockWebServiceResponse(mockStringResponse);
 
         Coordinate mockCoordinate = new Coordinate(11.22, 33.44);
-        LiveData<Weather> actual = mockDataSource.getWeatherByLocationAsync(mockCoordinate);
+        LiveData<WeatherDto> actual = mockDataSource.getWeatherByLocationAsync(mockCoordinate);
 
         String expectedTemperature = "30℃";
         String expectedHumidity = "42";
@@ -46,11 +46,11 @@ public class OpenWeatherMapDataSourceTest {
         String expectedTuesdayMaxTemp = "34℃";
         String expectedTuesdayMinTemp = "18℃";
 
-        Assert.assertEquals(expectedTemperature, actual.getValue().currentWeather.temperature);
-        Assert.assertEquals(expectedHumidity, actual.getValue().currentWeather.humidity);
-        Assert.assertEquals(expectedSkyCondition, actual.getValue().currentWeather.skyCondition);
-        Assert.assertEquals(expectedTuesdayMaxTemp, actual.getValue().forecast.get(0).maximumTemperature);
-        Assert.assertEquals(expectedTuesdayMinTemp, actual.getValue().forecast.get(0).minimumTemperature);
+        Assert.assertEquals(expectedTemperature, actual.getValue().getCurrentWeather().getTemperature());
+        Assert.assertEquals(expectedHumidity, actual.getValue().getCurrentWeather().getHumidity());
+        Assert.assertEquals(expectedSkyCondition, actual.getValue().getCurrentWeather().getSkyCondition());
+        Assert.assertEquals(expectedTuesdayMaxTemp, actual.getValue().getForecast().get(0).getMaximumTemperature());
+        Assert.assertEquals(expectedTuesdayMinTemp, actual.getValue().getForecast().get(0).getMinimumTemperature());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class OpenWeatherMapDataSourceTest {
         OpenWeatherMapDataSource mockDataSource = createMockDataSourceWithMockWebServiceResponse(mockStringResponse);
 
         Coordinate mockCoordinate = new Coordinate(11.22, 33.44);
-        LiveData<CityFullDto> actual = mockDataSource.getCityByLocationAsync(mockCoordinate);
+        LiveData<CityDto> actual = mockDataSource.getCityByLocationAsync(mockCoordinate);
 
         String expectedCityName = "Tawarano";
         String expectedCountryCode = "JP";

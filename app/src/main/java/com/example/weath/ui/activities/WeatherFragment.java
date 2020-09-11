@@ -58,12 +58,12 @@ public class WeatherFragment extends Fragment {
         viewModel.getWeather().observe(this, new Observer<Weather>() {
             @Override
             public void onChanged(Weather weather) {
-                boolean shouldDisplayCurrentSkyCondition = weather.currentWeather != null;
+                boolean shouldDisplayCurrentSkyCondition = weather.getCurrentWeather() != null;
                 if (!shouldDisplayCurrentSkyCondition){
                     return;
                 }
 
-                SkyCondition skyCondition = weather.currentWeather.skyCondition;
+                SkyCondition skyCondition = weather.getCurrentWeather().getSkyCondition();
                 int drawableId = findSkyConditionDrawableId(skyCondition);
                 ImageView imageView = getView().findViewById(R.id.imageView);
                 imageView.setImageResource(drawableId);
@@ -75,14 +75,14 @@ public class WeatherFragment extends Fragment {
         viewModel.getWeather().observe(this, new Observer<Weather>() {
             @Override
             public void onChanged(Weather weather) {
-                boolean shouldDisplayForecast = weather.forecast != null &&
-                        weather.forecast.size() > 0;
+                boolean shouldDisplayForecast = weather.getForecast() != null &&
+                        weather.getForecast().size() > 0;
 
                 if (!shouldDisplayForecast){
                     return;
                 }
 
-                List<ForecastDay> forecast = weather.forecast;
+                List<ForecastDay> forecast = weather.getForecast();
                 ForecastAdapter adapter = new ForecastAdapter(forecast);
 
                 RecyclerView recyclerView = getView().findViewById(R.id.recyclerViewForecast);

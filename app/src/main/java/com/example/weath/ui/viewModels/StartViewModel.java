@@ -10,7 +10,6 @@ import com.example.weath.domain.Repository;
 import com.example.weath.domain.domainModels.City;
 import com.example.weath.domain.domainModels.Coordinate;
 import com.example.weath.domain.domainModels.Weather;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 
 public class StartViewModel extends ViewModel {
     private Repository Repository;
@@ -80,7 +79,7 @@ public class StartViewModel extends ViewModel {
             }
         }
 
-        setWeatherByLocationAsync(city.getValue().location);
+        setWeatherByLocationAsync(city.getValue().getLocation());
     }
     private City createCity() {
         Coordinate cityCoordinate = App.citiesCollection.getCityCoordinates(searchedCity);
@@ -98,19 +97,12 @@ public class StartViewModel extends ViewModel {
         return searchedCity.substring(countryIndexStart, countryIndexStart + 2);
     }
     private void setCityByLocationAsync() {
-        LiveData<CityFullDto> cityResult = Repository.getCityByLocationAsync(App.currentLocation);
+        LiveData<City> cityResult = Repository.getCityByLocationAsync(App.currentLocation);
 
-        cityResult.observeForever(new Observer<CityFullDto>() {
+        cityResult.observeForever(new Observer<City>() {
             @Override
-            public void onChanged(CityFullDto responseCity) {
-                City convertedCity = new City(
-                        responseCity.name,
-                        responseCity.country,
-                        new Coordinate(
-                                responseCity.location.latitude,
-                                responseCity.location.longitude));
-
-                city.setValue(convertedCity);
+            public void onChanged(City responseCity) {
+                city.setValue(responseCity);
             }
         });
     }
@@ -121,7 +113,7 @@ public class StartViewModel extends ViewModel {
         result.observeForever(new Observer<Weather>() {
             @Override
             public void onChanged(Weather updatedWeather) {
-                boolean shouldUpdate = updatedWeather.currentWeather != null || updatedWeather.forecast != null;
+                boolean shouldUpdate = updatedWeather.getCurrentWeather() != null || updatedWeather.getForecast() != null;
                 if (!shouldUpdate){
                     return;
                 }

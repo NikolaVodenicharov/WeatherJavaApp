@@ -6,8 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.weath.LiveDataUtil;
+import com.example.weath.data.dataTransferObjects.CityDto;
 import com.example.weath.domain.domainModels.Coordinate;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
 import com.google.common.util.concurrent.MoreExecutors;
 
@@ -51,7 +51,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void addCity_notThrowingException(){
-        CityFullDto city = createCityFullDto();
+        CityDto city = createCityFullDto();
 
         databaseManager.insertCity(city);
     }
@@ -67,10 +67,10 @@ public class DatabaseManagerTest {
 
     @Test
     public void isExistingReturnTrue_whenCityIsExisting() throws InterruptedException {
-        CityFullDto cityFullDto = createCityFullDto();
-        databaseManager.insertCity(cityFullDto);
+        CityDto cityDto = createCityFullDto();
+        databaseManager.insertCity(cityDto);
 
-        Coordinate coordinate = new Coordinate(cityFullDto.location.latitude, cityFullDto.location.longitude);
+        Coordinate coordinate = new Coordinate(cityDto.location.latitude, cityDto.location.longitude);
 
         boolean isExisting = LiveDataUtil.getValue(
                 databaseManager.isExisting(coordinate));
@@ -80,8 +80,8 @@ public class DatabaseManagerTest {
 
     @Test
     public void isExistingReturnFalse_whenOtherCityIsExisting_butNotTheSearchedOne() throws InterruptedException {
-        CityFullDto cityFullDto = createCityFullDto();
-        databaseManager.insertCity(cityFullDto);
+        CityDto cityDto = createCityFullDto();
+        databaseManager.insertCity(cityDto);
 
         boolean isExisting = LiveDataUtil.getValue(
                 databaseManager.isExisting(dummyCoordinate));
@@ -91,7 +91,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void getFullCityReturnNull_whenIsNotExisting() throws InterruptedException {
-        CityFullDto city = LiveDataUtil.getValue(
+        CityDto city = LiveDataUtil.getValue(
                 databaseManager.getCityFull(dummyCoordinate));
 
         Assert.assertNull(city);
@@ -99,14 +99,14 @@ public class DatabaseManagerTest {
 
     @Test
     public void getFullCityReturnObject_whenIsAddedBeforeThat() throws InterruptedException {
-        CityFullDto cityFullDto = createCityFullDto();
-        databaseManager.insertCity(cityFullDto);
+        CityDto cityDto = createCityFullDto();
+        databaseManager.insertCity(cityDto);
 
         Coordinate coordinate = new Coordinate(
-                cityFullDto.location.latitude,
-                cityFullDto.location.longitude);
+                cityDto.location.latitude,
+                cityDto.location.longitude);
 
-        CityFullDto cityResult = LiveDataUtil.getValue(
+        CityDto cityResult = LiveDataUtil.getValue(
                 databaseManager.getCityFull(coordinate));
 
         Assert.assertNotNull(cityResult);
@@ -114,79 +114,79 @@ public class DatabaseManagerTest {
 
     @Test
     public void getFullCityGiveObjectWithTheSameData_whenIsAddedBeforeThat() throws InterruptedException {
-        CityFullDto expectedCityFullDto = createCityFullDto();
-        databaseManager.insertCity(expectedCityFullDto);
+        CityDto expectedCityDto = createCityFullDto();
+        databaseManager.insertCity(expectedCityDto);
 
         Coordinate coordinate = new Coordinate(
-                expectedCityFullDto.location.latitude,
-                expectedCityFullDto.location.longitude);
+                expectedCityDto.location.latitude,
+                expectedCityDto.location.longitude);
 
-        CityFullDto cityResult = LiveDataUtil.getValue(
+        CityDto cityResult = LiveDataUtil.getValue(
                 databaseManager.getCityFull(coordinate));
 
-        Assert.assertEquals(expectedCityFullDto.name, cityResult.name);
-        Assert.assertEquals(expectedCityFullDto.country, cityResult.country);
-        Assert.assertEquals(expectedCityFullDto.location.latitude, cityResult.location.latitude);
-        Assert.assertEquals(expectedCityFullDto.location.longitude, cityResult.location.longitude);
+        Assert.assertEquals(expectedCityDto.name, cityResult.name);
+        Assert.assertEquals(expectedCityDto.country, cityResult.country);
+        Assert.assertEquals(expectedCityDto.location.latitude, cityResult.location.latitude);
+        Assert.assertEquals(expectedCityDto.location.longitude, cityResult.location.longitude);
     }
 
     @Test
     public void getAllCitiesIsEmpty_whenNoCitiesAreInserted() throws InterruptedException {
-        List<CityFullDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
 
         Assert.assertEquals(0, cities.size());
     }
 
     @Test
     public void getAllCitiesHasSizeOne_whenOneCitiesIsInserted() throws InterruptedException {
-        CityFullDto city = createCityFullDto();
+        CityDto city = createCityFullDto();
         databaseManager.insertCity(city);
 
-        List<CityFullDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
 
         Assert.assertEquals(1, cities.size());
     }
 
     @Test
     public void getAllCitiesHasSizeTwo_whenTwoCitiesIsInserted() throws InterruptedException {
-        CityFullDto city = createCityFullDto();
+        CityDto city = createCityFullDto();
         databaseManager.insertCity(city);
 
-        CityFullDto city2 = createSecondCityFullDto();
+        CityDto city2 = createSecondCityFullDto();
         databaseManager.insertCity(city2);
 
-        List<CityFullDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
 
         Assert.assertEquals(2, cities.size());
     }
 
     @Test
     public void getAllCitiesIsNotEmpty_whenOneCitiesIsInserted() throws InterruptedException {
-        CityFullDto city = createCityFullDto();
+        CityDto city = createCityFullDto();
         databaseManager.insertCity(city);
 
-        List<CityFullDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
+        List<CityDto> cities = LiveDataUtil.getValue(databaseManager.getAll());
 
         Assert.assertTrue(cities.size() > 0);
     }
 
 
-    private CityFullDto createCityFullDto() {
+    private CityDto createCityFullDto() {
         final CoordinateEntity coordinateEntity = new CoordinateEntity(){{
             longitude = 22.32;
             latitude = 75.44; }};
 
-        return new CityFullDto(){{
+        return new CityDto(){{
             name = "TestName";
             country = "TestCountryCode";
             location = coordinateEntity; }};
     }
-    private CityFullDto createSecondCityFullDto() {
+    private CityDto createSecondCityFullDto() {
         final CoordinateEntity coordinateEntity = new CoordinateEntity(){{
             longitude = 86.52;
             latitude = 49.70; }};
 
-        return new CityFullDto(){{
+        return new CityDto(){{
             name = "TestName2";
             country = "TestCountryCode2";
             location = coordinateEntity; }};

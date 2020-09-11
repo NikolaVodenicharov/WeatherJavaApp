@@ -4,12 +4,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.weath.domain.domainModels.Coordinate;
-import com.example.weath.domain.domainModels.Weather;
+import com.example.weath.data.dataTransferObjects.CityDto;
+import com.example.weath.data.dataTransferObjects.WeatherDto;
 import com.example.weath.data.local.LocalDataSource;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 import com.example.weath.data.remote.RemoteDataSource;
+import com.example.weath.data.utils.CityMapperImpl;
+import com.example.weath.data.utils.WeatherMapperImpl;
 import com.example.weath.domain.Repository;
+import com.example.weath.domain.domainModels.City;
+import com.example.weath.domain.domainModels.Coordinate;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -26,18 +30,16 @@ public class RepositoryImplTest {
 
     @Test
     public void getCityByLocationAsync_getFromRemoteDataSource_whenThereIsNotExistingInDatabase(){
-        final CityFullDto expectedCityFullDto = new CityFullDto();
-        expectedCityFullDto.name = "TestName";
-        expectedCityFullDto.country = "TestCountry";
+        final CityDto expectedCityDto = createDummyCityDto();
 
         LocalDataSource mockDatabaseManager = new LocalDataSource() {
             @Override
-            public void insertCity(CityFullDto city) {
+            public void insertCity(CityDto city) {
 
             }
 
             @Override
-            public LiveData<CityFullDto> getCityFull(Coordinate coordinate) {
+            public LiveData<CityDto> getCityFull(Coordinate coordinate) {
                 return null;
             }
 
@@ -47,47 +49,45 @@ public class RepositoryImplTest {
             }
 
             @Override
-            public LiveData<List<CityFullDto>> getAll() {
+            public LiveData<List<CityDto>> getAll() {
                 return null;
             }
         };
 
         RemoteDataSource mockRemoteDataSource = new RemoteDataSource() {
             @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
+            public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate) {
                 return null;
             }
 
             @Override
-            public LiveData<CityFullDto> getCityByLocationAsync(Coordinate coordinate) {
-                return new MutableLiveData<>(expectedCityFullDto);
+            public LiveData<CityDto> getCityByLocationAsync(Coordinate coordinate) {
+                return new MutableLiveData<>(expectedCityDto);
             }
         };
 
-        Repository Repository = new RepositoryImpl(mockRemoteDataSource, mockDatabaseManager);
+        Repository Repository = new RepositoryImpl(mockRemoteDataSource, mockDatabaseManager, CityMapperImpl.getInstance(), WeatherMapperImpl.getInstance());
 
         Coordinate mockCoordinate = new Coordinate(11.22, 33.44);
-        LiveData<CityFullDto> actual = Repository.getCityByLocationAsync(mockCoordinate);
+        LiveData<City> actual = Repository.getCityByLocationAsync(mockCoordinate);
 
-        Assert.assertEquals(expectedCityFullDto.name, actual.getValue().name);
-        Assert.assertEquals(expectedCityFullDto.country, actual.getValue().country);
+        Assert.assertEquals(expectedCityDto.name, actual.getValue().getName());
+        Assert.assertEquals(expectedCityDto.country, actual.getValue().getCountry());
     }
 
     @Test
     public void getCityByLocationAsync_getFromDatabaseWhenExist(){
-        final CityFullDto expectedCityFullDto = new CityFullDto();
-        expectedCityFullDto.name = "TestName";
-        expectedCityFullDto.country = "TestCountry";
+        final CityDto expectedCityDto = createDummyCityDto();
 
         LocalDataSource mockDatabaseManager = new LocalDataSource() {
             @Override
-            public void insertCity(CityFullDto city) {
+            public void insertCity(CityDto city) {
 
             }
 
             @Override
-            public LiveData<CityFullDto> getCityFull(Coordinate coordinate) {
-                return new MutableLiveData<>(expectedCityFullDto);
+            public LiveData<CityDto> getCityFull(Coordinate coordinate) {
+                return new MutableLiveData<>(expectedCityDto);
             }
 
             @Override
@@ -96,50 +96,48 @@ public class RepositoryImplTest {
             }
 
             @Override
-            public LiveData<List<CityFullDto>> getAll() {
+            public LiveData<List<CityDto>> getAll() {
                 return null;
             }
         };
 
         RemoteDataSource mockRemoteDataSource = new RemoteDataSource() {
             @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
+            public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate) {
                 return null;
             }
 
             @Override
-            public LiveData<CityFullDto> getCityByLocationAsync(Coordinate coordinate) {
+            public LiveData<CityDto> getCityByLocationAsync(Coordinate coordinate) {
                 return null;
             }
         };
 
-        Repository Repository = new RepositoryImpl(mockRemoteDataSource, mockDatabaseManager);
+        Repository Repository = new RepositoryImpl(mockRemoteDataSource, mockDatabaseManager, CityMapperImpl.getInstance(), WeatherMapperImpl.getInstance());
 
         Coordinate mockCoordinate = new Coordinate(11.22, 33.44);
-        LiveData<CityFullDto> actual = Repository.getCityByLocationAsync(mockCoordinate);
+        LiveData<City> actual = Repository.getCityByLocationAsync(mockCoordinate);
 
-        Assert.assertEquals(expectedCityFullDto.name, actual.getValue().name);
-        Assert.assertEquals(expectedCityFullDto.country, actual.getValue().country);
+        Assert.assertEquals(expectedCityDto.name, actual.getValue().getName());
+        Assert.assertEquals(expectedCityDto.country, actual.getValue().getCountry());
     }
 
     @Test
     public void getCityByLocationAsync_getFromRemoteDataAndInsertInDatabase_WhenIsNotExistingInDatabase(){
-        final CityFullDto expectedCityFullDto = new CityFullDto();
-        expectedCityFullDto.name = "TestName";
-        expectedCityFullDto.country = "TestCountry";
+        final CityDto expectedCityDto = createDummyCityDto();
 
         LocalDataSource mockDatabaseManager = new LocalDataSource() {
-            private CityFullDto cityFullDto;
+            private CityDto cityFullDto;
             private boolean isExisting = false;
 
             @Override
-            public void insertCity(CityFullDto city) {
+            public void insertCity(CityDto city) {
                 cityFullDto = city;
                 isExisting = true;
             }
 
             @Override
-            public LiveData<CityFullDto> getCityFull(Coordinate coordinate) {
+            public LiveData<CityDto> getCityFull(Coordinate coordinate) {
                 return new MutableLiveData<>(cityFullDto);
             }
 
@@ -149,7 +147,7 @@ public class RepositoryImplTest {
             }
 
             @Override
-            public LiveData<List<CityFullDto>> getAll() {
+            public LiveData<List<CityDto>> getAll() {
                 return null;
             }
         };
@@ -158,12 +156,12 @@ public class RepositoryImplTest {
             private boolean askedOnce = false;
 
             @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
+            public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate) {
                 return null;
             }
 
             @Override
-            public LiveData<CityFullDto> getCityByLocationAsync(Coordinate coordinate) {
+            public LiveData<CityDto> getCityByLocationAsync(Coordinate coordinate) {
                 // if we ask second time it will return null.
                 // We do that to ensure that repository is not asking again the remote data source
                 // And the answer in assert is from local data source
@@ -172,11 +170,11 @@ public class RepositoryImplTest {
                 }
 
                 askedOnce = true;
-                return new MutableLiveData<>(expectedCityFullDto);
+                return new MutableLiveData<>(expectedCityDto);
             }
         };
 
-        Repository Repository = new RepositoryImpl(mockRemoteDataSource, mockDatabaseManager);
+        Repository Repository = new RepositoryImpl(mockRemoteDataSource, mockDatabaseManager, CityMapperImpl.getInstance(), WeatherMapperImpl.getInstance());
 
         Coordinate mockCoordinate = new Coordinate(11.22, 33.44);
 
@@ -184,9 +182,22 @@ public class RepositoryImplTest {
         Repository.getCityByLocationAsync(mockCoordinate);
 
         // get from database
-        LiveData<CityFullDto> actual = Repository.getCityByLocationAsync(mockCoordinate);
+        LiveData<City> actual = Repository.getCityByLocationAsync(mockCoordinate);
 
-        Assert.assertEquals(expectedCityFullDto.name, actual.getValue().name);
-        Assert.assertEquals(expectedCityFullDto.country, actual.getValue().country);
+        Assert.assertEquals(expectedCityDto.name, actual.getValue().getName());
+        Assert.assertEquals(expectedCityDto.country, actual.getValue().getCountry());
+    }
+
+    private CityDto createDummyCityDto (){
+        CoordinateEntity coordinateEntity= new CoordinateEntity();
+        coordinateEntity.latitude = 11.22;
+        coordinateEntity.longitude = 33.44;
+
+        CityDto dto = new CityDto();
+        dto.name = "TestName";
+        dto.country = "TestCountry";
+        dto.location = coordinateEntity;
+
+        return dto;
     }
 }

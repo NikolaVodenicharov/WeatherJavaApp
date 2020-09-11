@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.weath.domain.domainModels.Coordinate;
-import com.example.weath.domain.domainModels.CurrentWeather;
-import com.example.weath.domain.domainModels.ForecastDay;
-import com.example.weath.domain.domainModels.SkyCondition;
-import com.example.weath.domain.domainModels.Weather;
-import com.example.weath.data.local.dataTransferObjects.CityFullDto;
+import com.example.weath.data.dataTransferObjects.CityDto;
+import com.example.weath.data.dataTransferObjects.CurrentWeatherDto;
+import com.example.weath.data.dataTransferObjects.ForecastDayDto;
+import com.example.weath.data.dataTransferObjects.SkyConditionDto;
+import com.example.weath.data.dataTransferObjects.WeatherDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
+import com.example.weath.domain.domainModels.Coordinate;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,8 +39,8 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
         this.webService = webService;
     }
 
-    public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
-        final MutableLiveData<Weather> weather = new MutableLiveData<>(new Weather());
+    public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate){
+        final MutableLiveData<WeatherDto> weather = new MutableLiveData<>();
 
         String url = createOneCallUrl(coordinate);
 
@@ -51,7 +51,7 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
                 response.removeObserver(this);
 
                 try {
-                    Weather responseWeather = createWeatherFromOneCall(jsonObject);
+                    WeatherDto responseWeather = createWeatherFromOneCall(jsonObject);
                     weather.setValue(responseWeather);
 
                 } catch (JSONException e) {
@@ -63,8 +63,8 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
         return weather;
     }
 
-    public LiveData<CityFullDto> getCityByLocationAsync(Coordinate coordinate){
-        final MutableLiveData<CityFullDto> city = new MutableLiveData<>();
+    public LiveData<CityDto> getCityByLocationAsync(Coordinate coordinate){
+        final MutableLiveData<CityDto> city = new MutableLiveData<>();
 
         String url = createCurrentWeatherURL(coordinate);
 
@@ -75,7 +75,7 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
                 response.removeObserver(this);
 
                 try {
-                    CityFullDto responseCity = createCityFromCurrentWeather(jsonObject);
+                    CityDto responseCity = createCityFromCurrentWeather(jsonObject);
                     city.setValue(responseCity);
 
                 } catch (JSONException e) {
@@ -103,14 +103,13 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
                 METRIC_UNIT;
     }
 
-    private Weather createWeatherFromOneCall(JSONObject response) throws JSONException {
-        Weather weather = new Weather();
-        weather.currentWeather = createCurrentWeatherFromOneCall(response);
-        weather.forecast = createForecastFromOneCall(response);
+    private WeatherDto createWeatherFromOneCall(JSONObject response) throws JSONException {
+        return new WeatherDto(
+                        createCurrentWeatherFromOneCall(response),
+                        createForecastFromOneCall(response));
 
-        return weather;
     }
-    private CurrentWeather createCurrentWeatherFromOneCall(JSONObject response) throws JSONException {
+    private CurrentWeatherDto createCurrentWeatherFromOneCall(JSONObject response) throws JSONException {
         JSONObject current = response.getJSONObject("current");
         String temp = current.getString("temp");
         String humidity = current.getString("humidity"); // + " %" ?
@@ -126,12 +125,13 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
         JSONObject weatherArrayFirst = weatherArray.getJSONObject(0);
         String weatherCode = weatherArrayFirst.getString("id");
 
-        CurrentWeather currentWeather = new CurrentWeather();
-        currentWeather.temperature = createDisplayableTemperature(temp);
-        currentWeather.humidity = humidity;
-        currentWeather.sunrise = sunrise;
-        currentWeather.sunset = sunset;
-        currentWeather.skyCondition = createSkyCondition(weatherCode);
+        CurrentWeatherDto currentWeather = new CurrentWeatherDto(
+                createDisplayableTemperature(temp),
+                createSkyCondition(weatherCode),
+                humidity,
+                sunrise,
+                sunset );
+
         return currentWeather;
     }
     private String createDisplayableTemperature(String temp){
@@ -141,28 +141,28 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
 
         return result;
     }
-    private SkyCondition createSkyCondition(String skyId){
+    private SkyConditionDto createSkyCondition(String skyId){
 
         if (skyId.startsWith("2")){
-            return SkyCondition.THUNDERSTORM;
+            return SkyConditionDto.THUNDERSTORM;
         }
         else if (skyId.startsWith("3") || skyId.startsWith("5")){
-            return SkyCondition.RAIN;
+            return SkyConditionDto.RAIN;
         }
         else if (skyId.startsWith("6")){
-            return SkyCondition.SNOW;
+            return SkyConditionDto.SNOW;
         }
         else if (skyId.contains("800")){
-            return SkyCondition.CLEAR;
+            return SkyConditionDto.CLEAR;
         }
         else{                           // skyId.startsWith("7") || skyId.startsWith("8")
-            return SkyCondition.CLOUDS;
+            return SkyConditionDto.CLOUDS;
         }
     }
-    private List<ForecastDay> createForecastFromOneCall(JSONObject response) throws JSONException {
+    private List<ForecastDayDto> createForecastFromOneCall(JSONObject response) throws JSONException {
         JSONArray daily = response.getJSONArray("daily");
         int dailyLength = daily.length();
-        List<ForecastDay> forecastSevenDays = new ArrayList<>(7);
+        List<ForecastDayDto> forecastSevenDays = new ArrayList<>(7);
 
         // i = 1 to start from tomorrow, not today
         for (int i = 1; i < dailyLength; i++) {
@@ -180,14 +180,15 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
             JSONObject weatherForecastArrayFirst = weatherForecastArray.getJSONObject(0);
             String weatherCode = weatherForecastArrayFirst.getString("id");
 
-            ForecastDay day = new ForecastDay();
-            day.date = date;
-            day.maximumTemperature = createDisplayableTemperature(maxTemp);
-            day.minimumTemperature = createDisplayableTemperature(minTemp);
-            day.skyCondition= createSkyCondition(weatherCode);
+            ForecastDayDto day = new ForecastDayDto(
+                    date,
+                    createDisplayableTemperature(minTemp),
+                    createDisplayableTemperature(maxTemp),
+                    createSkyCondition(weatherCode));
 
             forecastSevenDays.add(day);
         }
+
         return forecastSevenDays;
     }
     private Date unixTimeConverter(String secondsUnix) {
@@ -199,7 +200,7 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
         return date;
     }
 
-    private CityFullDto createCityFromCurrentWeather(JSONObject response) throws JSONException {
+    private CityDto createCityFromCurrentWeather(JSONObject response) throws JSONException {
         JSONObject coord = response.getJSONObject("coord");
         String latitudeString = coord.getString("lat");
         String longitudeString = coord.getString("lon");
@@ -215,7 +216,7 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
 
         final String cityName = response.getString("name");
 
-        CityFullDto city = new CityFullDto();
+        CityDto city = new CityDto();
         city.name = cityName;
         city.country = countryCode;
         city.location = coordinate;

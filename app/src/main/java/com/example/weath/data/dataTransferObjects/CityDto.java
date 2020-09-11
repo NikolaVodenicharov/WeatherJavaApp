@@ -1,12 +1,10 @@
-package com.example.weath.data.local.dataTransferObjects;
+package com.example.weath.data.dataTransferObjects;
 
-import androidx.annotation.NonNull;
 import androidx.room.Embedded;
-import androidx.room.PrimaryKey;
 
 import com.example.weath.data.local.entities.CoordinateEntity;
 
-public class CityFullDto {
+public class CityDto {
     public String name;
     public String country;
 

@@ -1,15 +1,15 @@
-package com.example.weath.domain.domainModels;
+package com.example.weath.data.dataTransferObjects;
 
 import java.util.Date;
 
-public class CurrentWeather {
+public class CurrentWeatherDto {
     private String temperature;
-    private SkyCondition skyCondition;
+    private SkyConditionDto skyCondition;
     private String humidity;
     private Date sunrise;
     private Date sunset;
 
-    public CurrentWeather(String temperature, SkyCondition skyCondition, String humidity, Date sunrise, Date sunset) {
+    public CurrentWeatherDto(String temperature, SkyConditionDto skyCondition, String humidity, Date sunrise, Date sunset) {
         this.temperature = temperature;
         this.skyCondition = skyCondition;
         this.humidity = humidity;
@@ -21,7 +21,7 @@ public class CurrentWeather {
         return temperature;
     }
 
-    public SkyCondition getSkyCondition() {
+    public SkyConditionDto getSkyCondition() {
         return skyCondition;
     }
 

@@ -3,6 +3,19 @@ package com.example.weath.domain.domainModels;
 import java.util.List;
 
 public class Weather {
-    public CurrentWeather currentWeather;
-    public List<ForecastDay> forecast;
+    private CurrentWeather currentWeather;
+    private List<ForecastDay> forecast;
+
+    public Weather (CurrentWeather currentWeather, List<ForecastDay> forecast){
+        this.currentWeather = currentWeather;
+        this.forecast = forecast;
+    }
+
+    public CurrentWeather getCurrentWeather() {
+        return currentWeather;
+    }
+
+    public List<ForecastDay> getForecast() {
+        return forecast;
+    }
 }
