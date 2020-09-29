@@ -1,4 +1,4 @@
-package com.example.weath.domain.domainModels;
+package com.example.weath.domain.models;
 
 import java.util.List;
 

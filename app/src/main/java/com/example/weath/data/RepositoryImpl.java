@@ -11,9 +11,9 @@ import com.example.weath.data.remote.RemoteDataSource;
 import com.example.weath.data.utils.CityMapper;
 import com.example.weath.data.utils.WeatherMapper;
 import com.example.weath.domain.Repository;
-import com.example.weath.domain.domainModels.City;
-import com.example.weath.domain.domainModels.Coordinate;
-import com.example.weath.domain.domainModels.Weather;
+import com.example.weath.domain.models.City;
+import com.example.weath.domain.models.Coordinate;
+import com.example.weath.domain.models.Weather;
 
 public class RepositoryImpl implements Repository {
     private final RemoteDataSource remoteDataSource;

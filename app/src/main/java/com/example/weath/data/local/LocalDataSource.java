@@ -3,7 +3,7 @@ package com.example.weath.data.local;
 import androidx.lifecycle.LiveData;
 
 import com.example.weath.data.dataTransferObjects.CityDto;
-import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.models.Coordinate;
 
 import java.util.List;
 

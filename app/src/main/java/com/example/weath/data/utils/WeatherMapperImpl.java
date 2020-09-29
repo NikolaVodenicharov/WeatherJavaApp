@@ -4,10 +4,10 @@ import com.example.weath.data.dataTransferObjects.CurrentWeatherDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
 import com.example.weath.data.dataTransferObjects.WeatherDto;
-import com.example.weath.domain.domainModels.CurrentWeather;
-import com.example.weath.domain.domainModels.ForecastDay;
-import com.example.weath.domain.domainModels.SkyCondition;
-import com.example.weath.domain.domainModels.Weather;
+import com.example.weath.domain.models.CurrentWeather;
+import com.example.weath.domain.models.ForecastDay;
+import com.example.weath.domain.models.SkyCondition;
+import com.example.weath.domain.models.Weather;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,14 +1,10 @@
 package com.example.weath.ui.activities;
 
-import android.Manifest;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,8 +13,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.weath.App;
 import com.example.weath.R;
-import com.example.weath.ui.viewModels.StartViewModel;
 import com.example.weath.databinding.ActivityStartBinding;
+import com.example.weath.ui.utils.CurrentLocationHelper;
+import com.example.weath.ui.viewModels.StartViewModel;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -39,7 +36,7 @@ public class StartActivity extends AppCompatActivity {
 
         // ToDo check for internet. If there is not....
 
-        askCurrentLocationAsync();
+        getLocationAsync();
         initializeBindings();
         initializePager();
         initializeTabLayoutMediator();
@@ -86,49 +83,18 @@ public class StartActivity extends AppCompatActivity {
         });
     }
 
-    // ToDo may be i should move all of location permissions in App class
-    private void askCurrentLocationAsync() {
-        boolean isLocationPermissionGranted = App.checkPermissionGranted(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-        if (isLocationPermissionGranted){
+    private void getLocationAsync(){
+        if (App.lastKnownLocation != null &&
+            App.lastKnownLocation.getValue() != null){
             return;
         }
-
-        if (shouldRationaleLocationPermission()){
-            alertDialogRationale();
+        else if (CurrentLocationHelper.checkCoarseLocationPermission(this)){
+            App.lastKnownLocation = CurrentLocationHelper.getLastKnownLocation(this);
         }
         else{
-            requestLocationPermissionAsync();
+            // if location permission is granted that will trigger onRequestPermissionResult int this class
+            CurrentLocationHelper.askForLocationPermissionAsync(this);
         }
-    }
-    private boolean shouldRationaleLocationPermission() {
-        return ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-    }
-    private void alertDialogRationale() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setMessage(NEED_LOCATION_PERMISSION_MESSAGE);
-
-        builder.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                requestLocationPermissionAsync();
-            }
-        });
-
-        builder.setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        builder.show();
-    }
-    private void requestLocationPermissionAsync() {
-        ActivityCompat.requestPermissions(
-                StartActivity.this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_LOCATION_CODE);
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -145,7 +111,7 @@ public class StartActivity extends AppCompatActivity {
                 return;
             }
 
-            App.initializeCurrentLocation(getApplicationContext());
+            App.lastKnownLocation = CurrentLocationHelper.getLastKnownLocation(this);
 
             Toast.makeText(this, LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
         }

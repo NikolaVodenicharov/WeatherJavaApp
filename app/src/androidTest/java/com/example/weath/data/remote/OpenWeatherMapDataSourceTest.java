@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.weath.data.dataTransferObjects.CityDto;
 import com.example.weath.data.dataTransferObjects.WeatherDto;
-import com.example.weath.domain.domainModels.Coordinate;
-import com.example.weath.domain.domainModels.SkyCondition;
+import com.example.weath.domain.models.Coordinate;
+import com.example.weath.domain.models.SkyCondition;
 
 import org.json.JSONException;
 import org.json.JSONObject;

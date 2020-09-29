@@ -4,7 +4,7 @@ import com.example.weath.data.dataTransferObjects.CurrentWeatherDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
 import com.example.weath.data.dataTransferObjects.WeatherDto;
-import com.example.weath.domain.domainModels.Weather;
+import com.example.weath.domain.models.Weather;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.models.Coordinate;
 
 import java.io.BufferedReader;
 import java.io.IOException;

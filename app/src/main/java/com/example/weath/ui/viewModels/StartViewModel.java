@@ -7,12 +7,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.weath.App;
 import com.example.weath.domain.Repository;
-import com.example.weath.domain.domainModels.City;
-import com.example.weath.domain.domainModels.Coordinate;
-import com.example.weath.domain.domainModels.Weather;
+import com.example.weath.domain.models.City;
+import com.example.weath.domain.models.Coordinate;
+import com.example.weath.domain.models.Weather;
 
 public class StartViewModel extends ViewModel {
-    private Repository Repository;
+    private Repository repository;
 
     private City defaultCity = new City("New York City", "US", new Coordinate(40.71, -74.00));
     private MutableLiveData<Boolean> isSearchCityClicked = new MutableLiveData<>(false);
@@ -23,7 +23,7 @@ public class StartViewModel extends ViewModel {
     private MutableLiveData<Weather> weather = new MutableLiveData<>();
 
     public StartViewModel() {
-       this.Repository = App.Repository;
+       this.repository = App.repository;
     }
 
     public LiveData<Boolean> getIsSearchCityClicked() {
@@ -55,6 +55,8 @@ public class StartViewModel extends ViewModel {
         // This method is used when we need to fill up the city and weather objects.
         // it doesn't matter are the information displayed
 
+        //ToDo if there is no internet connection ?
+
         boolean canUseSearchedCityField = searchedCity != null && !searchedCity.isEmpty();
 
         if (canUseSearchedCityField){
@@ -64,14 +66,17 @@ public class StartViewModel extends ViewModel {
                 city.setValue(createCity());
             }
             else{
-                // searched city is not from autocomplete. look for ambiguous data
+                //ToDo searched city is not from autocomplete. look for ambiguous data
             }
         }
         else {
-            boolean canUseCurrentLocation = App.currentLocation != null;
+            boolean canUseCurrentLocation =
+                    App.lastKnownLocation != null &&
+                    App.lastKnownLocation.getValue() != null;
+
             if (canUseCurrentLocation){
-                setCityByLocationAsync();
-                setWeatherByLocationAsync(App.currentLocation);
+                setCityByLocationAsync(App.lastKnownLocation.getValue());
+                setWeatherByLocationAsync(App.lastKnownLocation.getValue());
                 return;
             }
             else{
@@ -96,8 +101,8 @@ public class StartViewModel extends ViewModel {
         int countryIndexStart = searchedCity.indexOf('(') + 1;
         return searchedCity.substring(countryIndexStart, countryIndexStart + 2);
     }
-    private void setCityByLocationAsync() {
-        LiveData<City> cityResult = Repository.getCityByLocationAsync(App.currentLocation);
+    private void setCityByLocationAsync(Coordinate coordinate) {
+        LiveData<City> cityResult = repository.getCityByLocationAsync(coordinate);
 
         cityResult.observeForever(new Observer<City>() {
             @Override
@@ -107,7 +112,7 @@ public class StartViewModel extends ViewModel {
         });
     }
     private void setWeatherByLocationAsync(Coordinate location) {
-        LiveData<Weather> result = Repository.getWeatherByLocationAsync(location);
+        LiveData<Weather> result = repository.getWeatherByLocationAsync(location);
 
         // ToDo is observe forever making memory leak ?
         result.observeForever(new Observer<Weather>() {

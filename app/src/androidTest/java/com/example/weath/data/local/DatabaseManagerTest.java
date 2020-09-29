@@ -7,7 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.weath.LiveDataUtil;
 import com.example.weath.data.dataTransferObjects.CityDto;
-import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.models.Coordinate;
 import com.example.weath.data.local.entities.CoordinateEntity;
 import com.google.common.util.concurrent.MoreExecutors;
 

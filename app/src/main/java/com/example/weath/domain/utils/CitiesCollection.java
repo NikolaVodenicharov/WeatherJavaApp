@@ -3,7 +3,7 @@ package com.example.weath.domain.utils;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
-import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.models.Coordinate;
 
 import java.util.Map;
 

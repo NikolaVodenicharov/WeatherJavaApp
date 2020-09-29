@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weath.R;
-import com.example.weath.domain.domainModels.ForecastDay;
-import com.example.weath.domain.domainModels.SkyCondition;
-import com.example.weath.domain.domainModels.Weather;
+import com.example.weath.domain.models.ForecastDay;
+import com.example.weath.domain.models.SkyCondition;
+import com.example.weath.domain.models.Weather;
 import com.example.weath.databinding.FragmentWeatherBinding;
 import com.example.weath.ui.viewModels.StartViewModel;
 

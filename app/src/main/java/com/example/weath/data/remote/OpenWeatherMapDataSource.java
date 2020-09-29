@@ -10,7 +10,7 @@ import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
 import com.example.weath.data.dataTransferObjects.WeatherDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
-import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.models.Coordinate;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -12,8 +12,8 @@ import com.example.weath.data.remote.RemoteDataSource;
 import com.example.weath.data.utils.CityMapperImpl;
 import com.example.weath.data.utils.WeatherMapperImpl;
 import com.example.weath.domain.Repository;
-import com.example.weath.domain.domainModels.City;
-import com.example.weath.domain.domainModels.Coordinate;
+import com.example.weath.domain.models.City;
+import com.example.weath.domain.models.Coordinate;
 
 import org.junit.Assert;
 import org.junit.Rule;

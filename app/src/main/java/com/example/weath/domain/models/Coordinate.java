@@ -1,4 +1,4 @@
-package com.example.weath.domain.domainModels;
+package com.example.weath.domain.models;
 
 public class Coordinate {
     private Double latitude;
