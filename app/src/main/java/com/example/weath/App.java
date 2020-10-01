@@ -1,6 +1,8 @@
 package com.example.weath;
 
 import android.app.Application;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Application {
+    private static ConnectivityManager connectivityManager;
     public static MutableLiveData<Coordinate> lastKnownLocation;
 
     public static CitiesCollection citiesCollection;
@@ -24,8 +27,19 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
+        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         initializeCitiesCollection();
         initializeRepository();
+    }
+
+    public static boolean isConnectedToInternet() {
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        boolean isConnected =
+                networkInfo != null &&
+                networkInfo.isConnectedOrConnecting();
+
+        return isConnected;
     }
 
     private void initializeCitiesCollection() {
@@ -41,4 +55,6 @@ public class App extends Application {
     private void initializeRepository() {
         repository = RepositoryFactory.createRepository(this);
     }
+
+
 }

@@ -15,6 +15,7 @@ import com.example.weath.App;
 import com.example.weath.R;
 import com.example.weath.databinding.ActivityStartBinding;
 import com.example.weath.ui.utils.CurrentLocationHelper;
+import com.example.weath.ui.utils.StartPagerAdapter;
 import com.example.weath.ui.viewModels.StartViewModel;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -73,7 +74,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void displayWeatherOnSearchCityClicked(){
-        viewModel.getIsSearchCityClicked().observe(this, new Observer<Boolean>() {
+        viewModel.getIsSearchWeatherCalled().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isClicked) {
                 if (isClicked){

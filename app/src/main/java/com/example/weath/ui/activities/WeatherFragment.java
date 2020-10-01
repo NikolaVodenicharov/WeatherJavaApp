@@ -19,6 +19,7 @@ import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.domain.models.SkyCondition;
 import com.example.weath.domain.models.Weather;
 import com.example.weath.databinding.FragmentWeatherBinding;
+import com.example.weath.ui.utils.ForecastAdapter;
 import com.example.weath.ui.viewModels.StartViewModel;
 
 import java.util.List;

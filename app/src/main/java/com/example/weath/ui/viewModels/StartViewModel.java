@@ -13,21 +13,22 @@ import com.example.weath.domain.models.Weather;
 
 public class StartViewModel extends ViewModel {
     private Repository repository;
+    private String errorMessage;
 
-    private City defaultCity = new City("New York City", "US", new Coordinate(40.71, -74.00));
-    private MutableLiveData<Boolean> isSearchCityClicked = new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> isSearchWeatherCalled = new MutableLiveData<>(false);
 
     public String searchedCity;
-    private MutableLiveData<City> city = new MutableLiveData<>();
+    private City defaultCity = new City("New York City", "US", new Coordinate(40.71, -74.00));
 
+    private MutableLiveData<City> city = new MutableLiveData<>();
     private MutableLiveData<Weather> weather = new MutableLiveData<>();
 
     public StartViewModel() {
        this.repository = App.repository;
     }
 
-    public LiveData<Boolean> getIsSearchCityClicked() {
-        return isSearchCityClicked;
+    public LiveData<Boolean> getIsSearchWeatherCalled() {
+        return isSearchWeatherCalled;
     }
 
     public LiveData<City> getCity() {
@@ -38,9 +39,9 @@ public class StartViewModel extends ViewModel {
         return weather;
     }
 
-    private void searchCityClickedSignal(){
-        isSearchCityClicked.setValue(true);
-        isSearchCityClicked.setValue(false);
+    private void searchWeatherCalledSignal(){
+        isSearchWeatherCalled.setValue(true);
+        isSearchWeatherCalled.setValue(false);
     }
 
     public void searchWeather(){
@@ -48,48 +49,77 @@ public class StartViewModel extends ViewModel {
         // We have to inform the activity that it need to display weather
 
         fillCityWeather();
-        searchCityClickedSignal();
+        searchWeatherCalledSignal();
     }
 
     public void fillCityWeather(){
-        // This method is used when we need to fill up the city and weather objects.
-        // it doesn't matter are the information displayed
+        clearErrorMessage();
 
-        //ToDo if there is no internet connection ?
-
-        boolean canUseSearchedCityField = searchedCity != null && !searchedCity.isEmpty();
-
-        if (canUseSearchedCityField){
-            boolean isSearchedCityAutoCompleted = searchedCity.contains(")"); // Sofia (BG) contains ")"
-
-            if (isSearchedCityAutoCompleted){
-                city.setValue(createCity());
-            }
-            else{
-                //ToDo searched city is not from autocomplete. look for ambiguous data
-            }
+        if (!App.isConnectedToInternet()){
+            noInternetConnectionCase();
         }
-        else {
-            boolean canUseCurrentLocation =
-                    App.lastKnownLocation != null &&
-                    App.lastKnownLocation.getValue() != null;
+        else if(isSearchedCityFromAutocomplete()){
+            searchedCityFromAutocompleteCase();
+        }
+        else if (isSearchedCityEmpty()){
+            emptySearchCityCase();
+        }
+        else{
+            searchedCityNotFromAutocompleteCase();
+        }
+    }
 
-            if (canUseCurrentLocation){
-                setCityByLocationAsync(App.lastKnownLocation.getValue());
-                setWeatherByLocationAsync(App.lastKnownLocation.getValue());
-                return;
-            }
-            else{
-                city.setValue(defaultCity);
-            }
+    private void clearErrorMessage() {
+        errorMessage = null;
+    }
+    private boolean isSearchedCityFromAutocomplete(){
+        if (isSearchedCityEmpty()){
+            return false;
         }
 
+        return  App.citiesCollection.isExist(searchedCity);
+    }
+    private boolean isSearchedCityEmpty() {
+        return searchedCity == null ||
+                searchedCity.isEmpty();
+    }
+
+    private void noInternetConnectionCase(){
+        errorMessage = "There is no internet connection";
+
+        // get last cached city and weather data;
+    }
+    private void emptySearchCityCase(){
+        fillDefaultCityWeather();
+    }
+    private void searchedCityFromAutocompleteCase(){
+        city.setValue(createCity());
         setWeatherByLocationAsync(city.getValue().getLocation());
     }
+    private void searchedCityNotFromAutocompleteCase(){
+        errorMessage = "The input can cause ambiguous result. Please use autocomplete.";
+        fillDefaultCityWeather();
+    }
+
+    private void fillDefaultCityWeather() {
+        boolean canUseCurrentLocation =
+                App.lastKnownLocation != null &&
+                        App.lastKnownLocation.getValue() != null;
+
+        if (canUseCurrentLocation){
+            setCityByLocationAsync(App.lastKnownLocation.getValue());
+            setWeatherByLocationAsync(App.lastKnownLocation.getValue());
+        }
+        else{
+            city.setValue(defaultCity);
+            setWeatherByLocationAsync(city.getValue().getLocation());
+        }
+    }
+
     private City createCity() {
-        Coordinate cityCoordinate = App.citiesCollection.getCityCoordinates(searchedCity);
         String extractedName = extractCityName(searchedCity);
         String extractedCountry = extractCountry(searchedCity);
+        Coordinate cityCoordinate = App.citiesCollection.getCityCoordinates(searchedCity);
 
         return new City(extractedName, extractedCountry, cityCoordinate);
     }
