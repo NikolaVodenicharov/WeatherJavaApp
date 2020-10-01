@@ -1,8 +1,9 @@
-package com.example.weath.domain.utils;
+package com.example.weath.data;
 
 import androidx.annotation.NonNull;
 
 import com.example.weath.domain.models.Coordinate;
+import com.example.weath.domain.CitiesCollection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class OpenWeatherMapCities implements CitiesCollection {
     private final int citiesInitialCapacity = 170000;
@@ -27,8 +29,8 @@ public class OpenWeatherMapCities implements CitiesCollection {
         loadAllCities(streams);
     }
 
-    public Map<String, String> getCitiesByNameAndCountry() {
-        return citiesByNameAndCountry;
+    public Set<String> getCitiesByNameAndCountry() {
+        return citiesByNameAndCountry.keySet();
     }
 
     public Coordinate getCityCoordinates(@NonNull String cityNameAndCountry){

@@ -9,8 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.weath.data.utils.RepositoryFactory;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.Coordinate;
-import com.example.weath.domain.utils.CitiesCollection;
-import com.example.weath.domain.utils.OpenWeatherMapCities;
+import com.example.weath.domain.CitiesCollection;
+import com.example.weath.data.OpenWeatherMapCities;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,9 +27,13 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        initializeConnectivityManager();
         initializeCitiesCollection();
         initializeRepository();
+    }
+
+    private void initializeConnectivityManager() {
+        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
     }
 
     public static boolean isConnectedToInternet() {
@@ -45,9 +49,9 @@ public class App extends Application {
     private void initializeCitiesCollection() {
         List<InputStream> streams = new ArrayList<>(4);
         streams.add(getResources().openRawResource(R.raw.ad));
-//        streams.add(getResources().openRawResource(R.raw.ek));
-//        streams.add(getResources().openRawResource(R.raw.mr));
-//        streams.add(getResources().openRawResource(R.raw.sz));
+        streams.add(getResources().openRawResource(R.raw.ek));
+        streams.add(getResources().openRawResource(R.raw.mr));
+        streams.add(getResources().openRawResource(R.raw.sz));
 
         citiesCollection = new OpenWeatherMapCities(streams);
     }

@@ -1,22 +1,21 @@
 package com.example.weath.ui.activities;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.weath.App;
 import com.example.weath.R;
-import com.example.weath.ui.viewModels.StartViewModel;
 import com.example.weath.databinding.FragmentSearchBinding;
+import com.example.weath.ui.viewModels.StartViewModel;
 
 public class SearchFragment extends Fragment {
     private FragmentSearchBinding binding;
@@ -49,7 +48,7 @@ public class SearchFragment extends Fragment {
     //Todo extract somewhere else ?
     private void initializeAutoCompleteFromHashMap(AutoCompleteTextView autocomplete) {
         String[] a = new String[2];
-        String[] cities = App.citiesCollection.getCitiesByNameAndCountry().keySet().toArray(a);
+        String[] cities = App.citiesCollection.getCitiesByNameAndCountry().toArray(a);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 getActivity(),

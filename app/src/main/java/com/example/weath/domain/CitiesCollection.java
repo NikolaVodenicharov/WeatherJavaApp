@@ -1,13 +1,13 @@
-package com.example.weath.domain.utils;
+package com.example.weath.domain;
 
 import androidx.annotation.NonNull;
 
 import com.example.weath.domain.models.Coordinate;
 
-import java.util.Map;
+import java.util.Set;
 
 public interface CitiesCollection {
-    Map<String, String> getCitiesByNameAndCountry();
+    Set<String> getCitiesByNameAndCountry();
     Coordinate getCityCoordinates(@NonNull String cityNameAndCountry);
     boolean isExist (@NonNull String cityNameAndCountry);
 }
