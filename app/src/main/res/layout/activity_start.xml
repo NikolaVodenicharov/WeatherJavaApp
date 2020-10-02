@@ -14,7 +14,6 @@
         android:orientation="vertical"
         tools:context=".ui.activities.StartActivity"
         android:background="@drawable/sky">
-        <!--    android:background="@drawable/sky"-->
 
         <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"

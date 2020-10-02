@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,6 +54,17 @@ public class WeatherFragment extends Fragment {
     public void onResume() {
         super.onResume();
         viewModel.fillCityWeather();
+        setErrorMessageVisibility();
+    }
+
+    private void setErrorMessageVisibility() {
+        TextView errorMessageTextView = getView().findViewById(R.id.error_message);
+        if (viewModel.getErrorMessage().getValue() == null){
+            errorMessageTextView.setVisibility(View.GONE);
+        }
+        else{
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void observeSkyCondition() {

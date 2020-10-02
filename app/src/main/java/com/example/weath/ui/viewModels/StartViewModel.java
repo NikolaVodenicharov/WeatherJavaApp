@@ -13,7 +13,7 @@ import com.example.weath.domain.models.Weather;
 
 public class StartViewModel extends ViewModel {
     private Repository repository;
-    private String errorMessage;
+    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     private MutableLiveData<Boolean> isSearchWeatherCalled = new MutableLiveData<>(false);
 
@@ -39,17 +39,13 @@ public class StartViewModel extends ViewModel {
         return weather;
     }
 
-    private void searchWeatherCalledSignal(){
-        isSearchWeatherCalled.setValue(true);
-        isSearchWeatherCalled.setValue(false);
+    public LiveData<String> getErrorMessage() {
+        return errorMessage;
     }
 
-    public void searchWeather(){
-        // this method is used when we click search button.
-        // We have to inform the activity that it need to display weather
-
-        fillCityWeather();
-        searchWeatherCalledSignal();
+    public void searchWeatherCalledSignal(){
+        isSearchWeatherCalled.setValue(true);
+        isSearchWeatherCalled.setValue(false);
     }
 
     public void fillCityWeather(){
@@ -70,7 +66,15 @@ public class StartViewModel extends ViewModel {
     }
 
     private void clearErrorMessage() {
-        errorMessage = null;
+        errorMessage.setValue(null);
+    }
+    private void setErrorMessage(String message){
+        try {
+            errorMessage.setValue(message);
+        }
+        catch(Exception e){
+            e.getMessage();
+        }
     }
     private boolean isSearchedCityFromAutocomplete(){
         if (isSearchedCityEmpty()){
@@ -85,7 +89,7 @@ public class StartViewModel extends ViewModel {
     }
 
     private void noInternetConnectionCase(){
-        errorMessage = "There is no internet connection";
+        setErrorMessage("There is no internet connection");
 
         // get last cached city and weather data;
     }
@@ -97,7 +101,7 @@ public class StartViewModel extends ViewModel {
         setWeatherByLocationAsync(city.getValue().getLocation());
     }
     private void searchedCityNotFromAutocompleteCase(){
-        errorMessage = "The input can cause ambiguous result. Please use autocomplete.";
+        setErrorMessage("The input can cause ambiguous result. Please use autocomplete.");
         fillDefaultCityWeather();
     }
 
