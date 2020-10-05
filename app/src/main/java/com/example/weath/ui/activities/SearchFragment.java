@@ -48,7 +48,7 @@ public class SearchFragment extends Fragment {
     //Todo extract somewhere else ?
     private void initializeAutoCompleteFromHashMap(AutoCompleteTextView autocomplete) {
         String[] a = new String[2];
-        String[] cities = App.citiesCollection.getCitiesByNameAndCountry().toArray(a);
+        String[] cities = App.citiesCollection.getCitiesNameAndCountryCode().toArray(a);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 getActivity(),
