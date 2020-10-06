@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.weath.App;
 import com.example.weath.domain.models.Coordinate;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -20,8 +22,8 @@ import com.google.android.gms.tasks.Task;
 
 public class CurrentLocationHelper {
     private static final int REQUEST_LOCATION_CODE = 5;
-    private static final String NEED_LOCATION_PERMISSION_MESSAGE = "To get the weather of your current location we need location permission.";
     private static final String LOCATION_PERMISSION_GRANTED_MESSAGE = "Permission granted, you can get the weather of your current location.";
+    private static final String NEED_LOCATION_PERMISSION_MESSAGE = "To get the weather of your current location we need location permission.";
 
     public static MutableLiveData<Coordinate> getLastKnownLocation(Context context) {
         boolean isPermissionGranted = checkCoarseLocationPermission(context);
@@ -64,6 +66,33 @@ public class CurrentLocationHelper {
         else{
             requestLocationPermissionAsync(activity);
         }
+    }
+
+    public static void onRequestPermissionsResult(Context context, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        boolean isAccessLocationTriggered = requestCode == REQUEST_LOCATION_CODE;
+        if (!isAccessLocationTriggered){
+            return;
+        }
+
+        boolean arePermissionsEmpty = permissions.length == 0;
+        if (arePermissionsEmpty){
+            return;
+        }
+
+        boolean areGrantResultsEmpty = grantResults.length == 0;
+        if (areGrantResultsEmpty){
+            return;
+        }
+
+        boolean isLocationPermissionGranted = checkCoarseLocationPermission(context);
+        if (!isLocationPermissionGranted)
+        {
+            return;
+        }
+
+        App.lastKnownLocation = getLastKnownLocation(context);
+
+        Toast.makeText(context, LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
     }
 
     private static boolean shouldRationaleLocationPermission(Activity activity) {

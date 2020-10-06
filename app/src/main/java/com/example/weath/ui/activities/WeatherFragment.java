@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.weath.App;
 import com.example.weath.R;
 import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.domain.models.SkyCondition;
@@ -56,8 +55,6 @@ public class WeatherFragment extends Fragment {
         super.onResume();
         viewModel.fillCityWeather();
         setErrorMessageVisibility();
-
-        App.citiesCollection.getCityNameAndCountryCode(App.lastKnownLocation.getValue());
     }
 
     private void setErrorMessageVisibility() {

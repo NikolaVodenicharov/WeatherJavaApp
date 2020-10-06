@@ -1,7 +1,6 @@
 package com.example.weath.ui.activities;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,10 +21,6 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class StartActivity extends AppCompatActivity {
     public static final int WEATHER_FRAGMENT_POSITION = 1;
-
-    private static final int REQUEST_LOCATION_CODE = 5;
-    private static final String NEED_LOCATION_PERMISSION_MESSAGE = "To get the weather of your current location we need location permission.";
-    private static final String LOCATION_PERMISSION_GRANTED_MESSAGE = "Permission granted, you can get the weather of your current location.";
 
     private ViewPager2 pager;
     private StartViewModel viewModel;
@@ -99,25 +94,34 @@ public class StartActivity extends AppCompatActivity {
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        boolean isAccessLocationTriggered = requestCode == REQUEST_LOCATION_CODE;
+        CurrentLocationHelper.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
 
-        if (isAccessLocationTriggered){
-            boolean arePermissionsEmpty = permissions.length == 0;
-            if (arePermissionsEmpty){
-                return;
-            }
+//        boolean isAccessLocationTriggered = requestCode == CurrentLocationHelper.REQUEST_LOCATION_CODE;
+//
+//        if (isAccessLocationTriggered){
+//            boolean arePermissionsEmpty = permissions.length == 0;
+//            if (arePermissionsEmpty){
+//                return;
+//            }
+//
+//            boolean areGrantResultsEmpty = grantResults.length == 0;
+//            if (areGrantResultsEmpty){
+//                return;
+//            }
+//
+//            boolean isLocationPermissionGranted = CurrentLocationHelper.checkCoarseLocationPermission(this);
+//            if (!isLocationPermissionGranted)
+//            {
+//                return;
+//            }
+//
+//            App.lastKnownLocation = CurrentLocationHelper.getLastKnownLocation(this);
+//
+//            Toast.makeText(this, CurrentLocationHelper.LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
+//        }
+//        else {
+//        }
 
-            boolean areGrantResultsEmpty = grantResults.length == 0;
-            if (areGrantResultsEmpty){
-                return;
-            }
-
-            App.lastKnownLocation = CurrentLocationHelper.getLastKnownLocation(this);
-
-            Toast.makeText(this, LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
-        }
-        else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
