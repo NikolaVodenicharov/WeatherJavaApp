@@ -1,13 +1,12 @@
 package com.example.weath.data.utils;
 
-import com.example.weath.data.dataTransferObjects.CurrentWeatherDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
 import com.example.weath.data.dataTransferObjects.WeatherDto;
-import com.example.weath.domain.models.CurrentWeather;
+import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.domain.models.SkyCondition;
-import com.example.weath.domain.models.Weather;
+import com.example.weath.domain.models.Weather2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,21 +27,29 @@ public class WeatherMapperImpl implements WeatherMapper {
     }
 
     @Override
-    public Weather mapToWeather(WeatherDto dto) {
-        CurrentWeather currentWeather = toCurrentWeather(dto.getCurrentWeather());
-        List<ForecastDay> forecast = toForecastDays(dto.getForecast());
+    public Weather2 mapToWeather(WeatherDto dto, City city) {
+        SkyConditionDto skyConditionDto = dto.getSkyCondition();
+        SkyCondition skyCondition = toSkyCondition(skyConditionDto);
 
-        return new Weather(currentWeather, forecast);
-    }
+        List<ForecastDay> forecastDays = toForecastDays(dto.getForecast());
 
-    private CurrentWeather toCurrentWeather(CurrentWeatherDto currentWeatherDto) {
-        return new CurrentWeather(
-                currentWeatherDto.getTemperature(),
-                toSkyCondition(currentWeatherDto.getSkyCondition()),
-                currentWeatherDto.getHumidity(),
-                currentWeatherDto.getSunrise(),
-                currentWeatherDto.getSunset());
+        Weather2 weather = new Weather2(
+                city.getName(),
+                city.getLocation(),
+                dto.getTemperatureInCelsius(),
+                skyCondition,
+                forecastDays);
+
+        return weather;
     }
+//    private CurrentWeather toCurrentWeather(CurrentWeatherTuple currentWeatherDto) {
+//        return new CurrentWeather(
+//                currentWeatherDto.getTemperature(),
+//                toSkyCondition(currentWeatherDto.getSkyCondition()),
+//                currentWeatherDto.getHumidity(),
+//                currentWeatherDto.getSunrise(),
+//                currentWeatherDto.getSunset());
+//    }
 
     private List<ForecastDay> toForecastDays(List<ForecastDayDto> forecastDayDtos) {
         List<ForecastDay> forecast = new ArrayList<>(7);
@@ -59,8 +66,8 @@ public class WeatherMapperImpl implements WeatherMapper {
     private ForecastDay toForecastDay(ForecastDayDto dto){
         return new ForecastDay(
                 dto.getDate(),
-                dto.getMinimumTemperature(),
-                dto.getMaximumTemperature(),
+                dto.getMinimumTemperatureInCelsius(),
+                dto.getMaximumTemperatureInCelsius(),
                 toSkyCondition(dto.getSkyCondition())
         );
     }

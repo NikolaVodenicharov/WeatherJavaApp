@@ -45,7 +45,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
         String dayOfWeek = formatter.format(date);
         holder.weekDay.setText(dayOfWeek);
 
-        String minMaxTemperature = forecastDay.getMinimumTemperature() + "/" +  forecastDay.getMaximumTemperature();
+        String minMaxTemperature = forecastDay.getMinimumTemperatureInCelsius() + "/" +  forecastDay.getMaximumTemperatureInCelsius();
         holder.minMaxTemperature.setText(minMaxTemperature);
 
         int drawableId = WeatherFragment.findSkyConditionDrawableId(forecastDay.getSkyCondition());

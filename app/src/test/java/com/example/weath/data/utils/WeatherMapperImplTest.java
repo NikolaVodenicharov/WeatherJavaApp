@@ -1,10 +1,11 @@
 package com.example.weath.data.utils;
 
-import com.example.weath.data.dataTransferObjects.CurrentWeatherDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
 import com.example.weath.data.dataTransferObjects.WeatherDto;
-import com.example.weath.domain.models.Weather;
+import com.example.weath.domain.models.City;
+import com.example.weath.domain.models.Coordinate;
+import com.example.weath.domain.models.Weather2;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherMapperImplTest {
+    private static final double DELTA = 0.00001;
 
     @Test
     public void CanGetWeatherMapperInstance(){
@@ -21,38 +23,42 @@ public class WeatherMapperImplTest {
     }
 
     @Test
-    public void CorrectlyMapFromDtoToDomain (){
-        CurrentWeatherDto expectedCurrentWeather = new CurrentWeatherDto(
-                "28",
-                SkyConditionDto.CLOUDS,
-                "60%",
-                new Date(2000, 1, 22),
-                new Date(2000, 1, 23));
-
+    public void mapToWeather2_giveCorrectResult(){
         ForecastDayDto expectedDay = new ForecastDayDto(
                 new Date(2000, 1, 24),
-                "20",
-                "30",
+                18.5,
+                25.4,
                 SkyConditionDto.CLEAR);
 
 
         List<ForecastDayDto> expectedForecast = new ArrayList<>(1);
         expectedForecast.add(expectedDay);
 
-        WeatherDto expectedWeather = new WeatherDto(expectedCurrentWeather, expectedForecast);
+        WeatherDto expectedWeather = new WeatherDto(23.4, SkyConditionDto.CLEAR, expectedForecast);
+        City expectedDomainCity = new City("Boston", "(US)", new Coordinate(11.22, 33.44));
 
         WeatherMapperImpl mapper = WeatherMapperImpl.getInstance();
-        Weather actual = mapper.mapToWeather(expectedWeather);
+        Weather2 actual = mapper.mapToWeather(expectedWeather, expectedDomainCity);
 
-        Assert.assertEquals(expectedCurrentWeather.getHumidity(), actual.getCurrentWeather().getHumidity());
-        Assert.assertEquals(expectedCurrentWeather.getTemperature(), actual.getCurrentWeather().getTemperature());
-        Assert.assertEquals(expectedCurrentWeather.getSunset(), actual.getCurrentWeather().getSunset());
-        Assert.assertEquals(expectedCurrentWeather.getSunrise(), actual.getCurrentWeather().getSunrise());
-        Assert.assertEquals(expectedCurrentWeather.getSkyCondition().name(), actual.getCurrentWeather().getSkyCondition().name());
+        Assert.assertEquals(expectedWeather.getTemperatureInCelsius(),
+                actual.getTemperatureInCelsius(),
+                DELTA);
 
-        Assert.assertEquals(expectedDay.getMaximumTemperature(), actual.getForecast().get(0).getMaximumTemperature());
-        Assert.assertEquals(expectedDay.getMinimumTemperature(), actual.getForecast().get(0).getMinimumTemperature());
-        Assert.assertEquals(expectedDay.getDate(), actual.getForecast().get(0).getDate());
-        Assert.assertEquals(expectedDay.getSkyCondition().name(), actual.getForecast().get(0).getSkyCondition().name());
+        Assert.assertEquals(expectedWeather.getSkyCondition().name(),
+                actual.getSkyCondition().name());
+
+        Assert.assertEquals(expectedDomainCity.getName(),
+                actual.getCityName());
+
+        Assert.assertEquals(expectedWeather.getForecast().get(0).getDate(),
+                actual.getForecast().get(0).getDate());
+
+        Assert.assertEquals(expectedWeather.getForecast().get(0).getMaximumTemperatureInCelsius(),
+                actual.getForecast().get(0).getMaximumTemperatureInCelsius(),
+                DELTA);
+
+        Assert.assertEquals(expectedWeather.getForecast().get(0).getMinimumTemperatureInCelsius(),
+                actual.getForecast().get(0).getMinimumTemperatureInCelsius(),
+                DELTA);
     }
 }

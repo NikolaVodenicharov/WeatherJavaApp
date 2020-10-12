@@ -32,7 +32,6 @@ public class RepositoryFactory {
             new RepositoryImpl(
                 restService,
                 databaseManager,
-                CityMapperImpl.getInstance(),
                 WeatherMapperImpl.getInstance());
     }
 }

@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData;
 import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
 import com.example.weath.domain.models.Weather;
+import com.example.weath.domain.models.Weather2;
 
 public interface Repository {
     LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate);
 
     LiveData<City> getCityByLocationAsync(Coordinate coordinate);
+
+    LiveData<Weather2> getWeatherAsync(City city);
 }

@@ -4,14 +4,14 @@ import java.util.Date;
 
 public class ForecastDay {
     private Date date;
-    private String minimumTemperature;
-    private String maximumTemperature;
+    private double minimumTemperatureInCelsius;
+    private double maximumTemperatureInCelsius;
     private SkyCondition skyCondition;
 
-    public ForecastDay(Date date, String minimumTemperature, String maximumTemperature, SkyCondition skyCondition) {
+    public ForecastDay(Date date, double minimumTemperatureInCelsius, double maximumTemperatureInCelsius, SkyCondition skyCondition) {
         this.date = date;
-        this.minimumTemperature = minimumTemperature;
-        this.maximumTemperature = maximumTemperature;
+        this.minimumTemperatureInCelsius = minimumTemperatureInCelsius;
+        this.maximumTemperatureInCelsius = maximumTemperatureInCelsius;
         this.skyCondition = skyCondition;
     }
 
@@ -19,12 +19,12 @@ public class ForecastDay {
         return date;
     }
 
-    public String getMinimumTemperature() {
-        return minimumTemperature;
+    public double getMinimumTemperatureInCelsius() {
+        return minimumTemperatureInCelsius;
     }
 
-    public String getMaximumTemperature() {
-        return maximumTemperature;
+    public double getMaximumTemperatureInCelsius() {
+        return maximumTemperatureInCelsius;
     }
 
     public SkyCondition getSkyCondition() {

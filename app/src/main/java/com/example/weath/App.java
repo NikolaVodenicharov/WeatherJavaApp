@@ -6,11 +6,11 @@ import android.net.NetworkInfo;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.weath.data.OpenWeatherMapCities;
 import com.example.weath.data.utils.RepositoryFactory;
+import com.example.weath.domain.CitiesCollection;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.Coordinate;
-import com.example.weath.domain.CitiesCollection;
-import com.example.weath.data.OpenWeatherMapCities;
 
 import java.io.InputStream;
 import java.util.ArrayList;

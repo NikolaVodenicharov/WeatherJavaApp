@@ -2,10 +2,9 @@ package com.example.weath.data.local;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.weath.data.dataTransferObjects.CityDto;
-import com.example.weath.data.local.entities.CityEntity;
-import com.example.weath.data.local.entities.CoordinateEntity;
-import com.example.weath.domain.models.Coordinate;
+import com.example.weath.data.local.entities.ForecastDayEntity;
+import com.example.weath.data.local.entities.WeatherEntity;
+import com.example.weath.data.local.entities.WeatherForecastDays;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -20,57 +19,28 @@ public class DatabaseManager implements LocalDataSource {
     }
 
     @Override
-    public void insertCity(final CityDto city) {
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                final CoordinateEntity trimmedCoordinate = new CoordinateEntity(){{
-                    latitude = trimTwoDigitsPrecision(city.location.latitude);
-                    longitude = trimTwoDigitsPrecision(city.location.longitude);
-                }};
+    public void insertWeather(WeatherEntity entity) {
 
-                CityEntity cityEntity = new CityEntity(){{
-                    name = city.name;
-                    country = city.country;
-                    location = trimmedCoordinate;
-                }};
-
-                database.cityDao().insert(cityEntity);
-            }
-        });
     }
 
     @Override
-    public LiveData<CityDto> getCityFull(Coordinate coordinate) {
-        double latitude = trimTwoDigitsPrecision(
-                coordinate.getLatitude());
+    public void updateWeather(WeatherEntity weather) {
 
-        double longitude = trimTwoDigitsPrecision(
-                coordinate.getLongitude());
-
-        LiveData<CityDto> city = database
-                .cityDao()
-                .getFull(latitude, longitude);
-
-        return city;
     }
 
     @Override
-    public LiveData<Boolean> isExisting(Coordinate coordinate) {
-        double latitude = trimTwoDigitsPrecision(
-                coordinate.getLatitude());
+    public void insertForecastDays(List<ForecastDayEntity> forecastDays) {
 
-        double longitude = trimTwoDigitsPrecision(
-                coordinate.getLongitude());
-
-        return database
-                .cityDao()
-                .isExisting(latitude, longitude);
     }
 
     @Override
-    public LiveData<List<CityDto>> getAll() {
-        return database.cityDao().getAll();
+    public void updateForecastDays(List<ForecastDayEntity> forecastDays) {
+
+    }
+
+    @Override
+    public LiveData<WeatherForecastDays> getWeather(double latitude, double longitude) {
+        return null;
     }
 
     private double trimTwoDigitsPrecision(double number){
