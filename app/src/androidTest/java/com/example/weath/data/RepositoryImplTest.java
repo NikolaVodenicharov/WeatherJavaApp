@@ -1,10 +1,25 @@
 package com.example.weath.data;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.example.weath.Constants;
+import com.example.weath.data.dataTransferObjects.SkyConditionDto;
+import com.example.weath.data.dataTransferObjects.WeatherOnlyDto;
+import com.example.weath.data.remote.RemoteDataSource;
+import com.example.weath.data.utils.WeatherMapperImpl;
+import com.example.weath.domain.models.City;
+import com.example.weath.domain.models.Coordinate;
+import com.example.weath.domain.models.Weather2;
+
+import org.junit.Assert;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.ArrayList;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RepositoryImplTest {
@@ -39,7 +54,7 @@ public class RepositoryImplTest {
 //
 //        RemoteDataSource mockRemoteDataSource = new RemoteDataSource() {
 //            @Override
-//            public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate) {
+//            public LiveData<WeatherOnlyDto> getWeatherByLocationAsync(Coordinate coordinate) {
 //                return null;
 //            }
 //
@@ -49,7 +64,7 @@ public class RepositoryImplTest {
 //            }
 //
 //            @Override
-//            public LiveData<WeatherDto> getWeatherAsync(Coordinate coordinate) {
+//            public LiveData<WeatherOnlyDto> getWeatherAsync(Coordinate coordinate) {
 //                return null;
 //            }
 //        };
@@ -91,7 +106,7 @@ public class RepositoryImplTest {
 //
 //        RemoteDataSource mockRemoteDataSource = new RemoteDataSource() {
 //            @Override
-//            public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate) {
+//            public LiveData<WeatherOnlyDto> getWeatherByLocationAsync(Coordinate coordinate) {
 //                return null;
 //            }
 //
@@ -101,7 +116,7 @@ public class RepositoryImplTest {
 //            }
 //
 //            @Override
-//            public LiveData<WeatherDto> getWeatherAsync(Coordinate coordinate) {
+//            public LiveData<WeatherOnlyDto> getWeatherAsync(Coordinate coordinate) {
 //                return null;
 //            }
 //        };
@@ -149,7 +164,7 @@ public class RepositoryImplTest {
 //            private boolean askedOnce = false;
 //
 //            @Override
-//            public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate) {
+//            public LiveData<WeatherOnlyDto> getWeatherByLocationAsync(Coordinate coordinate) {
 //                return null;
 //            }
 //
@@ -167,7 +182,7 @@ public class RepositoryImplTest {
 //            }
 //
 //            @Override
-//            public LiveData<WeatherDto> getWeatherAsync(Coordinate coordinate) {
+//            public LiveData<WeatherOnlyDto> getWeatherAsync(Coordinate coordinate) {
 //                return null;
 //            }
 //        };
@@ -186,43 +201,45 @@ public class RepositoryImplTest {
 //        Assert.assertEquals(expectedCityDto.country, actual.getValue().getCountry());
 //    }
 //
-//    @Test
-//    public void getWeatherAsync(){
-//        City mockCity = new City("TestCity", "TestCountry", new Coordinate(11.22, 33.44));
-//        WeatherDto mockWeather = new WeatherDto(12.45, SkyConditionDto.CLEAR, new ArrayList<>());
-//
-//        RemoteDataSource mockRemoteDataSource = new RemoteDataSource() {
-//            @Override
-//            public LiveData<WeatherDto> getWeatherByLocationAsync(Coordinate coordinate) {
-//                return null;
-//            }
-//
-//            @Override
-//            public LiveData<CityDto> getCityByLocationAsync(Coordinate coordinate) {
-//                return null;
-//            }
-//
-//            @Override
-//            public LiveData<WeatherDto> getWeatherAsync(Coordinate coordinate) {
-//                return new MutableLiveData<WeatherDto>(mockWeather);
-//            }
-//        };
-//
-//        RepositoryImpl repository = new RepositoryImpl(
-//                mockRemoteDataSource,
-//                null,
-//                null,
-//                WeatherMapperImpl.getInstance());
-//
-//
-//        LiveData<Weather2> actualWeather = repository.getWeatherAsync(mockCity);
-//
-//        Assert.assertEquals(mockWeather.getTemperatureInCelsius(), actualWeather.getValue().getTemperatureInCelsius(), Constants.DELTA);
-//        Assert.assertEquals(mockWeather.getSkyCondition().name(), actualWeather.getValue().getSkyCondition().name());
-//        Assert.assertEquals(mockCity.getName(), actualWeather.getValue().getCityName());
-//        Assert.assertEquals(mockCity.getLocation().getLatitude(), actualWeather.getValue().getCoordinate().getLatitude(), Constants.DELTA);
-//        Assert.assertEquals(mockCity.getLocation().getLongitude(), actualWeather.getValue().getCoordinate().getLongitude(), Constants.DELTA);
-//    }
+    @Test
+    public void getWeatherAsync_getFromRemoteDataSource_whenThereIsNotExistingInDatabase(){
+        WeatherOnlyDto mockWeather = mockWeatherDto();
+        RemoteDataSource mockRemoteDataSource = new RemoteDataSource() {
+            @Override
+            public LiveData<WeatherOnlyDto> getWeatherAsync(Coordinate coordinate) {
+                return new MutableLiveData<>(mockWeather);
+            }
+        };
+
+        RepositoryImpl repository = new RepositoryImpl(
+                mockRemoteDataSource,
+                null,
+                WeatherMapperImpl.getInstance());
+
+        City mockCity = mockCity();
+        LiveData<Weather2> actualWeather = repository.getWeatherAsync(mockCity);
+
+        Assert.assertEquals(mockWeather.getTemperatureInCelsius(), actualWeather.getValue().getTemperatureInCelsius(), Constants.DELTA);
+        Assert.assertEquals(mockWeather.getSkyCondition().name(), actualWeather.getValue().getSkyCondition().name());
+
+        Assert.assertEquals(mockCity.getName(), actualWeather.getValue().getCityName());
+        Assert.assertEquals(mockCity.getLocation().getLatitude(), actualWeather.getValue().getCoordinate().getLatitude(), Constants.DELTA);
+        Assert.assertEquals(mockCity.getLocation().getLongitude(), actualWeather.getValue().getCoordinate().getLongitude(), Constants.DELTA);
+    }
+
+    @Test
+    public void getWeatherAsync_getFromRemoteDataAndInsertInDatabase_whenIsNotExistingInDatabase(){
+
+    }
+
+    private City mockCity() {
+        return new City("TestCity", "TestCountry", new Coordinate(11.22, 33.44));
+    }
+    private WeatherOnlyDto mockWeatherDto() {
+        return new WeatherOnlyDto(12.45, SkyConditionDto.CLEAR, new ArrayList<>());
+    }
+
+
 //
 //    private CityDto createDummyCityDto (){
 //        CoordinateEntity coordinateEntity= new CoordinateEntity();

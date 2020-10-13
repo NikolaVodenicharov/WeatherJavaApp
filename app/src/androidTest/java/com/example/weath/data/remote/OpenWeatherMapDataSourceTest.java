@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.weath.Constants;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
-import com.example.weath.data.dataTransferObjects.WeatherDto;
+import com.example.weath.data.dataTransferObjects.WeatherOnlyDto;
 import com.example.weath.domain.models.Coordinate;
 
 import org.json.JSONException;
@@ -38,7 +38,7 @@ public class OpenWeatherMapDataSourceTest {
         OpenWeatherMapDataSource mockDataSource = createMockDataSourceWithMockWebServiceResponse(mockStringResponse);
 
         Coordinate mockCoordinate = new Coordinate(11.22, 33.44);
-        LiveData<WeatherDto> actual = mockDataSource.getWeatherAsync(mockCoordinate);
+        LiveData<WeatherOnlyDto> actual = mockDataSource.getWeatherAsync(mockCoordinate);
 
         double expectedTemperature = 30.44;
         SkyConditionDto expectedSkyCondition = SkyConditionDto.THUNDERSTORM;

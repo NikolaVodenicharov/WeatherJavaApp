@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.weath.data.dataTransferObjects.WeatherDto;
+import com.example.weath.data.dataTransferObjects.WeatherOnlyDto;
 import com.example.weath.data.local.LocalDataSource;
 import com.example.weath.data.remote.RemoteDataSource;
 import com.example.weath.data.utils.WeatherMapper;
@@ -33,11 +33,11 @@ public class RepositoryImpl implements Repository {
     public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
         final MutableLiveData<Weather> result = new MutableLiveData<>();
 
-//        final LiveData<WeatherDto> dto = remoteDataSource.getWeatherByLocationAsync(coordinate);
+//        final LiveData<WeatherOnlyDto> dto = remoteDataSource.getWeatherByLocationAsync(coordinate);
 //
-//        dto.observeForever(new Observer<WeatherDto>() {
+//        dto.observeForever(new Observer<WeatherOnlyDto>() {
 //            @Override
-//            public void onChanged(WeatherDto weatherDto) {
+//            public void onChanged(WeatherOnlyDto weatherDto) {
 //                dto.removeObserver(this);
 //
 //                Weather weatherDomain = weatherMapper.mapToWeather(weatherDto);
@@ -72,14 +72,14 @@ public class RepositoryImpl implements Repository {
     public LiveData<Weather2> getWeatherAsync(City city) {
         final MutableLiveData<Weather2> weather = new MutableLiveData<>();
 
-        final LiveData<WeatherDto> dto = remoteDataSource.getWeatherAsync(city.getLocation());
+        final LiveData<WeatherOnlyDto> dto = remoteDataSource.getWeatherAsync(city.getLocation());
 
-        dto.observeForever(new Observer<WeatherDto>() {
+        dto.observeForever(new Observer<WeatherOnlyDto>() {
             @Override
-            public void onChanged(WeatherDto weatherDto) {
+            public void onChanged(WeatherOnlyDto weatherOnlyDto) {
                 dto.removeObserver(this);
 
-                Weather2 weatherDomain = weatherMapper.mapToWeather(weatherDto, city);
+                Weather2 weatherDomain = weatherMapper.toWeather(weatherOnlyDto, city);
                 weather.setValue(weatherDomain);
             }
         });

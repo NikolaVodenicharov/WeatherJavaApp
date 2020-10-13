@@ -2,11 +2,9 @@ package com.example.weath.data.local;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.weath.data.local.entities.ForecastDayEntity;
-import com.example.weath.data.local.entities.WeatherEntity;
-import com.example.weath.data.local.entities.WeatherForecastDays;
+import com.example.weath.data.dataTransferObjects.CityWeatherDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class DatabaseManager implements LocalDataSource {
@@ -19,27 +17,22 @@ public class DatabaseManager implements LocalDataSource {
     }
 
     @Override
-    public void insertWeather(WeatherEntity entity) {
+    public void insertCityWeather(CityWeatherDto cityWeather) {
 
     }
 
     @Override
-    public void updateWeather(WeatherEntity weather) {
+    public void updateCityWeather(CityWeatherDto cityWeather) {
 
     }
 
     @Override
-    public void insertForecastDays(List<ForecastDayEntity> forecastDays) {
-
+    public LiveData<CityWeatherDto> getCityWeather(CoordinateEntity coordinate) {
+        return null;
     }
 
     @Override
-    public void updateForecastDays(List<ForecastDayEntity> forecastDays) {
-
-    }
-
-    @Override
-    public LiveData<WeatherForecastDays> getWeather(double latitude, double longitude) {
+    public LiveData<CityWeatherDto> getCityWeather(String cityName, String countryCode) {
         return null;
     }
 
@@ -49,4 +42,5 @@ public class DatabaseManager implements LocalDataSource {
 
         return trimmed;
     }
+
 }

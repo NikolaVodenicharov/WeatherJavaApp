@@ -2,18 +2,13 @@ package com.example.weath.data.local;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.weath.data.local.entities.ForecastDayEntity;
-import com.example.weath.data.local.entities.WeatherEntity;
-import com.example.weath.data.local.entities.WeatherForecastDays;
-
-import java.util.List;
+import com.example.weath.data.dataTransferObjects.CityWeatherDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 
 public interface LocalDataSource {
-    void insertWeather(WeatherEntity entity);
-    void updateWeather(WeatherEntity weather);
+    void insertCityWeather (CityWeatherDto cityWeather);
+    void updateCityWeather (CityWeatherDto cityWeather);
 
-    void insertForecastDays (List<ForecastDayEntity> forecastDays);
-    void updateForecastDays(List<ForecastDayEntity> forecastDays);
-
-    LiveData<WeatherForecastDays> getWeather(double latitude, double longitude);
+    LiveData<CityWeatherDto> getCityWeather(CoordinateEntity coordinate);
+    LiveData<CityWeatherDto> getCityWeather(String cityName, String countryCode);
 }
