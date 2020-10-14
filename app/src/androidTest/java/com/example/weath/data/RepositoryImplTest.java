@@ -214,7 +214,7 @@ public class RepositoryImplTest {
         RepositoryImpl repository = new RepositoryImpl(
                 mockRemoteDataSource,
                 null,
-                WeatherMapperImpl.getInstance());
+                new WeatherMapperImpl());
 
         City mockCity = mockCity();
         LiveData<Weather2> actualWeather = repository.getWeatherAsync(mockCity);

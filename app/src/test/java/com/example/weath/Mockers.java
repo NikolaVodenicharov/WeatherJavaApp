@@ -57,6 +57,10 @@ public class Mockers {
     }
 
     public static City mockCity() {
-        return new City("Boston", "(US)", new Coordinate(11.22, 33.44));
+        return new City("Boston", "(US)", mockCoordinate());
+    }
+
+    public static Coordinate mockCoordinate() {
+        return new Coordinate(11.22, 33.44);
     }
 }

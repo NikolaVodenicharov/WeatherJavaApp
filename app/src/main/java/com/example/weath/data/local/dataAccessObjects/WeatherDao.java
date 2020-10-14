@@ -3,6 +3,7 @@ package com.example.weath.data.local.dataAccessObjects;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
@@ -20,16 +21,22 @@ public interface WeatherDao {
     void insertWeather(WeatherEntity entity);
 
     @Insert
-    void insertForecastDays (List<ForecastDayEntity> forecastDays);
+    void insertForecastDays (List<ForecastDayEntity> forecast);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertOrReplaceWeather(WeatherEntity entity);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertOrReplaceForecast (List<ForecastDayEntity> forecast);
 
     @Query("Select Exists (Select * From Weathers Where latitude == :latitude And longitude == :longitude)")
     LiveData<Boolean> isExisting(double latitude, double longitude);
 
+    @Query("Select Exists (Select * From Weathers Where latitude == :latitude And longitude == :longitude And recordMoment >= :oldestMoment)")
+    LiveData<Boolean> isExistingAndUpToDate(double latitude, double longitude, long oldestMoment);
+
     @Query("Select * From Weathers")
     LiveData<List<WeatherEntity>> getAll();
-
-    @Query("Select * From ForecastDays")
-    LiveData<List<ForecastDayEntity>> getAllForecasts();
 
     @Transaction
     @Query("Select * From Weathers Where latitude == :latitude And longitude == :longitude Limit 1")

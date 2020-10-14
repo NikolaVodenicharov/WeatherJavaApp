@@ -186,6 +186,7 @@ public class OpenWeatherMapCities implements CitiesCollection {
         double multiplied = number * 100;
         long rounded = Math.round(multiplied);
         double divided = (double)rounded / 100;
+
         return divided;
     }
 }

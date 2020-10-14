@@ -25,13 +25,13 @@ public class RepositoryFactory {
 
         LocalDataSource databaseManager = new DatabaseManager(
                 AppDatabase.getInstance(context.getApplicationContext()),
-                Executors.newFixedThreadPool(4)
-        );
+                Executors.newFixedThreadPool(4),
+                new WeatherMapperImpl());
 
         return
             new RepositoryImpl(
                 restService,
                 databaseManager,
-                WeatherMapperImpl.getInstance());
+                new WeatherMapperImpl());
     }
 }

@@ -4,9 +4,11 @@ import com.example.weath.data.dataTransferObjects.CityWeatherDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
 import com.example.weath.data.dataTransferObjects.WeatherOnlyDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 import com.example.weath.data.local.entities.ForecastDayEntity;
 import com.example.weath.data.local.entities.WeatherWithForecast;
 import com.example.weath.domain.models.City;
+import com.example.weath.domain.models.Coordinate;
 import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.domain.models.SkyCondition;
 import com.example.weath.domain.models.Weather2;
@@ -15,20 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherMapperImpl implements WeatherMapper {
-    private static WeatherMapperImpl instance;
-
-    private WeatherMapperImpl(){
-
-    }
-
-    public static WeatherMapperImpl getInstance() {
-        if (instance == null){
-            instance = new WeatherMapperImpl();
-        }
-
-        return instance;
-    }
-
     @Override
     public Weather2 toWeather(WeatherOnlyDto dto, City city) {
         SkyConditionDto skyConditionDto = dto.getSkyCondition();
@@ -47,7 +35,7 @@ public class WeatherMapperImpl implements WeatherMapper {
     }
 
     @Override
-    public CityWeatherDto toCityWeather(WeatherWithForecast entity) {
+    public CityWeatherDto toCityWeatherDto(WeatherWithForecast entity) {
 
         CityWeatherDto cityWeather = new CityWeatherDto(
                 extractCityName(entity.weather.cityNameWithCountryCode),
@@ -60,6 +48,14 @@ public class WeatherMapperImpl implements WeatherMapper {
         return cityWeather;
     }
 
+    @Override
+    public CoordinateEntity toCoordinateEntity (Coordinate domain){
+        CoordinateEntity entity = new CoordinateEntity();
+        entity.latitude = domain.getLatitude();
+        entity.longitude = domain.getLongitude();
+
+        return entity;
+    }
 
 
     private List<ForecastDay> toForecastDays(List<ForecastDayDto> collection) {
@@ -85,6 +81,10 @@ public class WeatherMapperImpl implements WeatherMapper {
 
     private List<ForecastDayDto> toForecastDayDtoCollection(List<ForecastDayEntity> collection) {
         List<ForecastDayDto> forecast = new ArrayList<>(7);
+
+        if (collection == null){
+            return forecast;
+        }
 
         for (int i = 0; i < collection.size(); i++) {
             ForecastDayEntity forecastDayDto = collection.get(i);

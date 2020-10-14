@@ -19,6 +19,8 @@ public class RepositoryImpl implements Repository {
     private LocalDataSource localDataSource;
     private WeatherMapper weatherMapper;
 
+    private static final long THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
+
     public RepositoryImpl(RemoteDataSource remoteDataSource,
                           LocalDataSource localDataSource,
                           WeatherMapper weatherMapper) {
@@ -71,6 +73,38 @@ public class RepositoryImpl implements Repository {
     @Override
     public LiveData<Weather2> getWeatherAsync(City city) {
         final MutableLiveData<Weather2> weather = new MutableLiveData<>();
+
+        // check is city recorded in database
+        // if is recorded check is it up to date or outdated
+        // if is up to date - > use it
+        // else request from remote and update database.
+
+//        CoordinateEntity coordinate = weatherMapper.toCoordinateEntity(city.getLocation());
+//        LiveData<Boolean> isExisting = localDataSource.isExisting(coordinate);
+//
+//        isExisting.observeForever(new Observer<Boolean>() {
+//            @Override
+//            public void onChanged(Boolean isEntityExist) {
+//                isExisting.removeObserver(this);
+//
+//                if (isEntityExist){
+//                    LiveData<CityWeatherDto> cityWeather = localDataSource.getCityWeather(coordinate);
+//
+//                    cityWeather.observeForever(new Observer<CityWeatherDto>() {
+//                        @Override
+//                        public void onChanged(CityWeatherDto dto) {
+//                            cityWeather.removeObserver(this);
+//
+//                            boolean isOutdated = new Date().getTime() - dto.
+//                        }
+//                    });
+//                }
+//                else{
+//
+//                }
+//            }
+//        });
+
 
         final LiveData<WeatherOnlyDto> dto = remoteDataSource.getWeatherAsync(city.getLocation());
 

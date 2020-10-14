@@ -6,10 +6,12 @@ import com.example.weath.data.dataTransferObjects.CityWeatherDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
 import com.example.weath.data.dataTransferObjects.WeatherOnlyDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 import com.example.weath.data.local.entities.ForecastDayEntity;
 import com.example.weath.data.local.entities.WeatherEntity;
 import com.example.weath.data.local.entities.WeatherWithForecast;
 import com.example.weath.domain.models.City;
+import com.example.weath.domain.models.Coordinate;
 import com.example.weath.domain.models.Weather2;
 
 import org.junit.Assert;
@@ -21,7 +23,7 @@ import java.util.List;
 public class WeatherMapperImplTest {
     @Test
     public void CanGetWeatherMapperInstance(){
-        WeatherMapperImpl mapper = WeatherMapperImpl.getInstance();
+        WeatherMapperImpl mapper = new WeatherMapperImpl();
     }
 
     @Test
@@ -35,7 +37,7 @@ public class WeatherMapperImplTest {
         WeatherOnlyDto expectedWeather = new WeatherOnlyDto(23.4, SkyConditionDto.CLEAR, expectedForecast);
         City expectedDomainCity = Mockers.mockCity();
 
-        WeatherMapperImpl mapper = WeatherMapperImpl.getInstance();
+        WeatherMapperImpl mapper = new WeatherMapperImpl();
         Weather2 actual = mapper.toWeather(expectedWeather, expectedDomainCity);
 
         Assert.assertEquals(expectedWeather.getTemperatureInCelsius(),
@@ -61,7 +63,6 @@ public class WeatherMapperImplTest {
     }
 
 
-
     @Test
     public void toCityWeather_giveCorrectResult(){
         WeatherEntity weather = Mockers.mockWeatherEntity();
@@ -71,9 +72,9 @@ public class WeatherMapperImplTest {
         expected.weather = weather;
         expected.forecast = forecast;
 
-        WeatherMapperImpl mapper = WeatherMapperImpl.getInstance();
+        WeatherMapperImpl mapper = new WeatherMapperImpl();
 
-        CityWeatherDto actual = mapper.toCityWeather(expected);
+        CityWeatherDto actual = mapper.toCityWeatherDto(expected);
 
         Assert.assertEquals(expected.weather.skyCondition,
                 actual.getSkyCondition().name());
@@ -96,5 +97,66 @@ public class WeatherMapperImplTest {
         Assert.assertEquals(expected.forecast.get(0).maximumTemperatureInCelsius,
                 actual.getForecast().get(0).getMaximumTemperatureInCelsius(),
                 Constants.DELTA);
+    }
+
+    @Test
+    public void toCityWeather_notThrowingException_whenForecastIsEmpty(){
+        WeatherEntity weather = Mockers.mockWeatherEntity();
+
+        WeatherWithForecast expected = new WeatherWithForecast();
+        expected.weather = weather;
+        expected.forecast = new ArrayList<>();
+
+        WeatherMapperImpl mapper = new WeatherMapperImpl();
+
+        CityWeatherDto actual = mapper.toCityWeatherDto(expected);
+
+        Assert.assertEquals(expected.weather.skyCondition,
+                actual.getSkyCondition().name());
+
+        Assert.assertEquals(expected.weather.temperatureInCelsius,
+                actual.getTemperatureInCelsius(),
+                Constants.DELTA);
+
+        Assert.assertEquals("Houston", actual.getCityName());
+
+        Assert.assertEquals("(US)", actual.getCountryCode());
+    }
+
+    @Test
+    public void toCityWeather_notThrowingException_whenForecastIsNull(){
+        WeatherEntity weather = Mockers.mockWeatherEntity();
+
+        WeatherWithForecast expected = new WeatherWithForecast();
+        expected.weather = weather;
+        expected.forecast = null;
+
+        WeatherMapperImpl mapper = new WeatherMapperImpl();
+
+        CityWeatherDto actual = mapper.toCityWeatherDto(expected);
+
+        Assert.assertEquals(expected.weather.skyCondition,
+                actual.getSkyCondition().name());
+
+        Assert.assertEquals(expected.weather.temperatureInCelsius,
+                actual.getTemperatureInCelsius(),
+                Constants.DELTA);
+
+        Assert.assertEquals("Houston", actual.getCityName());
+
+        Assert.assertEquals("(US)", actual.getCountryCode());
+    }
+
+
+    @Test
+    public void toCoordinateEntity_giveCorrectResult(){
+        Coordinate domain = Mockers.mockCoordinate();
+
+        WeatherMapperImpl mapper = new WeatherMapperImpl();
+
+        CoordinateEntity entity = mapper.toCoordinateEntity(domain);
+
+        Assert.assertEquals(domain.getLatitude(), entity.latitude, Constants.DELTA);
+        Assert.assertEquals(domain.getLongitude(), entity.longitude, Constants.DELTA);
     }
 }
