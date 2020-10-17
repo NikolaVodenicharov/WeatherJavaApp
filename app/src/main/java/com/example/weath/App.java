@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.weath.data.OpenWeatherMapCities;
 import com.example.weath.data.utils.RepositoryFactory;
 import com.example.weath.domain.CitiesCollection;
+import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.Coordinate;
 
@@ -22,14 +23,17 @@ public class App extends Application {
 
     public static CitiesCollection citiesCollection;
     public static Repository repository;
+    public static DeviceConnectivity deviceConnectivity;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         initializeConnectivityManager();
+
         initializeCitiesCollection();
         initializeRepository();
+        initializeDeviceConnectivity();
     }
 
     private void initializeConnectivityManager() {
@@ -46,6 +50,7 @@ public class App extends Application {
         return isConnected;
     }
 
+
     private void initializeCitiesCollection() {
         List<InputStream> streams = new ArrayList<>(4);
         streams.add(getResources().openRawResource(R.raw.ad));
@@ -55,10 +60,12 @@ public class App extends Application {
 
         citiesCollection = new OpenWeatherMapCities(streams);
     }
-
     private void initializeRepository() {
         repository = RepositoryFactory.createRepository(this);
     }
+    private void initializeDeviceConnectivity() {
+        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-
+        deviceConnectivity = new DeviceConnectivityImpl(connectivityManager);
+    }
 }

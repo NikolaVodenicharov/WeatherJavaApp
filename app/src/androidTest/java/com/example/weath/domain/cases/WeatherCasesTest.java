@@ -66,6 +66,11 @@ public class WeatherCasesTest {
             public LiveData<Coordinate> getLastKnownLocation() {
                 return null;
             }
+
+            @Override
+            public void setLastKnownLocation(Coordinate location) {
+
+            }
         };
 
         WeatherCases cases = new WeatherCases(repository, null, deviceConnectivity);
@@ -155,6 +160,11 @@ public class WeatherCasesTest {
             public LiveData<Coordinate> getLastKnownLocation() {
                 return null;
             }
+
+            @Override
+            public void setLastKnownLocation(Coordinate location) {
+
+            }
         };
 
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
@@ -223,6 +233,11 @@ public class WeatherCasesTest {
             @Override
             public LiveData<Coordinate> getLastKnownLocation() {
                 return null;
+            }
+
+            @Override
+            public void setLastKnownLocation(Coordinate location) {
+
             }
         };
 
@@ -322,6 +337,11 @@ public class WeatherCasesTest {
             public LiveData<Coordinate> getLastKnownLocation() {
                 return new MutableLiveData<>(mockCoordinate);
             }
+
+            @Override
+            public void setLastKnownLocation(Coordinate location) {
+
+            }
         };
 
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
@@ -411,6 +431,11 @@ public class WeatherCasesTest {
             @Override
             public LiveData<Coordinate> getLastKnownLocation() {
                 return null;
+            }
+
+            @Override
+            public void setLastKnownLocation(Coordinate location) {
+
             }
         };
 
