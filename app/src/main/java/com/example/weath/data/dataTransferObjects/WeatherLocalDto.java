@@ -2,19 +2,22 @@ package com.example.weath.data.dataTransferObjects;
 
 import com.example.weath.data.local.entities.CoordinateEntity;
 
+import java.util.Date;
 import java.util.List;
 
-public class CityWeatherDto {
+public class WeatherLocalDto {
     private String cityName;
     private String countryCode;
+    private Date recordMoment;
     private CoordinateEntity coordinate;
     private double temperatureInCelsius;
     private SkyConditionDto skyCondition;
     private List<ForecastDayDto> forecast;
 
-    public CityWeatherDto(String cityName, String countryCode, CoordinateEntity coordinate, double temperatureInCelsius, SkyConditionDto skyCondition, List<ForecastDayDto> forecast) {
+    public WeatherLocalDto(String cityName, String countryCode, Date recordMoment, CoordinateEntity coordinate, double temperatureInCelsius, SkyConditionDto skyCondition, List<ForecastDayDto> forecast) {
         this.cityName = cityName;
         this.countryCode = countryCode;
+        this.recordMoment = recordMoment;
         this.coordinate = coordinate;
         this.temperatureInCelsius = temperatureInCelsius;
         this.skyCondition = skyCondition;
@@ -27,6 +30,10 @@ public class CityWeatherDto {
 
     public String getCountryCode() {
         return countryCode;
+    }
+
+    public Date getRecordMoment() {
+        return recordMoment;
     }
 
     public CoordinateEntity getCoordinate() {

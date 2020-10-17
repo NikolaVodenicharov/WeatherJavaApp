@@ -5,13 +5,14 @@ import androidx.room.Room;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.example.weath.Constants;
 import com.example.weath.LiveDataUtil;
-import com.example.weath.data.Mockers;
 import com.example.weath.data.local.AppDatabase;
 import com.example.weath.data.local.entities.ForecastDayEntity;
 import com.example.weath.data.local.entities.WeatherEntity;
 import com.example.weath.data.local.entities.WeatherWithForecast;
+import com.example.weath.testHelpers.TimeHelper;
+import com.example.weath.testHelpers.ConstantsHelper;
+import com.example.weath.testHelpers.MockerHelper;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -21,7 +22,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
@@ -48,21 +48,21 @@ public class WeatherDaoTest {
 
     @Test
     public void insertWeather_onInsert_notThrowingException(){
-        WeatherEntity weather = Mockers.mockWeatherEntity();
+        WeatherEntity weather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertWeather(weather);
     }
 
     @Test
     public void insertOrReplaceWeather_onInsert_notThrowingException(){
-        WeatherEntity weather = Mockers.mockWeatherEntity();
+        WeatherEntity weather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertOrReplaceWeather(weather);
     }
 
     @Test
     public void insertOrReplaceWeather_onInsertNewEntity_isAddedToDatabase() throws InterruptedException {
-        WeatherEntity weather = Mockers.mockWeatherEntity();
+        WeatherEntity weather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertOrReplaceWeather(weather);
         Boolean isExisting = LiveDataUtil.getValue(
@@ -73,9 +73,9 @@ public class WeatherDaoTest {
 
     @Test
     public void insertOrReplaceWeather_onInsertExistingEntity_successfullyUpdate() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
 
-        WeatherEntity updatedMockWeather = Mockers.updateWeatherEntity(mockWeather);
+        WeatherEntity updatedMockWeather = MockerHelper.updateWeatherEntity(mockWeather);
 
         database.weatherDao().insertOrReplaceWeather(mockWeather);
         database.weatherDao().insertOrReplaceWeather(updatedMockWeather);
@@ -89,8 +89,8 @@ public class WeatherDaoTest {
 
     @Test
     public void insertOrReplaceForecast_onInsert_notThrowingException(){
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        List<ForecastDayEntity> forecastDays = Mockers.mockForecastWithOneDay(mockWeather);
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mockWeather);
 
         database.weatherDao().insertOrReplaceWeather(mockWeather);
         database.weatherDao().insertOrReplaceForecast(forecastDays);
@@ -98,8 +98,8 @@ public class WeatherDaoTest {
 
     @Test
     public void insertOrReplaceForecast_onInsertNewEntities_isAddedToDatabase() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        List<ForecastDayEntity> forecastDays = Mockers.mockForecastWithOneDay(mockWeather);
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mockWeather);
 
         database.weatherDao().insertOrReplaceWeather(mockWeather);
         database.weatherDao().insertOrReplaceForecast(forecastDays);
@@ -112,8 +112,8 @@ public class WeatherDaoTest {
 
     @Test
     public void insertOrReplaceForecast_onInsertExistingEntities_successfullyUpdate() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        WeatherEntity updatedMockWeather = Mockers.updateWeatherEntity(mockWeather);
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        WeatherEntity updatedMockWeather = MockerHelper.updateWeatherEntity(mockWeather);
 
         database.weatherDao().insertOrReplaceWeather(mockWeather);
         database.weatherDao().insertOrReplaceWeather(updatedMockWeather);
@@ -127,7 +127,7 @@ public class WeatherDaoTest {
 
     @Test
     public void getAll_isNotEmpty_afterInsert() throws InterruptedException {
-        WeatherEntity weather = Mockers.mockWeatherEntity();
+        WeatherEntity weather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertWeather(weather);
         List<WeatherEntity> all = LiveDataUtil.getValue(database.weatherDao().getAll());
@@ -137,7 +137,7 @@ public class WeatherDaoTest {
 
     @Test
     public void isExisting_returnTrue_afterInsert() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertWeather(mockWeather);
         Boolean isExisting = LiveDataUtil.getValue(
@@ -148,7 +148,7 @@ public class WeatherDaoTest {
 
     @Test
     public void isExisting_returnFalse_forNotExistingEntity() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertWeather(mockWeather);
         Boolean isExisting = LiveDataUtil.getValue(
@@ -159,7 +159,7 @@ public class WeatherDaoTest {
 
     @Test
     public void isExistingAndUpToDate_returnFalse_whenCoordinateDoesNotMatch() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertWeather(mockWeather);
         Boolean isExisting = LiveDataUtil.getValue(
@@ -170,44 +170,38 @@ public class WeatherDaoTest {
 
     @Test
     public void isExistingAndUpToDate_returnFalse_whenEntityIsOutOfDate() throws InterruptedException {
-        long thirtyMinutesInMilliseconds = 1000 * 60 * 30;
-        long twentyMinutesInMilliseconds = 1000 * 60 * 20;
-
-        Date thirtyMinutesAgo = new Date(new Date().getTime() - thirtyMinutesInMilliseconds);
-        Date twentyMinutesAgo = new Date(new Date().getTime() - twentyMinutesInMilliseconds);
-
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        mockWeather.recordMoment = thirtyMinutesAgo;
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        mockWeather.recordMoment = TimeHelper.getThirtyMinutesAgo();
 
         database.weatherDao().insertWeather(mockWeather);
         Boolean isExisting = LiveDataUtil.getValue(
-                database.weatherDao().isExistingAndUpToDate(mockWeather.coordinate.latitude, mockWeather.coordinate.longitude, twentyMinutesAgo.getTime()));
+                database.weatherDao().isExistingAndUpToDate(
+                        mockWeather.coordinate.latitude,
+                        mockWeather.coordinate.longitude,
+                        TimeHelper.getTwentyMinutesAgo().getTime()));
 
         Assert.assertFalse(isExisting);
     }
 
     @Test
     public void isExistingAndUpToDate_returnTrue_whenEntityUpToDate() throws InterruptedException {
-        long thirtyMinutesInMilliseconds = 1000 * 60 * 30;
-        long twentyMinutesInMilliseconds = 1000 * 60 * 20;
-
-        Date thirtyMinutesAgo = new Date(new Date().getTime() - thirtyMinutesInMilliseconds);
-        Date twentyMinutesAgo = new Date(new Date().getTime() - twentyMinutesInMilliseconds);
-
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        mockWeather.recordMoment = twentyMinutesAgo;
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        mockWeather.recordMoment = TimeHelper.getTwentyMinutesAgo();
 
         database.weatherDao().insertWeather(mockWeather);
         Boolean isExisting = LiveDataUtil.getValue(
-                database.weatherDao().isExistingAndUpToDate(mockWeather.coordinate.latitude, mockWeather.coordinate.longitude, thirtyMinutesAgo.getTime()));
+                database.weatherDao().isExistingAndUpToDate(
+                        mockWeather.coordinate.latitude,
+                        mockWeather.coordinate.longitude,
+                        TimeHelper.getThirtyMinutesAgo().getTime()));
 
         Assert.assertTrue(isExisting);
     }
 
     @Test
     public void insertForecastDays_notThrowingException(){
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        List<ForecastDayEntity> forecastDays = Mockers.mockForecastWithOneDay(mockWeather);
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mockWeather);
 
         database.weatherDao().insertWeather(mockWeather);
         database.weatherDao().insertForecastDays(forecastDays);
@@ -215,8 +209,8 @@ public class WeatherDaoTest {
 
     @Test
     public void insertForecastDays_notEmpty_afterRecord() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        List<ForecastDayEntity> forecastDays = Mockers.mockForecastWithOneDay(mockWeather);
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mockWeather);
 
         database.weatherDao().insertWeather(mockWeather);
         database.weatherDao().insertForecastDays(forecastDays);
@@ -229,7 +223,7 @@ public class WeatherDaoTest {
 
     @Test
     public void insertForecastDays_isEmpty_whenThereAreNoRecords() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertWeather(mockWeather);
 
@@ -241,8 +235,8 @@ public class WeatherDaoTest {
 
     @Test
     public void getWeather_returnCorrectResult() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        List<ForecastDayEntity> forecastDays = Mockers.mockForecastWithOneDay(mockWeather);
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mockWeather);
 
         database.weatherDao().insertWeather(mockWeather);
         database.weatherDao().insertForecastDays(forecastDays);
@@ -256,9 +250,9 @@ public class WeatherDaoTest {
 
     @Test
     public void updateWeather_updateTheEntity() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
 
-        WeatherEntity updatedMockWeather = Mockers.updateWeatherEntity(mockWeather);
+        WeatherEntity updatedMockWeather = MockerHelper.updateWeatherEntity(mockWeather);
 
         database.weatherDao().insertWeather(mockWeather);
         database.weatherDao().updateWeather(updatedMockWeather);
@@ -272,14 +266,14 @@ public class WeatherDaoTest {
 
     @Test
     public void updateForecast_updateTheEntities() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        List<ForecastDayEntity> mockForecast = Mockers.mockForecastWithOneDay(mockWeather);
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> mockForecast = MockerHelper.mockForecastWithOneDay(mockWeather);
 
         database.weatherDao().insertWeather(mockWeather);
         database.weatherDao().insertForecastDays(mockForecast);
 
         List<ForecastDayEntity> updatedForecast = new ArrayList<>(1);
-        ForecastDayEntity updatedForecastDay = Mockers.updateForecastDayEntity(mockForecast.get(0));
+        ForecastDayEntity updatedForecastDay = MockerHelper.updateForecastDayEntity(mockForecast.get(0));
         updatedForecast.add(updatedForecastDay);
 
         database.weatherDao().updateForecastDays(updatedForecast);
@@ -292,8 +286,8 @@ public class WeatherDaoTest {
     }
 
     private void forecastDayEntityAssertEquals(ForecastDayEntity expected, ForecastDayEntity actual) {
-        Assert.assertEquals(expected.maximumTemperatureInCelsius, actual.maximumTemperatureInCelsius, Constants.DELTA);
-        Assert.assertEquals(expected.minimumTemperatureInCelsius, actual.minimumTemperatureInCelsius, Constants.DELTA);
+        Assert.assertEquals(expected.maximumTemperatureInCelsius, actual.maximumTemperatureInCelsius, ConstantsHelper.DELTA);
+        Assert.assertEquals(expected.minimumTemperatureInCelsius, actual.minimumTemperatureInCelsius, ConstantsHelper.DELTA);
         Assert.assertEquals(expected.skyCondition, actual.skyCondition);
         Assert.assertEquals(expected.date, actual.date);
         Assert.assertEquals(expected.cityNameWithCountryCode, actual.cityNameWithCountryCode);
@@ -301,7 +295,7 @@ public class WeatherDaoTest {
     private void weatherEntityAssertEquals(WeatherEntity expected, WeatherEntity actual) {
         Assert.assertEquals(expected.cityNameWithCountryCode, actual.cityNameWithCountryCode);
         Assert.assertEquals(expected.skyCondition, actual.skyCondition);
-        Assert.assertEquals(expected.temperatureInCelsius, actual.temperatureInCelsius, Constants.DELTA);
+        Assert.assertEquals(expected.temperatureInCelsius, actual.temperatureInCelsius, ConstantsHelper.DELTA);
         Assert.assertEquals(expected.recordMoment, actual.recordMoment);
     }
 

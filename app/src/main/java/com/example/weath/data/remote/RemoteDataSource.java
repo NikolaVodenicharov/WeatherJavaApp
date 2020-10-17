@@ -2,9 +2,9 @@ package com.example.weath.data.remote;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.weath.data.dataTransferObjects.WeatherOnlyDto;
-import com.example.weath.domain.models.Coordinate;
+import com.example.weath.data.dataTransferObjects.WeatherRemoteDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 
 public interface RemoteDataSource {
-    LiveData<WeatherOnlyDto> getWeatherAsync(Coordinate coordinate);
+    LiveData<WeatherRemoteDto> getWeatherAsync(CoordinateEntity coordinate);
 }

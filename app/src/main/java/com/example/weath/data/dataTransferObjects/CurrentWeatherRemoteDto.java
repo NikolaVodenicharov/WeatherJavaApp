@@ -1,10 +1,10 @@
 package com.example.weath.data.dataTransferObjects;
 
-public class CurrentWeatherTuple {
+public class CurrentWeatherRemoteDto {
     private double temperatureInCelsius;
     private SkyConditionDto skyCondition;
 
-    public CurrentWeatherTuple(double temperatureInCelsius, SkyConditionDto skyCondition) {
+    public CurrentWeatherRemoteDto(double temperatureInCelsius, SkyConditionDto skyCondition) {
         this.temperatureInCelsius = temperatureInCelsius;
         this.skyCondition = skyCondition;
     }

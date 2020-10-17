@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.weath.data.dataTransferObjects.CurrentWeatherTuple;
+import com.example.weath.data.dataTransferObjects.CurrentWeatherRemoteDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
-import com.example.weath.data.dataTransferObjects.WeatherOnlyDto;
-import com.example.weath.domain.models.Coordinate;
+import com.example.weath.data.dataTransferObjects.WeatherRemoteDto;
+import com.example.weath.data.local.entities.CoordinateEntity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +38,8 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
     }
 
     @Override
-    public LiveData<WeatherOnlyDto> getWeatherAsync(Coordinate coordinate) {
-        final MutableLiveData<WeatherOnlyDto> weather = new MutableLiveData<>();
+    public LiveData<WeatherRemoteDto> getWeatherAsync(CoordinateEntity coordinate) {
+        final MutableLiveData<WeatherRemoteDto> weather = new MutableLiveData<>();
 
         String url = createOneCallUrl(coordinate);
 
@@ -50,7 +50,7 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
                 response.removeObserver(this);
 
                 try {
-                    WeatherOnlyDto responseWeather = createWeatherFromOneCall(jsonObject);
+                    WeatherRemoteDto responseWeather = createWeatherFromOneCall(jsonObject);
                     weather.setValue(responseWeather);
 
                 } catch (JSONException e) {
@@ -62,26 +62,27 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
         return weather;
     }
 
-    private String createOneCallUrl(Coordinate coordinate) {
+    private String createOneCallUrl(CoordinateEntity coordinate) {
         return BASE_ONE_CALL +
-                BY_LATITUDE + coordinate.getLatitude().toString() + AMPERSAND +
-                BY_LONGITUDE + coordinate.getLongitude().toString() + AMPERSAND +
+                BY_LATITUDE + coordinate.latitude.toString() + AMPERSAND +
+                BY_LONGITUDE + coordinate.longitude.toString() + AMPERSAND +
                 EXCLUDE_MINUTELY_AND_HOURLY + AMPERSAND +
                 API_KEY + AMPERSAND +
                 METRIC_UNIT;
     }
 
-    private WeatherOnlyDto createWeatherFromOneCall(JSONObject response) throws JSONException {
-        CurrentWeatherTuple currentWeatherTuple = createCurrentWeatherFromOneCall(response);
+    private WeatherRemoteDto createWeatherFromOneCall(JSONObject response) throws JSONException {
+        CurrentWeatherRemoteDto currentWeatherRemoteDto = createCurrentWeatherFromOneCall(response);
 
-        return new WeatherOnlyDto(
-                currentWeatherTuple.getTemperatureInCelsius(),
-                currentWeatherTuple.getSkyCondition(),
+        return new WeatherRemoteDto(
+                new Date(),
+                currentWeatherRemoteDto.getTemperatureInCelsius(),
+                currentWeatherRemoteDto.getSkyCondition(),
                 createForecastFromOneCall2(response));
 
     }
 
-    private CurrentWeatherTuple createCurrentWeatherFromOneCall(JSONObject response) throws JSONException {
+    private CurrentWeatherRemoteDto createCurrentWeatherFromOneCall(JSONObject response) throws JSONException {
         JSONObject current = response.getJSONObject("current");
         String temp = current.getString("temp");
 
@@ -90,7 +91,7 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
         JSONObject weatherArrayFirst = weatherArray.getJSONObject(0);
         String weatherCode = weatherArrayFirst.getString("id");
 
-        CurrentWeatherTuple currentWeather = new CurrentWeatherTuple(
+        CurrentWeatherRemoteDto currentWeather = new CurrentWeatherRemoteDto(
                 Double.parseDouble(temp),
                 createSkyCondition(weatherCode));
 

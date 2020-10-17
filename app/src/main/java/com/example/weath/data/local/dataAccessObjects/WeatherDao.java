@@ -32,8 +32,8 @@ public interface WeatherDao {
     @Query("Select Exists (Select * From Weathers Where latitude == :latitude And longitude == :longitude)")
     LiveData<Boolean> isExisting(double latitude, double longitude);
 
-    @Query("Select Exists (Select * From Weathers Where latitude == :latitude And longitude == :longitude And recordMoment >= :oldestMoment)")
-    LiveData<Boolean> isExistingAndUpToDate(double latitude, double longitude, long oldestMoment);
+    @Query("Select Exists (Select * From Weathers Where latitude == :latitude And longitude == :longitude And recordMoment >= :minimumUpToDate)")
+    LiveData<Boolean> isExistingAndUpToDate(double latitude, double longitude, long minimumUpToDate);
 
     @Query("Select * From Weathers")
     LiveData<List<WeatherEntity>> getAll();

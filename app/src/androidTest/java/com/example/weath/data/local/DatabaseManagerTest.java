@@ -6,14 +6,15 @@ import androidx.room.Room;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.example.weath.Constants;
 import com.example.weath.LiveDataUtil;
-import com.example.weath.data.Mockers;
-import com.example.weath.data.dataTransferObjects.CityWeatherDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
+import com.example.weath.data.dataTransferObjects.WeatherLocalDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
 import com.example.weath.data.local.entities.WeatherEntity;
 import com.example.weath.data.utils.WeatherMapperImpl;
+import com.example.weath.testHelpers.ConstantsHelper;
+import com.example.weath.testHelpers.MockerHelper;
+import com.example.weath.testHelpers.TimeHelper;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import org.junit.After;
@@ -23,16 +24,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Date;
-
 @RunWith(AndroidJUnit4.class)
 public class DatabaseManagerTest {
-    private long thirtyMinutesInMilliseconds = 1000 * 60 * 30;
-    private long twentyMinutesInMilliseconds = 1000 * 60 * 20;
-
-    private Date thirtyMinutesAgo = new Date(new Date().getTime() - thirtyMinutesInMilliseconds);
-    private Date twentyMinutesAgo = new Date(new Date().getTime() - twentyMinutesInMilliseconds);
-
     private AppDatabase database;
     private LocalDataSource databaseManager;
 
@@ -61,32 +54,32 @@ public class DatabaseManagerTest {
 
     @Test
     public void insertOrReplaceCityWeather_notThrowingException(){
-        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockCityWeatherDto();
 
-        databaseManager.insertOrReplaceCityWeather(cityWeatherDto);
+        databaseManager.insertOrReplaceCityWeather(weatherLocalDto);
     }
 
     @Test
     public void insertOrReplaceCityWeather_onInsertNewEntity_isAddedToDatabase() throws InterruptedException {
-        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockCityWeatherDto();
 
-        databaseManager.insertOrReplaceCityWeather(cityWeatherDto);
+        databaseManager.insertOrReplaceCityWeather(weatherLocalDto);
         Boolean isExisting = LiveDataUtil.getValue(
-                databaseManager.isExistingAndUpToDate(cityWeatherDto.getCoordinate(), thirtyMinutesAgo));
+                databaseManager.isExistingAndUpToDate(weatherLocalDto.getCoordinate(), TimeHelper.getThirtyMinutesAgo()));
 
         Assert.assertTrue(isExisting);
     }
 
     @Test
     public void insertOrReplaceWeather_onInsertExistingEntity_successfullyUpdate() throws InterruptedException {
-        CityWeatherDto current = Mockers.mockCityWeatherDto();
-        CityWeatherDto expected = Mockers.updateCityWeatherDto(current);
+        WeatherLocalDto current = MockerHelper.mockCityWeatherDto();
+        WeatherLocalDto expected = MockerHelper.updateCityWeatherDto(current);
 
         databaseManager.insertOrReplaceCityWeather(current);
         databaseManager.insertOrReplaceCityWeather(expected);
 
-        CityWeatherDto actual = LiveDataUtil.getValue(
-                databaseManager.getCityWeather(
+        WeatherLocalDto actual = LiveDataUtil.getValue(
+                databaseManager.getWeather(
                         expected.getCoordinate()));
 
         cityWeatherDtoBasicFieldsAssertEquals(expected, actual);
@@ -98,7 +91,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void isExistingAndUpToDate_returnFalse_whenCoordinateDoesNotMatch() throws InterruptedException {
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
 
         database.weatherDao().insertWeather(mockWeather);
         Boolean isExisting = LiveDataUtil.getValue(
@@ -109,112 +102,70 @@ public class DatabaseManagerTest {
 
     @Test
     public void isExistingAndUpToDate_returnFalse_whenEntityIsOutOfDate() throws InterruptedException {
-        long thirtyMinutesInMilliseconds = 1000 * 60 * 30;
-        long twentyMinutesInMilliseconds = 1000 * 60 * 20;
-
-        Date thirtyMinutesAgo = new Date(new Date().getTime() - thirtyMinutesInMilliseconds);
-        Date twentyMinutesAgo = new Date(new Date().getTime() - twentyMinutesInMilliseconds);
-
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        mockWeather.recordMoment = thirtyMinutesAgo;
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        mockWeather.recordMoment = TimeHelper.getThirtyMinutesAgo();
 
         database.weatherDao().insertWeather(mockWeather);
+
         Boolean isExisting = LiveDataUtil.getValue(
-                database.weatherDao().isExistingAndUpToDate(mockWeather.coordinate.latitude, mockWeather.coordinate.longitude, twentyMinutesAgo.getTime()));
+                databaseManager.isExistingAndUpToDate(mockWeather.coordinate, TimeHelper.getTwentyMinutesAgo()));
 
         Assert.assertFalse(isExisting);
     }
 
     @Test
     public void isExistingAndUpToDate_returnTrue_whenEntityUpToDate() throws InterruptedException {
-        long thirtyMinutesInMilliseconds = 1000 * 60 * 30;
-        long twentyMinutesInMilliseconds = 1000 * 60 * 20;
-
-        Date thirtyMinutesAgo = new Date(new Date().getTime() - thirtyMinutesInMilliseconds);
-        Date twentyMinutesAgo = new Date(new Date().getTime() - twentyMinutesInMilliseconds);
-
-        WeatherEntity mockWeather = Mockers.mockWeatherEntity();
-        mockWeather.recordMoment = twentyMinutesAgo;
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        mockWeather.recordMoment = TimeHelper.getTwentyMinutesAgo();
 
         database.weatherDao().insertWeather(mockWeather);
         Boolean isExisting = LiveDataUtil.getValue(
-                database.weatherDao().isExistingAndUpToDate(mockWeather.coordinate.latitude, mockWeather.coordinate.longitude, thirtyMinutesAgo.getTime()));
+                databaseManager.isExistingAndUpToDate(mockWeather.coordinate, TimeHelper.getThirtyMinutesAgo()));
 
         Assert.assertTrue(isExisting);
     }
 
-//    @Test
-//    public void isExisting_liveDataIsNotNull() {
-//        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
-//
-//        databaseManager.insertOrReplaceCityWeather(cityWeatherDto);
-//        LiveData<Boolean> isExisting = databaseManager.isExistingAndUpToDate(cityWeatherDto.getCoordinate());
-//
-//        Assert.assertNotNull(isExisting);
-//    }
-//
-//    @Test
-//    public void isExisting_returnTrueAfterInsert() throws InterruptedException {
-//        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
-//
-//        databaseManager.insertOrReplaceCityWeather(cityWeatherDto);
-//
-//        boolean isExisting = LiveDataUtil.getValue(
-//                databaseManager.isExistingAndUpToDate(
-//                        cityWeatherDto.getCoordinate()));
-//
-//        Assert.assertTrue(isExisting);
-//    }
-//
-//    @Test
-//    public void isExisting_returnFalseWhenNotExist() throws InterruptedException {
-//        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
-//
-//        boolean isExisting = LiveDataUtil.getValue(databaseManager.isExistingAndUpToDate(cityWeatherDto.getCoordinate()));
-//
-//        Assert.assertFalse(isExisting);
-//    }
 
     @Test
     public void getCityWeather_liveDataIsNotNull(){
-        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockCityWeatherDto();
 
-        LiveData<CityWeatherDto> cityWeather = databaseManager.getCityWeather(cityWeatherDto.getCoordinate());
+        LiveData<WeatherLocalDto> cityWeather = databaseManager.getWeather(weatherLocalDto.getCoordinate());
 
         Assert.assertNotNull(cityWeather);
     }
 
     @Test
     public void getCityWeather_isNull_whenDatabaseIsEmpty() throws InterruptedException {
-        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockCityWeatherDto();
 
-        CityWeatherDto cityWeather = LiveDataUtil.getValue(
-                databaseManager.getCityWeather(
-                        cityWeatherDto.getCoordinate()));
+        WeatherLocalDto cityWeather = LiveDataUtil.getValue(
+                databaseManager.getWeather(
+                        weatherLocalDto.getCoordinate()));
 
         Assert.assertNull(cityWeather);
     }
 
     @Test
     public void getCityWeather_isNull_whenDatabaseIsNotEmpty_butEntityDoesNotExist() throws InterruptedException {
-        CityWeatherDto cityWeatherDto = Mockers.mockCityWeatherDto();
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockCityWeatherDto();
 
-        databaseManager.insertOrReplaceCityWeather(cityWeatherDto);
+        databaseManager.insertOrReplaceCityWeather(weatherLocalDto);
 
-        CityWeatherDto cityWeather = LiveDataUtil.getValue(
-                databaseManager.getCityWeather(
-                        Mockers.mockCoordinateEntity()));
+        WeatherLocalDto cityWeather = LiveDataUtil.getValue(
+                databaseManager.getWeather(
+                        MockerHelper.mockCoordinateEntity()));
 
         Assert.assertNull(cityWeather);
     }
 
     @Test
     public void getCityWeather_returnCorrectResult_whenEntityExist() throws InterruptedException {
-        CityWeatherDto mockCityWeather = Mockers.mockCityWeatherDto();
+        WeatherLocalDto mockCityWeather = MockerHelper.mockCityWeatherDto();
         databaseManager.insertOrReplaceCityWeather(mockCityWeather);
 
-        CityWeatherDto actualCityWeather = LiveDataUtil.getValue(
-                databaseManager.getCityWeather(
+        WeatherLocalDto actualCityWeather = LiveDataUtil.getValue(
+                databaseManager.getWeather(
                         mockCityWeather.getCoordinate()));
 
         cityWeatherDtoBasicFieldsAssertEquals(mockCityWeather, actualCityWeather);
@@ -224,7 +175,7 @@ public class DatabaseManagerTest {
         forecastDayDtoAssertEquals(mockCityWeather.getForecast().get(0), actualCityWeather.getForecast().get(0));
     }
 
-    private void cityWeatherDtoBasicFieldsAssertEquals(CityWeatherDto expected, CityWeatherDto actual) {
+    private void cityWeatherDtoBasicFieldsAssertEquals(WeatherLocalDto expected, WeatherLocalDto actual) {
         Assert.assertEquals(expected.getCityName(),
                 actual.getCityName());
 
@@ -236,16 +187,16 @@ public class DatabaseManagerTest {
 
         Assert.assertEquals(expected.getTemperatureInCelsius(),
                 actual.getTemperatureInCelsius(),
-                Constants.DELTA);
+                ConstantsHelper.DELTA);
     }
     private void coordinateEntityAssertEquals(CoordinateEntity expected, CoordinateEntity actual) {
         Assert.assertEquals(expected.latitude,
                 actual.latitude,
-                Constants.DELTA);
+                ConstantsHelper.DELTA);
 
         Assert.assertEquals(expected.longitude,
                 actual.longitude,
-                Constants.DELTA);
+                ConstantsHelper.DELTA);
     }
     private void forecastDayDtoAssertEquals(ForecastDayDto expected, ForecastDayDto actual) {
         Assert.assertEquals(expected.getDate(),
@@ -253,11 +204,11 @@ public class DatabaseManagerTest {
 
         Assert.assertEquals(expected.getMinimumTemperatureInCelsius(),
                 actual.getMinimumTemperatureInCelsius(),
-                Constants.DELTA);
+                ConstantsHelper.DELTA);
 
         Assert.assertEquals(expected.getMaximumTemperatureInCelsius(),
                 actual.getMaximumTemperatureInCelsius(),
-                Constants.DELTA);
+                ConstantsHelper.DELTA);
 
         Assert.assertEquals(expected.getSkyCondition(),
                 actual.getSkyCondition());

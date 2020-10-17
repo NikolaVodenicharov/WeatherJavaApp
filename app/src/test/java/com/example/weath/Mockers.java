@@ -1,7 +1,9 @@
 package com.example.weath;
 
+import com.example.weath.data.dataTransferObjects.WeatherLocalDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
+import com.example.weath.data.dataTransferObjects.WeatherRemoteDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
 import com.example.weath.data.local.entities.ForecastDayEntity;
 import com.example.weath.data.local.entities.WeatherEntity;
@@ -27,25 +29,36 @@ public class Mockers {
 
         return weather;
     }
+    public static WeatherLocalDto mockCityWeatherDto(){
+        WeatherLocalDto weatherLocalDto = new WeatherLocalDto(
+                "Houston",
+                "(US)",
+                new Date(),
+                internalMockCoordinateEntity(),
+                25,
+                SkyConditionDto.CLEAR,
+                mockForecastDayDtoCollectionWithOneDay());
 
-    public static List<ForecastDayEntity> mockForecastWithOneDay(String cityNameWithCountryCode) {
+        return weatherLocalDto;
+    }
+    public static WeatherRemoteDto mockWeatherRemoteDto() {
+        return new WeatherRemoteDto(new Date(),12.45, SkyConditionDto.CLEAR, mockForecastDayDtoCollectionWithOneDay());
+    }
+
+    public static List<ForecastDayEntity> mockForecastDayEntityCollectionWithOneDay(String cityNameWithCountryCode) {
         List<ForecastDayEntity> forecastDays = new ArrayList<>(5);
         ForecastDayEntity forecastDay = mockForecastDayEntity(cityNameWithCountryCode);
         forecastDays.add(forecastDay);
 
         return forecastDays;
     }
-    private static ForecastDayEntity mockForecastDayEntity(String cityNameWithCountryCode) {
-        ForecastDayEntity forecastDay = new ForecastDayEntity();
-        forecastDay.date = new Date();
-        forecastDay.minimumTemperatureInCelsius = 20;
-        forecastDay.maximumTemperatureInCelsius = 30;
-        forecastDay.skyCondition = SkyConditionDto.SNOW.name();
-        forecastDay.cityNameWithCountryCode = cityNameWithCountryCode;
 
-        return forecastDay;
+    public static List<ForecastDayDto> mockForecastDayDtoCollectionWithOneDay(){
+        List<ForecastDayDto> forecast = new ArrayList<>(1);
+        forecast.add(mockForecastDayDto());
+
+        return forecast;
     }
-
     public static ForecastDayDto mockForecastDayDto(){
         ForecastDayDto forecastDay = new ForecastDayDto(
                 new Date(2000, 1, 24),
@@ -62,5 +75,23 @@ public class Mockers {
 
     public static Coordinate mockCoordinate() {
         return new Coordinate(11.22, 33.44);
+    }
+    private static CoordinateEntity internalMockCoordinateEntity() {
+        CoordinateEntity coordinateEntity = new CoordinateEntity();
+        coordinateEntity.latitude = 11.22;
+        coordinateEntity.longitude = 33.44;
+
+        return coordinateEntity;
+    }
+
+    private static ForecastDayEntity mockForecastDayEntity(String cityNameWithCountryCode) {
+        ForecastDayEntity forecastDay = new ForecastDayEntity();
+        forecastDay.date = new Date();
+        forecastDay.minimumTemperatureInCelsius = 20;
+        forecastDay.maximumTemperatureInCelsius = 30;
+        forecastDay.skyCondition = SkyConditionDto.SNOW.name();
+        forecastDay.cityNameWithCountryCode = cityNameWithCountryCode;
+
+        return forecastDay;
     }
 }
