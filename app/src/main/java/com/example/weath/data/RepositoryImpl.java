@@ -53,6 +53,11 @@ public class RepositoryImpl implements Repository {
         return loadWeatherFromDatabase(coordinate, minimumUpToDate);
     }
 
+    @Override
+    public LiveData<Weather2> getLastCachedWeatherAsync() {
+        return null;
+    }
+
     private void refreshWeather(City city, Date minimumUpToDate, CoordinateEntity coordinate) {
         LiveData<Boolean> isExisting = localDataSource.isExistingAndUpToDate(coordinate, minimumUpToDate);
 

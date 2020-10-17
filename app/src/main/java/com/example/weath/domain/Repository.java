@@ -15,4 +15,6 @@ public interface Repository {
     LiveData<City> getCityByLocationAsync(Coordinate coordinate);
 
     LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment);
+
+    LiveData<Weather2> getLastCachedWeatherAsync();
 }

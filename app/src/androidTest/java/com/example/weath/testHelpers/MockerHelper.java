@@ -1,26 +1,33 @@
 package com.example.weath.testHelpers;
 
-import com.example.weath.data.dataTransferObjects.WeatherLocalDto;
 import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.SkyConditionDto;
+import com.example.weath.data.dataTransferObjects.WeatherLocalDto;
 import com.example.weath.data.dataTransferObjects.WeatherRemoteDto;
 import com.example.weath.data.local.entities.CoordinateEntity;
 import com.example.weath.data.local.entities.ForecastDayEntity;
 import com.example.weath.data.local.entities.WeatherEntity;
 import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
+import com.example.weath.domain.models.ForecastDay;
+import com.example.weath.domain.models.SkyCondition;
+import com.example.weath.domain.models.Weather2;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class MockerHelper {
-    public static CoordinateEntity mockCoordinateEntity() {
-        CoordinateEntity coordinateEntity = new CoordinateEntity();
-        coordinateEntity.latitude = -75.45;
-        coordinateEntity.longitude = 88.15;
+    public static Weather2 mockWeather(){
+        Weather2 weatherLocalDto = new Weather2(
+                "Houston",
+                new Date(),
+                mockCoordinate(),
+                25,
+                SkyCondition.CLEAR,
+                mockDomainForecastWithOneDay());
 
-        return coordinateEntity;
+        return weatherLocalDto;
     }
 
     public static WeatherLocalDto mockCityWeatherDto(){
@@ -48,6 +55,10 @@ public class MockerHelper {
         return updated;
     }
 
+    public static WeatherRemoteDto mockWeatherOnlyDto() {
+        return new WeatherRemoteDto(new Date(), 12.45, SkyConditionDto.CLEAR, mockForecastWithOneDay());
+    }
+
     public static WeatherEntity mockWeatherEntity() {
         CoordinateEntity coordinate = new CoordinateEntity();
         coordinate.latitude = 11.22;
@@ -70,10 +81,6 @@ public class MockerHelper {
         updatedMockWeather.skyCondition = SkyConditionDto.RAIN.name();
         updatedMockWeather.recordMoment = new Date();
         return updatedMockWeather;
-    }
-
-    public static WeatherRemoteDto mockWeatherOnlyDto() {
-        return new WeatherRemoteDto(new Date(), 12.45, SkyConditionDto.CLEAR, mockForecastWithOneDay());
     }
 
     public static ForecastDayEntity mockForecastDayEntity(WeatherEntity weather) {
@@ -113,6 +120,19 @@ public class MockerHelper {
         return new City("Houston", "(US)", new Coordinate(11.22, 33.44));
     }
 
+    public static CoordinateEntity mockCoordinateEntity() {
+        CoordinateEntity coordinateEntity = new CoordinateEntity();
+        coordinateEntity.latitude = -75.45;
+        coordinateEntity.longitude = 88.15;
+
+        return coordinateEntity;
+    }
+    public static Coordinate mockCoordinate(){
+        Coordinate coordinate = new Coordinate(-75.45, 88.15);
+
+        return coordinate;
+    }
+
     private static CoordinateEntity internalMockCoordinateEntity() {
         CoordinateEntity coordinateEntity = new CoordinateEntity();
         coordinateEntity.latitude = 11.22;
@@ -134,6 +154,20 @@ public class MockerHelper {
                 SkyConditionDto.SNOW);
 
         return forecastDayDto;
+    }
+
+    private static List<ForecastDay> mockDomainForecastWithOneDay(){
+        List<ForecastDay> forecast = new ArrayList<>(1);
+
+        ForecastDay forecastDay = new ForecastDay(
+                new Date(),
+                20,
+                30,
+                SkyCondition.SNOW);
+
+        forecast.add(forecastDay);
+
+        return forecast;
     }
 
     private static List<ForecastDayDto> updateForecast(List<ForecastDayDto> current){
