@@ -11,6 +11,7 @@ import com.example.weath.data.utils.RepositoryFactory;
 import com.example.weath.domain.CitiesCollection;
 import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.Repository;
+import com.example.weath.domain.cases.WeatherCases;
 import com.example.weath.domain.models.Coordinate;
 
 import java.io.InputStream;
@@ -25,6 +26,8 @@ public class App extends Application {
     public static Repository repository;
     public static DeviceConnectivity deviceConnectivity;
 
+    public static WeatherCases weatherCases;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -34,6 +37,8 @@ public class App extends Application {
         initializeCitiesCollection();
         initializeRepository();
         initializeDeviceConnectivity();
+
+        weatherCases = new WeatherCases(repository, citiesCollection, deviceConnectivity);
     }
 
     private void initializeConnectivityManager() {
@@ -54,9 +59,9 @@ public class App extends Application {
     private void initializeCitiesCollection() {
         List<InputStream> streams = new ArrayList<>(4);
         streams.add(getResources().openRawResource(R.raw.ad));
-        streams.add(getResources().openRawResource(R.raw.ek));
-        streams.add(getResources().openRawResource(R.raw.mr));
-        streams.add(getResources().openRawResource(R.raw.sz));
+//        streams.add(getResources().openRawResource(R.raw.ek));
+//        streams.add(getResources().openRawResource(R.raw.mr));
+//        streams.add(getResources().openRawResource(R.raw.sz));
 
         citiesCollection = new OpenWeatherMapCities(streams);
     }

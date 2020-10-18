@@ -8,5 +8,5 @@ public interface DeviceConnectivity {
     boolean isConnectedToInternet();
 
     LiveData<Coordinate> getLastKnownLocation();
-    void setLastKnownLocation(Coordinate location);
+    void setLastKnownLocation(LiveData<Coordinate> location);
 }

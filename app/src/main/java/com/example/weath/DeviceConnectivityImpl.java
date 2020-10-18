@@ -5,6 +5,7 @@ import android.net.NetworkInfo;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.models.Coordinate;
@@ -33,7 +34,14 @@ public class DeviceConnectivityImpl implements DeviceConnectivity {
         return lastKnownLocation;
     }
 
-    public void setLastKnownLocation(Coordinate location) {
-        lastKnownLocation.setValue(location);
+    public void setLastKnownLocation(LiveData<Coordinate> location) {
+        location.observeForever(new Observer<Coordinate>() {
+            @Override
+            public void onChanged(Coordinate coordinate) {
+                location.removeObserver(this);
+
+                lastKnownLocation.setValue(coordinate);
+            }
+        });
     }
 }

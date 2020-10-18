@@ -80,47 +80,23 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void getLocationAsync(){
-        if (App.lastKnownLocation != null &&
-            App.lastKnownLocation.getValue() != null){
+        boolean locationExist = App.deviceConnectivity.getLastKnownLocation() != null &&
+                App.deviceConnectivity.getLastKnownLocation().getValue() != null;
+
+        if (locationExist){
             return;
         }
         else if (CurrentLocationHelper.checkCoarseLocationPermission(this)){
-            App.lastKnownLocation = CurrentLocationHelper.getLastKnownLocation(this);
+            App.deviceConnectivity.setLastKnownLocation(
+                    CurrentLocationHelper.getLastKnownLocation(this));
         }
         else{
-            // if location permission is granted that will trigger onRequestPermissionResult int this class
             CurrentLocationHelper.askForLocationPermissionAsync(this);
         }
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        CurrentLocationHelper.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-
-//        boolean isAccessLocationTriggered = requestCode == CurrentLocationHelper.REQUEST_LOCATION_CODE;
-//
-//        if (isAccessLocationTriggered){
-//            boolean arePermissionsEmpty = permissions.length == 0;
-//            if (arePermissionsEmpty){
-//                return;
-//            }
-//
-//            boolean areGrantResultsEmpty = grantResults.length == 0;
-//            if (areGrantResultsEmpty){
-//                return;
-//            }
-//
-//            boolean isLocationPermissionGranted = CurrentLocationHelper.checkCoarseLocationPermission(this);
-//            if (!isLocationPermissionGranted)
-//            {
-//                return;
-//            }
-//
-//            App.lastKnownLocation = CurrentLocationHelper.getLastKnownLocation(this);
-//
-//            Toast.makeText(this, CurrentLocationHelper.LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
-//        }
-//        else {
-//        }
+        CurrentLocationHelper.onRequestPermissionsResult(App.deviceConnectivity,this, requestCode, permissions, grantResults);
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }

@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weath.R;
-import com.example.weath.domain.models.ForecastDay;
-import com.example.weath.domain.models.SkyCondition;
-import com.example.weath.domain.models.Weather;
 import com.example.weath.databinding.FragmentWeatherBinding;
+import com.example.weath.domain.models.SkyCondition;
+import com.example.weath.ui.models.ForecastDayUi;
+import com.example.weath.ui.models.WeatherUi;
 import com.example.weath.ui.utils.ForecastAdapter;
 import com.example.weath.ui.viewModels.StartViewModel;
 
@@ -59,7 +59,12 @@ public class WeatherFragment extends Fragment {
 
     private void setErrorMessageVisibility() {
         TextView errorMessageTextView = getView().findViewById(R.id.error_message);
-        if (viewModel.getErrorMessage().getValue() == null){
+
+        if (viewModel.getWeatherUiLiveData().getValue() == null){
+            return;
+        }
+
+        if (viewModel.getWeatherUiLiveData().getValue().getErrorMessage() == null){
             errorMessageTextView.setVisibility(View.GONE);
         }
         else{
@@ -68,34 +73,48 @@ public class WeatherFragment extends Fragment {
     }
 
     private void observeSkyCondition() {
-        viewModel.getWeather().observe(this, new Observer<Weather>() {
+        viewModel.getWeatherUiLiveData().observe(this, new Observer<WeatherUi>() {
             @Override
-            public void onChanged(Weather weather) {
-                boolean shouldDisplayCurrentSkyCondition = weather.getCurrentWeather() != null;
-                if (!shouldDisplayCurrentSkyCondition){
+            public void onChanged(WeatherUi weatherUi) {
+                if (weatherUi == null){
                     return;
                 }
 
-                SkyCondition skyCondition = weather.getCurrentWeather().getSkyCondition();
+                SkyCondition skyCondition = weatherUi.getSkyCondition();
                 int drawableId = findSkyConditionDrawableId(skyCondition);
                 ImageView imageView = getView().findViewById(R.id.imageView);
                 imageView.setImageResource(drawableId);
             }
         });
+
+//        viewModel.getWeather().observe(this, new Observer<Weather>() {
+//            @Override
+//            public void onChanged(Weather weather) {
+//                boolean shouldDisplayCurrentSkyCondition = weather.getCurrentWeather() != null;
+//                if (!shouldDisplayCurrentSkyCondition){
+//                    return;
+//                }
+//
+//                SkyCondition skyCondition = weather.getCurrentWeather().getSkyCondition();
+//                int drawableId = findSkyConditionDrawableId(skyCondition);
+//                ImageView imageView = getView().findViewById(R.id.imageView);
+//                imageView.setImageResource(drawableId);
+//            }
+//        });
     }
 
     private void observeForecast() {
-        viewModel.getWeather().observe(this, new Observer<Weather>() {
+        viewModel.getWeatherUiLiveData().observe(this, new Observer<WeatherUi>() {
             @Override
-            public void onChanged(Weather weather) {
-                boolean shouldDisplayForecast = weather.getForecast() != null &&
-                        weather.getForecast().size() > 0;
+            public void onChanged(WeatherUi weatherUi) {
+                boolean shouldDisplayForecast = weatherUi.getForecast() != null &&
+                        weatherUi.getForecast().size() > 0;
 
                 if (!shouldDisplayForecast){
                     return;
                 }
 
-                List<ForecastDay> forecast = weather.getForecast();
+                List<ForecastDayUi> forecast = weatherUi.getForecast();
                 ForecastAdapter adapter = new ForecastAdapter(forecast);
 
                 RecyclerView recyclerView = getView().findViewById(R.id.recyclerViewForecast);
@@ -103,6 +122,25 @@ public class WeatherFragment extends Fragment {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             }
         });
+
+//        viewModel.getWeather().observe(this, new Observer<Weather>() {
+//            @Override
+//            public void onChanged(Weather weather) {
+//                boolean shouldDisplayForecast = weather.getForecast() != null &&
+//                        weather.getForecast().size() > 0;
+//
+//                if (!shouldDisplayForecast){
+//                    return;
+//                }
+//
+//                List<ForecastDay> forecast = weather.getForecast();
+//                ForecastAdapter adapter = new ForecastAdapter(forecast);
+//
+//                RecyclerView recyclerView = getView().findViewById(R.id.recyclerViewForecast);
+//                recyclerView.setAdapter(adapter);
+//                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//            }
+//        });
     }
 
     public static int findSkyConditionDrawableId(SkyCondition skyCondition){

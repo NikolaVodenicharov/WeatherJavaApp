@@ -11,17 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weath.R;
-import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.ui.activities.WeatherFragment;
+import com.example.weath.ui.models.ForecastDayUi;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastDayViewHolder> {
-    private List<ForecastDay> forecastDays;
+    private List<ForecastDayUi> forecastDays;
 
-    public ForecastAdapter(List<ForecastDay> forecastDays) {
+    public ForecastAdapter(List<ForecastDayUi> forecastDays) {
         this.forecastDays = forecastDays;
     }
 
@@ -38,7 +38,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
     @Override
     public void onBindViewHolder(@NonNull ForecastDayViewHolder holder, int position) {
-        ForecastDay forecastDay = forecastDays.get(position);
+        ForecastDayUi forecastDay = forecastDays.get(position);
 
         Date date = forecastDay.getDate();
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE");

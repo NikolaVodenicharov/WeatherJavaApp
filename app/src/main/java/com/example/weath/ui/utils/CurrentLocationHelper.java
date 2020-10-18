@@ -13,7 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.weath.App;
+import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.models.Coordinate;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -68,7 +68,7 @@ public class CurrentLocationHelper {
         }
     }
 
-    public static void onRequestPermissionsResult(Context context, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+    public static void onRequestPermissionsResult(DeviceConnectivity deviceConnectivity, Context context, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
         boolean isAccessLocationTriggered = requestCode == REQUEST_LOCATION_CODE;
         if (!isAccessLocationTriggered){
             return;
@@ -90,7 +90,8 @@ public class CurrentLocationHelper {
             return;
         }
 
-        App.lastKnownLocation = getLastKnownLocation(context);
+        deviceConnectivity.setLastKnownLocation(getLastKnownLocation(context));
+        //App.lastKnownLocation = getLastKnownLocation(context);
 
         Toast.makeText(context, LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
     }

@@ -20,7 +20,7 @@
             android:id="@+id/error_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.errorMessage}"
+            android:text="@{viewModel.weatherUiLiveData.errorMessage}"
             android:textSize="@dimen/error_message_text_size"
             android:textColor="@color/error"
             android:textAlignment="center"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/current_day_margin"
             android:layout_marginBottom="@dimen/current_day_margin"
-            android:text="@{viewModel.city.name}"
+            android:text="@{viewModel.weatherUiLiveData.cityName}"
             android:textSize="@dimen/current_day_text_size_50dp" />
 
         <LinearLayout
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="100dp"
-                android:text="@{viewModel.weather.currentWeather.temperature}"
+                android:text="@{viewModel.weatherUiLiveData.temperatureInCelsius}"
                 android:textSize="@dimen/current_day_text_size_50dp" />
 
             <ImageView
