@@ -5,7 +5,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.example.weath.data.dataTransferObjects.ForecastDayDto;
 import com.example.weath.data.dataTransferObjects.WeatherRemoteDto;
+import com.example.weath.domain.Repository;
+import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.testHelpers.ConstantsHelper;
 import com.example.weath.data.dataTransferObjects.WeatherLocalDto;
 import com.example.weath.data.local.LocalDataSource;
@@ -31,7 +34,7 @@ public class RepositoryImplTest {
 
     @Test
     public void getWeatherAsync_requestFromRemoteDataSource_whenEntityNotExistingInDatabase(){
-        WeatherRemoteDto remoteDto = MockerHelper.mockWeatherOnlyDto();
+        WeatherRemoteDto remoteDto = MockerHelper.mockWeatherRemoteDto();
         RemoteDataSource mockRemoteDataSource = new RemoteDataSource() {
             @Override
             public LiveData<WeatherRemoteDto> getWeatherAsync(CoordinateEntity coordinate) {
@@ -54,6 +57,11 @@ public class RepositoryImplTest {
             @Override
             public LiveData<Boolean> isExistingAndUpToDate(CoordinateEntity coordinate, Date minimumUpToDate) {
                 return new MutableLiveData<>(localDto.getValue() != null);
+            }
+
+            @Override
+            public LiveData<WeatherLocalDto> getLastCachedWeatherAsync() {
+                return null;
             }
         };
 
@@ -82,7 +90,7 @@ public class RepositoryImplTest {
 
     @Test
     public void getWeatherAsync_getFromLocaleDatabase_whenIsExistingAndUpToDateInDatabase(){
-        WeatherLocalDto weatherLocalDto = MockerHelper.mockCityWeatherDto();
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockWeatherLocalDto();
 
         LocalDataSource localDataSource = new LocalDataSource() {
             @Override
@@ -98,6 +106,11 @@ public class RepositoryImplTest {
             @Override
             public LiveData<Boolean> isExistingAndUpToDate(CoordinateEntity coordinate, Date minimumUpToDate) {
                 return new MutableLiveData<>(true);
+            }
+
+            @Override
+            public LiveData<WeatherLocalDto> getLastCachedWeatherAsync() {
+                return null;
             }
         };
 
@@ -122,5 +135,67 @@ public class RepositoryImplTest {
                 Assert.assertEquals(mockCity.getLocation().getLongitude(), weather2.getCoordinate().getLongitude(), ConstantsHelper.DELTA);
             }
         });
+    }
+
+    @Test
+    public void getLastCachedWeatherAsync_getLastUpToDateWeather(){
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockWeatherLocalDto();
+
+        LocalDataSource localDataSource = new LocalDataSource() {
+            @Override
+            public void insertOrReplaceCityWeather(WeatherLocalDto cityWeather) {
+
+            }
+
+            @Override
+            public LiveData<WeatherLocalDto> getWeather(CoordinateEntity coordinate) {
+                return null;
+            }
+
+            @Override
+            public LiveData<WeatherLocalDto> getLastCachedWeatherAsync() {
+                return new MutableLiveData<>(weatherLocalDto);
+            }
+
+            @Override
+            public LiveData<Boolean> isExistingAndUpToDate(CoordinateEntity coordinate, Date minimumUpToDate) {
+                return null;
+            }
+        };
+
+        Repository repository = new RepositoryImpl(null, localDataSource, new WeatherMapperImpl());
+
+        LiveData<Weather2> actualWeather = repository.getLastCachedWeatherAsync();
+
+        Assert.assertNotNull(actualWeather);
+        Assert.assertNotNull(actualWeather.getValue());
+
+        weatherAssertEquals(weatherLocalDto, actualWeather.getValue());
+
+        forecastDayAssertEquals(weatherLocalDto.getForecast().get(0), actualWeather.getValue().getForecast().get(0));
+    }
+
+    private void weatherAssertEquals(WeatherLocalDto weatherLocalDto, Weather2 actualWeather) {
+        Assert.assertEquals(weatherLocalDto.getCityName(), actualWeather.getCityName());
+        Assert.assertEquals(weatherLocalDto.getRecordMoment(), actualWeather.getRecordMoment());
+        Assert.assertEquals(weatherLocalDto.getTemperatureInCelsius(), actualWeather.getTemperatureInCelsius(), ConstantsHelper.DELTA);
+        Assert.assertEquals(weatherLocalDto.getSkyCondition().name(), actualWeather.getSkyCondition().name());
+        Assert.assertEquals(weatherLocalDto.getCoordinate().latitude, actualWeather.getCoordinate().getLatitude());
+        Assert.assertEquals(weatherLocalDto.getCoordinate().longitude, actualWeather.getCoordinate().getLongitude());
+    }
+    private void forecastDayAssertEquals(ForecastDayDto forecastDayDto, ForecastDay actualForecastDay) {
+        Assert.assertEquals(forecastDayDto.getSkyCondition().name(),
+                actualForecastDay.getSkyCondition().name());
+
+        Assert.assertEquals(forecastDayDto.getMinimumTemperatureInCelsius(),
+                actualForecastDay.getMinimumTemperatureInCelsius(),
+                ConstantsHelper.DELTA);
+
+        Assert.assertEquals(forecastDayDto.getMaximumTemperatureInCelsius(),
+                actualForecastDay.getMaximumTemperatureInCelsius(),
+                ConstantsHelper.DELTA);
+
+        Assert.assertEquals(forecastDayDto.getDate(),
+                actualForecastDay.getDate());
     }
 }

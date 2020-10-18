@@ -41,7 +41,22 @@ public class RepositoryImpl implements Repository {
 
     @Override
     public LiveData<Weather2> getLastCachedWeatherAsync() {
-        return null;
+        MutableLiveData<Weather2> weatherLiveData = new MutableLiveData<>();
+
+        LiveData<WeatherLocalDto> dto = localDataSource.getLastCachedWeatherAsync();
+
+        dto.observeForever(new Observer<WeatherLocalDto>() {
+            @Override
+            public void onChanged(WeatherLocalDto weatherLocalDto) {
+                dto.removeObserver(this);
+
+                Weather2 weather = weatherMapper.toWeather(weatherLocalDto);
+
+                weatherLiveData.setValue(weather);
+            }
+        });
+
+        return weatherLiveData;
     }
 
     private void refreshWeather(City city, Date minimumUpToDate, CoordinateEntity coordinate) {

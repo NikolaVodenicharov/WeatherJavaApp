@@ -11,5 +11,8 @@ public interface LocalDataSource {
     void insertOrReplaceCityWeather(WeatherLocalDto cityWeather);
 
     LiveData<WeatherLocalDto> getWeather(CoordinateEntity coordinate);
+    LiveData<WeatherLocalDto> getLastCachedWeatherAsync();
+
     LiveData<Boolean> isExistingAndUpToDate(CoordinateEntity coordinate, Date minimumUpToDate);
+
 }

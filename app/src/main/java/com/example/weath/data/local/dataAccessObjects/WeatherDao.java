@@ -42,9 +42,14 @@ public interface WeatherDao {
     @Query("Select * From Weathers Where latitude == :latitude And longitude == :longitude Limit 1")
     LiveData<WeatherWithForecast> getWeather(double latitude, double longitude);
 
+    @Transaction
+    @Query("Select * From Weathers Order by recordMoment Desc Limit 1")
+    LiveData<WeatherWithForecast> getLastCachedWeather();
+
     @Update
     void updateWeather(WeatherEntity weather);
 
     @Update
     void updateForecastDays(List<ForecastDayEntity> forecastDays);
+
 }

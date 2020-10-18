@@ -64,6 +64,30 @@ public class DatabaseManager implements LocalDataSource {
     }
 
     @Override
+    public LiveData<WeatherLocalDto> getLastCachedWeatherAsync() {
+        MutableLiveData<WeatherLocalDto> result = new MutableLiveData<>();
+
+        LiveData<WeatherWithForecast> weatherLiveData = database.weatherDao().getLastCachedWeather();
+
+        weatherLiveData.observeForever(new Observer<WeatherWithForecast>() {
+            @Override
+            public void onChanged(WeatherWithForecast entity) {
+                weatherLiveData.removeObserver(this);
+
+                if (entity == null){
+                    return;
+                }
+
+                WeatherLocalDto weatherLocalDto = weatherMapper.toWeatherLocalDto(entity);
+
+                result.setValue(weatherLocalDto);
+            }
+        });
+
+        return result;
+    }
+
+    @Override
     public LiveData<Boolean> isExistingAndUpToDate(CoordinateEntity coordinate, Date minimumUpToDate) {
         return database.weatherDao().isExistingAndUpToDate(coordinate.latitude, coordinate.longitude, minimumUpToDate.getTime());
     }

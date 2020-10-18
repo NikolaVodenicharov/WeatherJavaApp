@@ -30,7 +30,7 @@ public class MockerHelper {
         return weatherLocalDto;
     }
 
-    public static WeatherLocalDto mockCityWeatherDto(){
+    public static WeatherLocalDto mockWeatherLocalDto(){
         WeatherLocalDto weatherLocalDto = new WeatherLocalDto(
                 "Houston",
                 "(US)",
@@ -42,7 +42,19 @@ public class MockerHelper {
 
         return weatherLocalDto;
     }
-    public static WeatherLocalDto updateCityWeatherDto(WeatherLocalDto current) {
+    public static WeatherLocalDto mockWeatherLocalDto2(){
+        WeatherLocalDto weatherLocalDto = new WeatherLocalDto(
+                "Miami",
+                "(US)",
+                TimeHelper.getThirtyMinutesAgo(),
+                internalMockCoordinateEntity(),
+                28,
+                SkyConditionDto.CLOUDS,
+                mockForecastWithOneDay());
+
+        return weatherLocalDto;
+    }
+    public static WeatherLocalDto updateWeatherLocalDto(WeatherLocalDto current) {
         WeatherLocalDto updated = new WeatherLocalDto(
                 current.getCityName(),
                 current.getCountryCode(),
@@ -55,7 +67,7 @@ public class MockerHelper {
         return updated;
     }
 
-    public static WeatherRemoteDto mockWeatherOnlyDto() {
+    public static WeatherRemoteDto mockWeatherRemoteDto() {
         return new WeatherRemoteDto(new Date(), 12.45, SkyConditionDto.CLEAR, mockForecastWithOneDay());
     }
 
@@ -67,6 +79,20 @@ public class MockerHelper {
         WeatherEntity weather = new WeatherEntity();
         weather.cityNameWithCountryCode = "Houston (US)";
         weather.recordMoment = new Date();
+        weather.skyCondition = SkyConditionDto.CLOUDS.name();
+        weather.temperatureInCelsius = 25;
+        weather.coordinate = coordinate;
+
+        return weather;
+    }
+    public static WeatherEntity mockWeatherEntity2() {
+        CoordinateEntity coordinate = new CoordinateEntity();
+        coordinate.latitude = -41.82;
+        coordinate.longitude = 78.54;
+
+        WeatherEntity weather = new WeatherEntity();
+        weather.cityNameWithCountryCode = "Miami (US)";
+        weather.recordMoment = TimeHelper.getThirtyMinutesAgo();
         weather.skyCondition = SkyConditionDto.CLOUDS.name();
         weather.temperatureInCelsius = 25;
         weather.coordinate = coordinate;

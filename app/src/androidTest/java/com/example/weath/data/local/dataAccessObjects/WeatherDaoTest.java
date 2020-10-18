@@ -1,6 +1,7 @@
 package com.example.weath.data.local.dataAccessObjects;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.LiveData;
 import androidx.room.Room;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -10,9 +11,9 @@ import com.example.weath.data.local.AppDatabase;
 import com.example.weath.data.local.entities.ForecastDayEntity;
 import com.example.weath.data.local.entities.WeatherEntity;
 import com.example.weath.data.local.entities.WeatherWithForecast;
-import com.example.weath.testHelpers.TimeHelper;
 import com.example.weath.testHelpers.ConstantsHelper;
 import com.example.weath.testHelpers.MockerHelper;
+import com.example.weath.testHelpers.TimeHelper;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -283,6 +284,48 @@ public class WeatherDaoTest {
                         mockWeather.coordinate.latitude, mockWeather.coordinate.longitude));
 
         forecastDayEntityAssertEquals(updatedForecastDay, actual.forecast.get(0));
+    }
+
+    @Test
+    public void getLastCachedWeather_returnNull_whenDatabaseIsEmpty(){
+        LiveData<WeatherWithForecast> actual = database.weatherDao().getLastCachedWeather();
+
+        Assert.assertNotNull(actual);
+        Assert.assertNull(actual.getValue());
+    }
+
+    @Test
+    public void getLastCachedWeather_returnTheOnlyInsertedEntity_whenDatabaseHasOnlyOneEntity() throws InterruptedException {
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mockWeather);
+
+        database.weatherDao().insertWeather(mockWeather);
+        database.weatherDao().insertForecastDays(forecastDays);
+
+        WeatherWithForecast actual = LiveDataUtil.getValue(
+                database.weatherDao().getLastCachedWeather());
+
+        weatherEntityAssertEquals(mockWeather, actual.weather);
+        forecastDayEntityAssertEquals(forecastDays.get(0), actual.forecast.get(0));
+    }
+
+    @Test
+    public void getLastCachedWeather_returnMostUpToDateEntity_whenDatabaseHasOnlyTwoEntities() throws InterruptedException {
+        WeatherEntity mostUpToDate = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mostUpToDate);
+        database.weatherDao().insertWeather(mostUpToDate);
+        database.weatherDao().insertForecastDays(forecastDays);
+
+        WeatherEntity olderEntity = MockerHelper.mockWeatherEntity2();
+        List<ForecastDayEntity> forecastDaysOlder = MockerHelper.mockForecastWithOneDay(olderEntity);
+        database.weatherDao().insertWeather(olderEntity);
+        database.weatherDao().insertForecastDays(forecastDaysOlder);
+
+        WeatherWithForecast actual = LiveDataUtil.getValue(
+                database.weatherDao().getLastCachedWeather());
+
+        weatherEntityAssertEquals(mostUpToDate, actual.weather);
+        forecastDayEntityAssertEquals(forecastDays.get(0), actual.forecast.get(0));
     }
 
     private void forecastDayEntityAssertEquals(ForecastDayEntity expected, ForecastDayEntity actual) {
