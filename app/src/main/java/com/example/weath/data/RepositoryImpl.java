@@ -12,8 +12,6 @@ import com.example.weath.data.remote.RemoteDataSource;
 import com.example.weath.data.utils.WeatherMapper;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.City;
-import com.example.weath.domain.models.Coordinate;
-import com.example.weath.domain.models.Weather;
 import com.example.weath.domain.models.Weather2;
 
 import java.util.Date;
@@ -31,18 +29,6 @@ public class RepositoryImpl implements Repository {
         this.weatherMapper = weatherMapper;
     }
 
-    @Override
-    public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate){
-        final MutableLiveData<Weather> result = new MutableLiveData<>();
-
-        return result;
-    }
-
-    @Override
-    public LiveData<City> getCityByLocationAsync(final Coordinate coordinate){
-
-        return null;
-    }
 
     @Override
     public LiveData<Weather2> getWeatherAsync(City city, Date minimumUpToDate) {

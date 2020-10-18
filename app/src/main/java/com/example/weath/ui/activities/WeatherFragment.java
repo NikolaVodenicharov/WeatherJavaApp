@@ -25,7 +25,6 @@ import com.example.weath.ui.viewModels.StartViewModel;
 
 import java.util.List;
 
-//ToDo if there is no internet or permission is denied, also if location permission is denied, what will this fragment display ?
 public class WeatherFragment extends Fragment {
     private FragmentWeatherBinding binding;
     StartViewModel viewModel;
@@ -86,21 +85,6 @@ public class WeatherFragment extends Fragment {
                 imageView.setImageResource(drawableId);
             }
         });
-
-//        viewModel.getWeather().observe(this, new Observer<Weather>() {
-//            @Override
-//            public void onChanged(Weather weather) {
-//                boolean shouldDisplayCurrentSkyCondition = weather.getCurrentWeather() != null;
-//                if (!shouldDisplayCurrentSkyCondition){
-//                    return;
-//                }
-//
-//                SkyCondition skyCondition = weather.getCurrentWeather().getSkyCondition();
-//                int drawableId = findSkyConditionDrawableId(skyCondition);
-//                ImageView imageView = getView().findViewById(R.id.imageView);
-//                imageView.setImageResource(drawableId);
-//            }
-//        });
     }
 
     private void observeForecast() {
@@ -122,25 +106,6 @@ public class WeatherFragment extends Fragment {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             }
         });
-
-//        viewModel.getWeather().observe(this, new Observer<Weather>() {
-//            @Override
-//            public void onChanged(Weather weather) {
-//                boolean shouldDisplayForecast = weather.getForecast() != null &&
-//                        weather.getForecast().size() > 0;
-//
-//                if (!shouldDisplayForecast){
-//                    return;
-//                }
-//
-//                List<ForecastDay> forecast = weather.getForecast();
-//                ForecastAdapter adapter = new ForecastAdapter(forecast);
-//
-//                RecyclerView recyclerView = getView().findViewById(R.id.recyclerViewForecast);
-//                recyclerView.setAdapter(adapter);
-//                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//            }
-//        });
     }
 
     public static int findSkyConditionDrawableId(SkyCondition skyCondition){

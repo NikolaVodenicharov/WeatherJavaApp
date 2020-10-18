@@ -11,7 +11,6 @@ import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
-import com.example.weath.domain.models.Weather;
 import com.example.weath.domain.models.Weather2;
 import com.example.weath.testHelpers.ConstantsHelper;
 import com.example.weath.testHelpers.MockerHelper;
@@ -34,16 +33,6 @@ public class WeatherCasesTest {
         Weather2 expected = MockerHelper.mockWeather();
 
         Repository repository = new Repository() {
-            @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
-            @Override
-            public LiveData<City> getCityByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
             @Override
             public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
                 return null;
@@ -68,7 +57,7 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(Coordinate location) {
+            public void setLastKnownLocation(LiveData<Coordinate> location) {
 
             }
         };
@@ -106,16 +95,6 @@ public class WeatherCasesTest {
     public void getWeather_returnActualWeather_whenSearchedInputIsFromAutocomplete(){
         Weather2 expected = MockerHelper.mockWeather();
         Repository repository = new Repository() {
-            @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
-            @Override
-            public LiveData<City> getCityByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
             @Override
             public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
                 return new MutableLiveData<>(expected);
@@ -162,7 +141,7 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(Coordinate location) {
+            public void setLastKnownLocation(LiveData<Coordinate> location) {
 
             }
         };
@@ -199,16 +178,6 @@ public class WeatherCasesTest {
         Weather2 expected = MockerHelper.mockWeather();
         Repository repository = new Repository() {
             @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
-            @Override
-            public LiveData<City> getCityByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
-            @Override
             public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
                 if (city.getName().equals("New York City")){
                     return new MutableLiveData<>(expected);
@@ -236,7 +205,7 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(Coordinate location) {
+            public void setLastKnownLocation(LiveData<Coordinate> location) {
 
             }
         };
@@ -275,16 +244,6 @@ public class WeatherCasesTest {
         String cityNameWithCountryCode = "Houston (US)";
 
         Repository repository = new Repository() {
-            @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
-            @Override
-            public LiveData<City> getCityByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
             @Override
             public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
                 if (city.getName().equals("Houston")){
@@ -339,9 +298,10 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(Coordinate location) {
+            public void setLastKnownLocation(LiveData<Coordinate> location) {
 
             }
+
         };
 
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
@@ -376,16 +336,6 @@ public class WeatherCasesTest {
         Weather2 expected = MockerHelper.mockWeather();
 
         Repository repository = new Repository() {
-            @Override
-            public LiveData<Weather> getWeatherByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
-            @Override
-            public LiveData<City> getCityByLocationAsync(Coordinate coordinate) {
-                return null;
-            }
-
             @Override
             public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
                 if (city.getName().equals("New York City")){
@@ -434,9 +384,10 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(Coordinate location) {
+            public void setLastKnownLocation(LiveData<Coordinate> location) {
 
             }
+
         };
 
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);

@@ -30,8 +30,6 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ToDo check for internet. If there is not....
-
         getLocationAsync();
         initializeBindings();
         initializePager();
@@ -80,6 +78,8 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void getLocationAsync(){
+        //ToDo move it to the helper class ?
+
         boolean locationExist = App.deviceConnectivity.getLastKnownLocation() != null &&
                 App.deviceConnectivity.getLastKnownLocation().getValue() != null;
 
