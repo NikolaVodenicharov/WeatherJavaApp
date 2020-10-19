@@ -156,12 +156,4 @@ public class OpenWeatherMapDataSource implements RemoteDataSource {
 
         return date;
     }
-
-    private String createDisplayableTemperature(String temp){
-        String[] data = temp.split("\\.");
-        String nonDecimal = data[0];
-        String result = nonDecimal + CELSIUS;
-
-        return result;
-    }
 }

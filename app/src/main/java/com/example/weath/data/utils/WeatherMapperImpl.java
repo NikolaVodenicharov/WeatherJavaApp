@@ -177,14 +177,14 @@ public class WeatherMapperImpl implements WeatherMapper {
 
     private String extractCityName (String cityNameWithCountryCode){
         int length = cityNameWithCountryCode.length();
-        int endIndex = length - 5;
+        int endIndex = length - 3;
         String cityName = cityNameWithCountryCode.substring(0, endIndex);
 
         return cityName;
     }
     private String extractCountryCode (String cityNameWithCountryCode){
         int length = cityNameWithCountryCode.length();
-        int startIndex = length - 4;
+        int startIndex = length - 2;
         String countryCode = cityNameWithCountryCode.substring(startIndex);
 
         return countryCode;

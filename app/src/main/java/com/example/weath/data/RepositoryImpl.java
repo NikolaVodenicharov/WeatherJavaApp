@@ -93,7 +93,6 @@ public class RepositoryImpl implements Repository {
         cityWeather.observeForever(new Observer<WeatherLocalDto>() {
             @Override
             public void onChanged(WeatherLocalDto weatherLocalDto) {
-
                 if (weatherLocalDto == null || weatherLocalDto.getRecordMoment().getTime() < minimumUpToDate.getTime()){
                     return;
                 }

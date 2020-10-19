@@ -49,11 +49,11 @@ public class DatabaseManager implements LocalDataSource {
         weatherWithForecast.observeForever(new Observer<WeatherWithForecast>() {
             @Override
             public void onChanged(WeatherWithForecast entity) {
-                weatherWithForecast.removeObserver(this);
-
                 if (entity == null){
                     return;
                 }
+
+                weatherWithForecast.removeObserver(this);
 
                 WeatherLocalDto dto = weatherMapper.toWeatherLocalDto(entity);
                 cityWeatherDto.setValue(dto);
@@ -89,6 +89,17 @@ public class DatabaseManager implements LocalDataSource {
 
     @Override
     public LiveData<Boolean> isExistingAndUpToDate(CoordinateEntity coordinate, Date minimumUpToDate) {
+        LiveData<List<WeatherEntity>> all = database.weatherDao().getAll();
+
+        all.observeForever(new Observer<List<WeatherEntity>>() {
+            @Override
+            public void onChanged(List<WeatherEntity> weatherEntities) {
+                all.removeObserver(this);
+
+                int count = weatherEntities.size();
+            }
+        });
+
         return database.weatherDao().isExistingAndUpToDate(coordinate.latitude, coordinate.longitude, minimumUpToDate.getTime());
     }
 }
