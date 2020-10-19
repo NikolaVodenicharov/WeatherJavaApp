@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,33 +40,35 @@ public class WeatherFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onResume() {
+        super.onResume();
+
+        viewModel.fillCityWeather();
 
         observeSkyCondition();
         observeForecast();
+        observeErrorMessage();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        viewModel.fillCityWeather();
-        setErrorMessageVisibility();
-    }
+    private void observeErrorMessage() {
+        viewModel.getWeatherUiLiveData().observe(this, new Observer<WeatherUi>() {
+            @Override
+            public void onChanged(WeatherUi weatherUi) {
+                TextView errorMessageTextView = getView().findViewById(R.id.error_message);
 
-    private void setErrorMessageVisibility() {
-        TextView errorMessageTextView = getView().findViewById(R.id.error_message);
+                boolean noErrorMessage =
+                        viewModel.getWeatherUiLiveData().getValue() == null ||
+                                viewModel.getWeatherUiLiveData().getValue().getErrorMessage() == null ||
+                                viewModel.getWeatherUiLiveData().getValue().getErrorMessage().isEmpty();
 
-        if (viewModel.getWeatherUiLiveData().getValue() == null){
-            return;
-        }
-
-        if (viewModel.getWeatherUiLiveData().getValue().getErrorMessage() == null){
-            errorMessageTextView.setVisibility(View.GONE);
-        }
-        else{
-            errorMessageTextView.setVisibility(View.VISIBLE);
-        }
+                if (noErrorMessage){
+                    errorMessageTextView.setVisibility(View.GONE);
+                }
+                else{
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     private void observeSkyCondition() {
