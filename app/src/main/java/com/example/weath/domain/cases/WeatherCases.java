@@ -9,7 +9,7 @@ import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 
 import java.util.Date;
 
@@ -29,7 +29,7 @@ public class WeatherCases {
         this.deviceConnectivity = deviceConnectivity;
     }
 
-    public LiveData<Weather2> getWeather(String inputSearch){
+    public LiveData<Weather> getWeather(String inputSearch){
         if (isDisconnectedFromInternet()){
             return noInternetConnectionCase();
         }
@@ -44,14 +44,14 @@ public class WeatherCases {
         }
     }
 
-    private LiveData<Weather2> noInternetConnectionCase(){
-        MutableLiveData<Weather2> result = new MutableLiveData<>();
+    private LiveData<Weather> noInternetConnectionCase(){
+        MutableLiveData<Weather> result = new MutableLiveData<>();
 
-        LiveData<Weather2> lastCached = repository.getLastCachedWeatherAsync();
+        LiveData<Weather> lastCached = repository.getLastCachedWeatherAsync();
 
-        lastCached.observeForever(new Observer<Weather2>() {
+        lastCached.observeForever(new Observer<Weather>() {
             @Override
-            public void onChanged(Weather2 weather) {
+            public void onChanged(Weather weather) {
                 lastCached.removeObserver(this);
 
                 weather.setErrorMessage(NO_INTERNET + "The current data is from " + weather.getRecordMoment());
@@ -61,27 +61,27 @@ public class WeatherCases {
 
         return result;
     }
-    private LiveData<Weather2> searchedCityFromAutocompleteCase(String inputSearch){
+    private LiveData<Weather> searchedCityFromAutocompleteCase(String inputSearch){
         City city = createCity(inputSearch);
-        LiveData<Weather2> weather = repository.getWeatherAsync(city, getThirtyMinutesAgo());
+        LiveData<Weather> weather = repository.getWeatherAsync(city, getThirtyMinutesAgo());
 
         return weather;
     }
-    private LiveData<Weather2> emptySearchCityCase(){
+    private LiveData<Weather> emptySearchCityCase(){
         City city = createDefaultCity();
-        LiveData<Weather2> weather = repository.getWeatherAsync(city, getThirtyMinutesAgo());
+        LiveData<Weather> weather = repository.getWeatherAsync(city, getThirtyMinutesAgo());
 
         return weather;
     }
-    private LiveData<Weather2> searchedCityNotFromAutocompleteCase(){
-        MutableLiveData<Weather2> result = new MutableLiveData<>();
+    private LiveData<Weather> searchedCityNotFromAutocompleteCase(){
+        MutableLiveData<Weather> result = new MutableLiveData<>();
 
         City city = createDefaultCity();
-        LiveData<Weather2> liveDataWeather = repository.getWeatherAsync(city, getThirtyMinutesAgo());
+        LiveData<Weather> liveDataWeather = repository.getWeatherAsync(city, getThirtyMinutesAgo());
 
-        liveDataWeather.observeForever(new Observer<Weather2>() {
+        liveDataWeather.observeForever(new Observer<Weather>() {
             @Override
-            public void onChanged(Weather2 weather) {
+            public void onChanged(Weather weather) {
                 if (weather.getRecordMoment().getTime() > getThirtyMinutesAgo().getTime()){
                     liveDataWeather.removeObserver(this);
                 }

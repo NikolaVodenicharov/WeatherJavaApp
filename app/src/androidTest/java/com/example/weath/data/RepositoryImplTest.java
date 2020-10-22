@@ -16,7 +16,7 @@ import com.example.weath.data.local.entities.CoordinateEntity;
 import com.example.weath.data.remote.RemoteDataSource;
 import com.example.weath.data.utils.WeatherMapperImpl;
 import com.example.weath.domain.models.City;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 import com.example.weath.testHelpers.MockerHelper;
 
 import org.junit.Assert;
@@ -71,11 +71,11 @@ public class RepositoryImplTest {
                 new WeatherMapperImpl());
 
         City mockCity = MockerHelper.mockCity();
-        LiveData<Weather2> actualWeather = repository.getWeatherAsync(mockCity, new Date());
+        LiveData<Weather> actualWeather = repository.getWeatherAsync(mockCity, new Date());
 
-        actualWeather.observeForever(new Observer<Weather2>() {
+        actualWeather.observeForever(new Observer<Weather>() {
             @Override
-            public void onChanged(Weather2 weather) {
+            public void onChanged(Weather weather) {
                 actualWeather.removeObserver(this);
 
                 Assert.assertEquals(remoteDto.getTemperatureInCelsius(), weather.getTemperatureInCelsius(), ConstantsHelper.DELTA);
@@ -120,19 +120,19 @@ public class RepositoryImplTest {
                 new WeatherMapperImpl());
 
         City mockCity = MockerHelper.mockCity();
-        LiveData<Weather2> actualWeather = repository.getWeatherAsync(mockCity, new Date());
+        LiveData<Weather> actualWeather = repository.getWeatherAsync(mockCity, new Date());
 
-        actualWeather.observeForever(new Observer<Weather2>() {
+        actualWeather.observeForever(new Observer<Weather>() {
             @Override
-            public void onChanged(Weather2 weather2) {
+            public void onChanged(Weather weather) {
                 actualWeather.removeObserver(this);
 
-                Assert.assertEquals(weatherLocalDto.getTemperatureInCelsius(), weather2.getTemperatureInCelsius(), ConstantsHelper.DELTA);
-                Assert.assertEquals(weatherLocalDto.getSkyCondition().name(), weather2.getSkyCondition().name());
+                Assert.assertEquals(weatherLocalDto.getTemperatureInCelsius(), weather.getTemperatureInCelsius(), ConstantsHelper.DELTA);
+                Assert.assertEquals(weatherLocalDto.getSkyCondition().name(), weather.getSkyCondition().name());
 
-                Assert.assertEquals(mockCity.getName(), weather2.getCityName());
-                Assert.assertEquals(mockCity.getLocation().getLatitude(), weather2.getCoordinate().getLatitude(), ConstantsHelper.DELTA);
-                Assert.assertEquals(mockCity.getLocation().getLongitude(), weather2.getCoordinate().getLongitude(), ConstantsHelper.DELTA);
+                Assert.assertEquals(mockCity.getName(), weather.getCityName());
+                Assert.assertEquals(mockCity.getLocation().getLatitude(), weather.getCoordinate().getLatitude(), ConstantsHelper.DELTA);
+                Assert.assertEquals(mockCity.getLocation().getLongitude(), weather.getCoordinate().getLongitude(), ConstantsHelper.DELTA);
             }
         });
     }
@@ -165,7 +165,7 @@ public class RepositoryImplTest {
 
         Repository repository = new RepositoryImpl(null, localDataSource, new WeatherMapperImpl());
 
-        LiveData<Weather2> actualWeather = repository.getLastCachedWeatherAsync();
+        LiveData<Weather> actualWeather = repository.getLastCachedWeatherAsync();
 
         Assert.assertNotNull(actualWeather);
         Assert.assertNotNull(actualWeather.getValue());
@@ -175,7 +175,7 @@ public class RepositoryImplTest {
         forecastDayAssertEquals(weatherLocalDto.getForecast().get(0), actualWeather.getValue().getForecast().get(0));
     }
 
-    private void weatherAssertEquals(WeatherLocalDto weatherLocalDto, Weather2 actualWeather) {
+    private void weatherAssertEquals(WeatherLocalDto weatherLocalDto, Weather actualWeather) {
         Assert.assertEquals(weatherLocalDto.getCityName(), actualWeather.getCityName());
         Assert.assertEquals(weatherLocalDto.getRecordMoment(), actualWeather.getRecordMoment());
         Assert.assertEquals(weatherLocalDto.getTemperatureInCelsius(), actualWeather.getTemperatureInCelsius(), ConstantsHelper.DELTA);

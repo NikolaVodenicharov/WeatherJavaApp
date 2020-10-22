@@ -11,7 +11,7 @@ import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 import com.example.weath.testHelpers.ConstantsHelper;
 import com.example.weath.testHelpers.MockerHelper;
 
@@ -30,16 +30,16 @@ public class WeatherCasesTest {
 
     @Test
     public void getWeather_returnLastCachedWeather_whenDeviceIsDisconnectedFromInternet(){
-        Weather2 expected = MockerHelper.mockWeather();
+        Weather expected = MockerHelper.mockWeather();
 
         Repository repository = new Repository() {
             @Override
-            public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
+            public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
                 return null;
             }
 
             @Override
-            public LiveData<Weather2> getLastCachedWeatherAsync() {
+            public LiveData<Weather> getLastCachedWeatherAsync() {
 
                 return new MutableLiveData<>(expected);
             }
@@ -65,7 +65,7 @@ public class WeatherCasesTest {
         WeatherCases cases = new WeatherCases(repository, null, deviceConnectivity);
 
         String searchedInput = "Paris (FR)";
-        LiveData<Weather2> actual = cases.getWeather(searchedInput);
+        LiveData<Weather> actual = cases.getWeather(searchedInput);
 
         Assert.assertFalse(actual.getValue().getErrorMessage().isEmpty());
 
@@ -93,15 +93,15 @@ public class WeatherCasesTest {
 
     @Test
     public void getWeather_returnActualWeather_whenSearchedInputIsFromAutocomplete(){
-        Weather2 expected = MockerHelper.mockWeather();
+        Weather expected = MockerHelper.mockWeather();
         Repository repository = new Repository() {
             @Override
-            public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
+            public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
                 return new MutableLiveData<>(expected);
             }
 
             @Override
-            public LiveData<Weather2> getLastCachedWeatherAsync() {
+            public LiveData<Weather> getLastCachedWeatherAsync() {
                 return null;
             }
         };
@@ -149,7 +149,7 @@ public class WeatherCasesTest {
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
 
         String searchedInput = "Paris (FR)";
-        LiveData<Weather2> actual = cases.getWeather(searchedInput);
+        LiveData<Weather> actual = cases.getWeather(searchedInput);
 
         Assert.assertEquals(expected.getCityName(), actual.getValue().getCityName());
         Assert.assertEquals(expected.getSkyCondition(), actual.getValue().getSkyCondition());
@@ -175,10 +175,10 @@ public class WeatherCasesTest {
 
     @Test
     public void getWeather_returnDefaultWeather_whenSearchedInputIsEmptyAndThereIsNoLocationData(){
-        Weather2 expected = MockerHelper.mockWeather();
+        Weather expected = MockerHelper.mockWeather();
         Repository repository = new Repository() {
             @Override
-            public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
+            public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
                 if (city.getName().equals("New York City")){
                     return new MutableLiveData<>(expected);
                 }
@@ -188,7 +188,7 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public LiveData<Weather2> getLastCachedWeatherAsync() {
+            public LiveData<Weather> getLastCachedWeatherAsync() {
                 return null;
             }
         };
@@ -213,7 +213,7 @@ public class WeatherCasesTest {
         WeatherCases cases = new WeatherCases(repository, null, deviceConnectivity);
 
         String searchedInput = "";
-        LiveData<Weather2> actual = cases.getWeather(searchedInput);
+        LiveData<Weather> actual = cases.getWeather(searchedInput);
 
         Assert.assertEquals(expected.getCityName(), actual.getValue().getCityName());
         Assert.assertEquals(expected.getSkyCondition(), actual.getValue().getSkyCondition());
@@ -239,13 +239,13 @@ public class WeatherCasesTest {
 
     @Test
     public void getWeather_returnWeatherByCurrentLocation_whenSearchedInputIsEmptyButLocationDataExist(){
-        Weather2 expected = MockerHelper.mockWeather();
+        Weather expected = MockerHelper.mockWeather();
         Coordinate mockCoordinate = new Coordinate(11.22, 33.44);
         String cityNameWithCountryCode = "Houston (US)";
 
         Repository repository = new Repository() {
             @Override
-            public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
+            public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
                 if (city.getName().equals("Houston")){
                     return new MutableLiveData<>(expected);
                 }
@@ -255,7 +255,7 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public LiveData<Weather2> getLastCachedWeatherAsync() {
+            public LiveData<Weather> getLastCachedWeatherAsync() {
                 return null;
             }
         };
@@ -307,7 +307,7 @@ public class WeatherCasesTest {
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
 
         String searchedInput = "";
-        LiveData<Weather2> actual = cases.getWeather(searchedInput);
+        LiveData<Weather> actual = cases.getWeather(searchedInput);
 
         Assert.assertEquals(expected.getCityName(), actual.getValue().getCityName());
         Assert.assertEquals(expected.getSkyCondition(), actual.getValue().getSkyCondition());
@@ -333,11 +333,11 @@ public class WeatherCasesTest {
 
     @Test
     public void getWeather_returnDefaultWeatherAndErrorMessage_whenInputSearchIsInvalidAndThereIsNoLocationData(){
-        Weather2 expected = MockerHelper.mockWeather();
+        Weather expected = MockerHelper.mockWeather();
 
         Repository repository = new Repository() {
             @Override
-            public LiveData<Weather2> getWeatherAsync(City city, Date oldestMoment) {
+            public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
                 if (city.getName().equals("New York City")){
                     return new MutableLiveData<>(expected);
                 }
@@ -347,7 +347,7 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public LiveData<Weather2> getLastCachedWeatherAsync() {
+            public LiveData<Weather> getLastCachedWeatherAsync() {
                 return null;
             }
         };
@@ -393,7 +393,7 @@ public class WeatherCasesTest {
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
 
         String searchedInput = "invalid data";
-        LiveData<Weather2> actual = cases.getWeather(searchedInput);
+        LiveData<Weather> actual = cases.getWeather(searchedInput);
 
         Assert.assertEquals(expected.getCityName(), actual.getValue().getCityName());
         Assert.assertEquals(expected.getSkyCondition(), actual.getValue().getSkyCondition());

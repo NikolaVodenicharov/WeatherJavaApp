@@ -12,7 +12,7 @@ import com.example.weath.data.remote.RemoteDataSource;
 import com.example.weath.data.utils.WeatherMapper;
 import com.example.weath.domain.Repository;
 import com.example.weath.domain.models.City;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 
 import java.util.Date;
 
@@ -31,7 +31,7 @@ public class RepositoryImpl implements Repository {
 
 
     @Override
-    public LiveData<Weather2> getWeatherAsync(City city, Date minimumUpToDate) {
+    public LiveData<Weather> getWeatherAsync(City city, Date minimumUpToDate) {
         CoordinateEntity coordinate = weatherMapper.toCoordinateEntity(city.getLocation());
 
         refreshWeather(city, minimumUpToDate, coordinate);
@@ -40,8 +40,8 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public LiveData<Weather2> getLastCachedWeatherAsync() {
-        MutableLiveData<Weather2> weatherLiveData = new MutableLiveData<>();
+    public LiveData<Weather> getLastCachedWeatherAsync() {
+        MutableLiveData<Weather> weatherLiveData = new MutableLiveData<>();
 
         LiveData<WeatherLocalDto> dto = localDataSource.getLastCachedWeatherAsync();
 
@@ -50,7 +50,7 @@ public class RepositoryImpl implements Repository {
             public void onChanged(WeatherLocalDto weatherLocalDto) {
                 dto.removeObserver(this);
 
-                Weather2 weather = weatherMapper.toWeather(weatherLocalDto);
+                Weather weather = weatherMapper.toWeather(weatherLocalDto);
 
                 weatherLiveData.setValue(weather);
             }
@@ -85,8 +85,8 @@ public class RepositoryImpl implements Repository {
             }
         });
     }
-    private LiveData<Weather2> loadWeatherFromDatabase(CoordinateEntity coordinate, Date minimumUpToDate) {
-        MutableLiveData<Weather2> weatherResult = new MutableLiveData<>();
+    private LiveData<Weather> loadWeatherFromDatabase(CoordinateEntity coordinate, Date minimumUpToDate) {
+        MutableLiveData<Weather> weatherResult = new MutableLiveData<>();
 
         LiveData<WeatherLocalDto> cityWeather = localDataSource.getWeather(coordinate);
 
@@ -99,8 +99,8 @@ public class RepositoryImpl implements Repository {
 
                 cityWeather.removeObserver(this);
 
-                Weather2 weather2 = weatherMapper.toWeather(weatherLocalDto);
-                weatherResult.setValue(weather2);
+                Weather weather = weatherMapper.toWeather(weatherLocalDto);
+                weatherResult.setValue(weather);
             }
         });
 

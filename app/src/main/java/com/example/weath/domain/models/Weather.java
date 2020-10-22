@@ -3,7 +3,7 @@ package com.example.weath.domain.models;
 import java.util.Date;
 import java.util.List;
 
-public class Weather2 {
+public class Weather {
     private String cityName;
     private Date recordMoment;
     private Coordinate coordinate;
@@ -14,7 +14,7 @@ public class Weather2 {
     //additional field, used when there is an error. we set these fields only through setters
     private String errorMessage;
 
-    public Weather2(String cityName, Date recordMoment, Coordinate coordinate, double temperatureInCelsius, SkyCondition skyCondition, List<ForecastDay> forecast) {
+    public Weather(String cityName, Date recordMoment, Coordinate coordinate, double temperatureInCelsius, SkyCondition skyCondition, List<ForecastDay> forecast) {
         this.cityName = cityName;
         this.recordMoment = recordMoment;
         this.coordinate = coordinate;

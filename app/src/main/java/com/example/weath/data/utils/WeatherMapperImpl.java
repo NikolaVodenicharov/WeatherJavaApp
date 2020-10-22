@@ -12,15 +12,15 @@ import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
 import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.domain.models.SkyCondition;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherMapperImpl implements WeatherMapper {
     @Override
-    public Weather2 toWeather(WeatherLocalDto dto) {
-        Weather2 weather2 = new Weather2(
+    public Weather toWeather(WeatherLocalDto dto) {
+        Weather weather = new Weather(
                 dto.getCityName(),
                 dto.getRecordMoment(),
                 toCoordinate(dto.getCoordinate()),
@@ -28,17 +28,17 @@ public class WeatherMapperImpl implements WeatherMapper {
                 toSkyCondition(dto.getSkyCondition()),
                 toForecastDayCollection(dto.getForecast()));
 
-        return weather2;
+        return weather;
     }
 
     @Override
-    public Weather2 toWeather(WeatherRemoteDto dto, City city) {
+    public Weather toWeather(WeatherRemoteDto dto, City city) {
         SkyConditionDto skyConditionDto = dto.getSkyCondition();
         SkyCondition skyCondition = toSkyCondition(skyConditionDto);
 
         List<ForecastDay> forecastDays = toForecastDayCollection(dto.getForecast());
 
-        Weather2 weather = new Weather2(
+        Weather weather = new Weather(
                 city.getName(),
                 dto.getRecordMoment(),
                 city.getLocation(),

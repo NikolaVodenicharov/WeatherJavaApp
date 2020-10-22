@@ -11,15 +11,15 @@ import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
 import com.example.weath.domain.models.ForecastDay;
 import com.example.weath.domain.models.SkyCondition;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class MockerHelper {
-    public static Weather2 mockWeather(){
-        Weather2 weatherLocalDto = new Weather2(
+    public static Weather mockWeather(){
+        Weather weatherLocalDto = new Weather(
                 "Houston",
                 new Date(),
                 mockCoordinate(),

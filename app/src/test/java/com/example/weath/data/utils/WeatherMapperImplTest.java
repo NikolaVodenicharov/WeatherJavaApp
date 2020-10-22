@@ -13,7 +13,7 @@ import com.example.weath.data.local.entities.WeatherWithForecast;
 import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
 import com.example.weath.domain.models.ForecastDay;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class WeatherMapperImplTest {
         City expectedDomainCity = Mockers.mockCity();
 
         WeatherMapperImpl mapper = new WeatherMapperImpl();
-        Weather2 actual = mapper.toWeather(expectedWeather, expectedDomainCity);
+        Weather actual = mapper.toWeather(expectedWeather, expectedDomainCity);
 
         Assert.assertEquals(expectedDomainCity.getName(),
                 actual.getCityName());
@@ -70,19 +70,19 @@ public class WeatherMapperImplTest {
 
         WeatherLocalDto weatherLocalDto = Mockers.mockCityWeatherDto();
 
-        Weather2 weather2 = mapper.toWeather(weatherLocalDto);
+        Weather weather = mapper.toWeather(weatherLocalDto);
 
-        Assert.assertEquals(weatherLocalDto.getCityName(), weather2.getCityName());
+        Assert.assertEquals(weatherLocalDto.getCityName(), weather.getCityName());
 
-        Assert.assertEquals(weatherLocalDto.getRecordMoment(), weather2.getRecordMoment());
+        Assert.assertEquals(weatherLocalDto.getRecordMoment(), weather.getRecordMoment());
 
-        Assert.assertEquals(weatherLocalDto.getCoordinate().longitude, weather2.getCoordinate().getLongitude());
-        Assert.assertEquals(weatherLocalDto.getCoordinate().latitude, weather2.getCoordinate().getLatitude());
+        Assert.assertEquals(weatherLocalDto.getCoordinate().longitude, weather.getCoordinate().getLongitude());
+        Assert.assertEquals(weatherLocalDto.getCoordinate().latitude, weather.getCoordinate().getLatitude());
 
-        Assert.assertEquals(weatherLocalDto.getSkyCondition().name(), weather2.getSkyCondition().name());
-        Assert.assertEquals(weatherLocalDto.getTemperatureInCelsius(), weather2.getTemperatureInCelsius(), Constants.DELTA);
+        Assert.assertEquals(weatherLocalDto.getSkyCondition().name(), weather.getSkyCondition().name());
+        Assert.assertEquals(weatherLocalDto.getTemperatureInCelsius(), weather.getTemperatureInCelsius(), Constants.DELTA);
 
-        forecastDayAssertEquals(weatherLocalDto.getForecast().get(0), weather2.getForecast().get(0));
+        forecastDayAssertEquals(weatherLocalDto.getForecast().get(0), weather.getForecast().get(0));
     }
 
     @Test

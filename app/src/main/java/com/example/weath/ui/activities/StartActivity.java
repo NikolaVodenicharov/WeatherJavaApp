@@ -13,7 +13,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.weath.App;
 import com.example.weath.R;
 import com.example.weath.databinding.ActivityStartBinding;
-import com.example.weath.ui.utils.CurrentLocationHelper;
 import com.example.weath.ui.utils.StartPagerAdapter;
 import com.example.weath.ui.viewModels.StartViewModel;
 import com.google.android.material.tabs.TabLayout;
@@ -30,7 +29,7 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getLocationAsync();
+        App.deviceConnectivity.updateCurrentLocationAsync(this);
         initializeBindings();
         initializePager();
         initializeTabLayoutMediator();
@@ -77,26 +76,9 @@ public class StartActivity extends AppCompatActivity {
         });
     }
 
-    private void getLocationAsync(){
-        //ToDo move it to the helper class ?
-
-        boolean locationExist = App.deviceConnectivity.getLastKnownLocation() != null &&
-                App.deviceConnectivity.getLastKnownLocation().getValue() != null;
-
-        if (locationExist){
-            return;
-        }
-        else if (CurrentLocationHelper.checkCoarseLocationPermission(this)){
-            App.deviceConnectivity.setLastKnownLocation(
-                    CurrentLocationHelper.getLastKnownLocation(this));
-        }
-        else{
-            CurrentLocationHelper.askForLocationPermissionAsync(this);
-        }
-    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        CurrentLocationHelper.onRequestPermissionsResult(App.deviceConnectivity,this, requestCode, permissions, grantResults);
+        App.deviceConnectivity.onRequestPermissionsResult(this);
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }

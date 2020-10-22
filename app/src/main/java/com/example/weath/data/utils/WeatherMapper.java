@@ -8,13 +8,13 @@ import com.example.weath.data.local.entities.WeatherEntity;
 import com.example.weath.data.local.entities.WeatherWithForecast;
 import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 
 import java.util.List;
 
 public interface WeatherMapper {
-    Weather2 toWeather(WeatherLocalDto weatherLocalDto);
-    Weather2 toWeather(WeatherRemoteDto dto, City city);
+    Weather toWeather(WeatherLocalDto weatherLocalDto);
+    Weather toWeather(WeatherRemoteDto dto, City city);
 
     WeatherLocalDto toWeatherLocalDto(WeatherWithForecast entity);
     WeatherLocalDto toWeatherLocalDto(WeatherRemoteDto weatherRemoteDto, City city);

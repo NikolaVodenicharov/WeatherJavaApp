@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.weath.App;
 import com.example.weath.domain.models.ForecastDay;
-import com.example.weath.domain.models.Weather2;
+import com.example.weath.domain.models.Weather;
 import com.example.weath.ui.models.ForecastDayUi;
 import com.example.weath.ui.models.WeatherUi;
 
@@ -33,11 +33,11 @@ public class StartViewModel extends ViewModel {
     }
 
     public void fillCityWeather(){
-        LiveData<Weather2> result = App.weatherCases.getWeather(searchedCity);
+        LiveData<Weather> result = App.weatherCases.getWeather(searchedCity);
 
-        result.observeForever(new Observer<Weather2>() {
+        result.observeForever(new Observer<Weather>() {
             @Override
-            public void onChanged(Weather2 weather) {
+            public void onChanged(Weather weather) {
                 WeatherUi weatherUi = toWeatherUi(weather);
 
                 weatherUiLiveData.setValue(weatherUi);
@@ -45,7 +45,7 @@ public class StartViewModel extends ViewModel {
         });
     }
 
-    private WeatherUi toWeatherUi (Weather2 weather){
+    private WeatherUi toWeatherUi (Weather weather){
         WeatherUi weatherUi = new WeatherUi(
                 weather.getCityName(),
                 weather.getRecordMoment(),
