@@ -1,5 +1,8 @@
 package com.example.weath.domain.cases;
 
+import android.app.Activity;
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
@@ -29,12 +32,17 @@ public class WeatherCasesTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Test
-    public void getWeather_returnLastCachedWeather_whenDeviceIsDisconnectedFromInternet(){
+    public void getWeather_returnLastCachedWeather_whenDeviceIsDisconnectedFromInternetAndSearchedInputIsInvalid(){
         Weather expected = MockerHelper.mockWeather();
 
         Repository repository = new Repository() {
             @Override
             public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
+                return null;
+            }
+
+            @Override
+            public LiveData<Weather> getWeatherCacheAsync(City city) {
                 return null;
             }
 
@@ -57,14 +65,210 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(LiveData<Coordinate> location) {
+            public void updateCurrentLocationAsync(Activity activity) {
+
+            }
+
+            @Override
+            public void onRequestPermissionsResult(Context context) {
 
             }
         };
 
         WeatherCases cases = new WeatherCases(repository, null, deviceConnectivity);
 
+        String searchedInput = "";
+        LiveData<Weather> actual = cases.getWeather(searchedInput);
+
+        Assert.assertFalse(actual.getValue().getErrorMessage().isEmpty());
+
+        Assert.assertEquals(expected.getCityName(), actual.getValue().getCityName());
+        Assert.assertEquals(expected.getSkyCondition(), actual.getValue().getSkyCondition());
+        Assert.assertEquals(expected.getTemperatureInCelsius(), actual.getValue().getTemperatureInCelsius(), ConstantsHelper.DELTA);
+        Assert.assertEquals(expected.getCoordinate().getLatitude(), actual.getValue().getCoordinate().getLatitude());
+        Assert.assertEquals(expected.getCoordinate().getLongitude(), actual.getValue().getCoordinate().getLongitude());
+        Assert.assertEquals(expected.getRecordMoment().getTime(), actual.getValue().getRecordMoment().getTime());
+
+        Assert.assertEquals(expected.getForecast().get(0).getDate().getTime(),
+                actual.getValue().getForecast().get(0).getDate().getTime());
+
+        Assert.assertEquals(expected.getForecast().get(0).getMinimumTemperatureInCelsius(),
+                actual.getValue().getForecast().get(0).getMinimumTemperatureInCelsius(),
+                ConstantsHelper.DELTA);
+
+        Assert.assertEquals(expected.getForecast().get(0).getMaximumTemperatureInCelsius(),
+                actual.getValue().getForecast().get(0).getMaximumTemperatureInCelsius(),
+                ConstantsHelper.DELTA);
+
+        Assert.assertEquals(expected.getForecast().get(0).getSkyCondition(),
+                actual.getValue().getForecast().get(0).getSkyCondition());
+    }
+
+    @Test
+    public void getWeather_returnLastCachedWeather_whenDeviceIsDisconnectedFromInternetAndSearchedIsFromAutoComplete_butThereIsNoCachedDataForThisCity(){
+        Weather expected = MockerHelper.mockWeather();
+
+        Repository repository = new Repository() {
+            @Override
+            public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
+                return null;
+            }
+
+            @Override
+            public LiveData<Weather> getWeatherCacheAsync(City city) {
+                return new MutableLiveData<>();
+            }
+
+            @Override
+            public LiveData<Weather> getLastCachedWeatherAsync() {
+
+                return new MutableLiveData<>(expected);
+            }
+        };
+
+        DeviceConnectivity deviceConnectivity = new DeviceConnectivity() {
+            @Override
+            public boolean isConnectedToInternet() {
+                return false;
+            }
+
+            @Override
+            public LiveData<Coordinate> getLastKnownLocation() {
+                return null;
+            }
+
+            @Override
+            public void updateCurrentLocationAsync(Activity activity) {
+
+            }
+
+            @Override
+            public void onRequestPermissionsResult(Context context) {
+
+            }
+        };
+
+        CitiesCollection cities = new CitiesCollection() {
+            @Override
+            public Set<String> getCitiesNameAndCountryCode() {
+                return null;
+            }
+
+            @Override
+            public String getCityNameAndCountryCode(Coordinate coordinate) {
+                return null;
+            }
+
+            @Override
+            public Coordinate getCityCoordinates(@NonNull String cityNameAndCountry) {
+                return new Coordinate(-85.16, 12.45);
+            }
+
+            @Override
+            public boolean isExist(@NonNull String cityNameAndCountry) {
+                return true;
+            }
+        };
+
+        WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
+
         String searchedInput = "Paris (FR)";
+        LiveData<Weather> actual = cases.getWeather(searchedInput);
+
+        Assert.assertFalse(actual.getValue().getErrorMessage().isEmpty());
+
+        Assert.assertEquals(expected.getCityName(), actual.getValue().getCityName());
+        Assert.assertEquals(expected.getSkyCondition(), actual.getValue().getSkyCondition());
+        Assert.assertEquals(expected.getTemperatureInCelsius(), actual.getValue().getTemperatureInCelsius(), ConstantsHelper.DELTA);
+        Assert.assertEquals(expected.getCoordinate().getLatitude(), actual.getValue().getCoordinate().getLatitude());
+        Assert.assertEquals(expected.getCoordinate().getLongitude(), actual.getValue().getCoordinate().getLongitude());
+        Assert.assertEquals(expected.getRecordMoment().getTime(), actual.getValue().getRecordMoment().getTime());
+
+        Assert.assertEquals(expected.getForecast().get(0).getDate().getTime(),
+                actual.getValue().getForecast().get(0).getDate().getTime());
+
+        Assert.assertEquals(expected.getForecast().get(0).getMinimumTemperatureInCelsius(),
+                actual.getValue().getForecast().get(0).getMinimumTemperatureInCelsius(),
+                ConstantsHelper.DELTA);
+
+        Assert.assertEquals(expected.getForecast().get(0).getMaximumTemperatureInCelsius(),
+                actual.getValue().getForecast().get(0).getMaximumTemperatureInCelsius(),
+                ConstantsHelper.DELTA);
+
+        Assert.assertEquals(expected.getForecast().get(0).getSkyCondition(),
+                actual.getValue().getForecast().get(0).getSkyCondition());
+    }
+
+    @Test
+    public void getWeather_returnCachedCity_whenDeviceIsDisconnectedFromInternetAndSearchedIsFromAutoComplete_andThereIsCachedDataForThisCity(){
+        Weather expected = MockerHelper.mockWeather2();
+        Weather lastCached = MockerHelper.mockWeather();
+
+        Repository repository = new Repository() {
+            @Override
+            public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
+                return null;
+            }
+
+            @Override
+            public LiveData<Weather> getWeatherCacheAsync(City city) {
+                return new MutableLiveData<>(expected);
+            }
+
+            @Override
+            public LiveData<Weather> getLastCachedWeatherAsync() {
+
+                return new MutableLiveData<>(lastCached);
+            }
+        };
+
+        DeviceConnectivity deviceConnectivity = new DeviceConnectivity() {
+            @Override
+            public boolean isConnectedToInternet() {
+                return false;
+            }
+
+            @Override
+            public LiveData<Coordinate> getLastKnownLocation() {
+                return null;
+            }
+
+            @Override
+            public void updateCurrentLocationAsync(Activity activity) {
+
+            }
+
+            @Override
+            public void onRequestPermissionsResult(Context context) {
+
+            }
+        };
+
+        CitiesCollection cities = new CitiesCollection() {
+            @Override
+            public Set<String> getCitiesNameAndCountryCode() {
+                return null;
+            }
+
+            @Override
+            public String getCityNameAndCountryCode(Coordinate coordinate) {
+                return null;
+            }
+
+            @Override
+            public Coordinate getCityCoordinates(@NonNull String cityNameAndCountry) {
+                return new Coordinate(-85.16, 12.45);
+            }
+
+            @Override
+            public boolean isExist(@NonNull String cityNameAndCountry) {
+                return true;
+            }
+        };
+
+        WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
+
+        String searchedInput = "Toronto (CA)";
         LiveData<Weather> actual = cases.getWeather(searchedInput);
 
         Assert.assertFalse(actual.getValue().getErrorMessage().isEmpty());
@@ -98,6 +302,11 @@ public class WeatherCasesTest {
             @Override
             public LiveData<Weather> getWeatherAsync(City city, Date oldestMoment) {
                 return new MutableLiveData<>(expected);
+            }
+
+            @Override
+            public LiveData<Weather> getWeatherCacheAsync(City city) {
+                return null;
             }
 
             @Override
@@ -141,9 +350,15 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(LiveData<Coordinate> location) {
+            public void updateCurrentLocationAsync(Activity activity) {
 
             }
+
+            @Override
+            public void onRequestPermissionsResult(Context context) {
+
+            }
+
         };
 
         WeatherCases cases = new WeatherCases(repository, cities, deviceConnectivity);
@@ -188,6 +403,11 @@ public class WeatherCasesTest {
             }
 
             @Override
+            public LiveData<Weather> getWeatherCacheAsync(City city) {
+                return null;
+            }
+
+            @Override
             public LiveData<Weather> getLastCachedWeatherAsync() {
                 return null;
             }
@@ -205,9 +425,15 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(LiveData<Coordinate> location) {
+            public void updateCurrentLocationAsync(Activity activity) {
 
             }
+
+            @Override
+            public void onRequestPermissionsResult(Context context) {
+
+            }
+
         };
 
         WeatherCases cases = new WeatherCases(repository, null, deviceConnectivity);
@@ -255,6 +481,11 @@ public class WeatherCasesTest {
             }
 
             @Override
+            public LiveData<Weather> getWeatherCacheAsync(City city) {
+                return null;
+            }
+
+            @Override
             public LiveData<Weather> getLastCachedWeatherAsync() {
                 return null;
             }
@@ -298,7 +529,12 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(LiveData<Coordinate> location) {
+            public void updateCurrentLocationAsync(Activity activity) {
+
+            }
+
+            @Override
+            public void onRequestPermissionsResult(Context context) {
 
             }
 
@@ -347,6 +583,11 @@ public class WeatherCasesTest {
             }
 
             @Override
+            public LiveData<Weather> getWeatherCacheAsync(City city) {
+                return null;
+            }
+
+            @Override
             public LiveData<Weather> getLastCachedWeatherAsync() {
                 return null;
             }
@@ -384,7 +625,12 @@ public class WeatherCasesTest {
             }
 
             @Override
-            public void setLastKnownLocation(LiveData<Coordinate> location) {
+            public void updateCurrentLocationAsync(Activity activity) {
+
+            }
+
+            @Override
+            public void onRequestPermissionsResult(Context context) {
 
             }
 

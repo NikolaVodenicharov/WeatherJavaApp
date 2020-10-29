@@ -29,11 +29,22 @@ public class MockerHelper {
 
         return weatherLocalDto;
     }
+    public static Weather mockWeather2(){
+        Weather weatherLocalDto = new Weather(
+                "Toronto",
+                new Date(),
+                mockCoordinate(),
+                10,
+                SkyCondition.RAIN,
+                mockDomainForecastWithOneDay());
+
+        return weatherLocalDto;
+    }
 
     public static WeatherLocalDto mockWeatherLocalDto(){
         WeatherLocalDto weatherLocalDto = new WeatherLocalDto(
                 "Houston",
-                "(US)",
+                "US",
                 new Date(),
                 internalMockCoordinateEntity(),
                 25,

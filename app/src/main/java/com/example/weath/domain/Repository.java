@@ -9,6 +9,7 @@ import java.util.Date;
 
 public interface Repository {
     LiveData<Weather> getWeatherAsync(City city, Date oldestMoment);
+    LiveData<Weather> getWeatherCacheAsync(City city);
 
     LiveData<Weather> getLastCachedWeatherAsync();
 }

@@ -80,11 +80,6 @@ public class DeviceConnectivityImpl implements DeviceConnectivity {
 
     @SuppressLint("MissingPermission")
     private MutableLiveData<Coordinate> requestLastKnownLocation(Context context) {
-        boolean isPermissionGranted = isLocationPermissionGranted(context);
-        if (!isPermissionGranted) {
-            return null;
-        }
-
         MutableLiveData<Coordinate> currentLocation = new MutableLiveData<>();
 
         FusedLocationProviderClient fusedLocation = LocationServices.getFusedLocationProviderClient(context);

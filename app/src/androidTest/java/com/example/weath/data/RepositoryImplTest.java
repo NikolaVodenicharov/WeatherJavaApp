@@ -138,6 +138,55 @@ public class RepositoryImplTest {
     }
 
     @Test
+    public void getWeatherCacheAsync_returnEntity_ifExistInDatabase(){
+        WeatherLocalDto weatherLocalDto = MockerHelper.mockWeatherLocalDto();
+
+        LocalDataSource localDataSource = new LocalDataSource() {
+            @Override
+            public void insertOrReplaceCityWeather(WeatherLocalDto cityWeather) {
+
+            }
+
+            @Override
+            public LiveData<WeatherLocalDto> getWeather(CoordinateEntity coordinate) {
+                return new MutableLiveData<>(weatherLocalDto);
+            }
+
+            @Override
+            public LiveData<Boolean> isExistingAndUpToDate(CoordinateEntity coordinate, Date minimumUpToDate) {
+                return new MutableLiveData<>(true);
+            }
+
+            @Override
+            public LiveData<WeatherLocalDto> getLastCachedWeatherAsync() {
+                return null;
+            }
+        };
+
+        RepositoryImpl repository = new RepositoryImpl(
+                null,
+                localDataSource,
+                new WeatherMapperImpl());
+
+        City mockCity = MockerHelper.mockCity();
+        LiveData<Weather> actualWeather = repository.getWeatherCacheAsync(mockCity);
+
+        actualWeather.observeForever(new Observer<Weather>() {
+            @Override
+            public void onChanged(Weather weather) {
+                actualWeather.removeObserver(this);
+
+                Assert.assertEquals(weatherLocalDto.getTemperatureInCelsius(), weather.getTemperatureInCelsius(), ConstantsHelper.DELTA);
+                Assert.assertEquals(weatherLocalDto.getSkyCondition().name(), weather.getSkyCondition().name());
+
+                Assert.assertEquals(mockCity.getName(), weather.getCityName());
+                Assert.assertEquals(mockCity.getLocation().getLatitude(), weather.getCoordinate().getLatitude(), ConstantsHelper.DELTA);
+                Assert.assertEquals(mockCity.getLocation().getLongitude(), weather.getCoordinate().getLongitude(), ConstantsHelper.DELTA);
+            }
+        });
+    }
+
+    @Test
     public void getLastCachedWeatherAsync_getLastUpToDateWeather(){
         WeatherLocalDto weatherLocalDto = MockerHelper.mockWeatherLocalDto();
 

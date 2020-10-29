@@ -52,4 +52,6 @@ public interface WeatherDao {
     @Update
     void updateForecastDays(List<ForecastDayEntity> forecastDays);
 
+    @Query("Delete From ForecastDays Where cityNameWithCountryCode == :cityNameWithCountryCode")
+    void deleteForecastDays(String cityNameWithCountryCode);
 }

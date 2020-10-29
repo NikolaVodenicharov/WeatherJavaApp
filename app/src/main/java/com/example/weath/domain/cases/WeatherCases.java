@@ -11,12 +11,17 @@ import com.example.weath.domain.models.City;
 import com.example.weath.domain.models.Coordinate;
 import com.example.weath.domain.models.Weather;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class WeatherCases {
     private static final long thirtyMinutesInMilliseconds = 1000 * 60 * 30;
+
     private static final String AMBIGUOUS_RESULT = "This is default city weather. The input search cause ambiguous result. Please use autocomplete.";
-    private static final String NO_INTERNET = "There is no internet connection. This is latest city weather result.";
+    private static final String NO_INTERNET_LATEST_CACHE = "There is no internet connection. This is latest city weather result. The current data is from ";
+    private static final String NO_INTERNET_CITY_CACHE = "There is no internet connection. The current data is from ";
+    private static final SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm a");
+
     private static final City defaultCity = new City("New York City", "US", new Coordinate(40.71, -74.00));
 
     private Repository repository;
@@ -31,7 +36,7 @@ public class WeatherCases {
 
     public LiveData<Weather> getWeather(String inputSearch){
         if (isDisconnectedFromInternet()){
-            return noInternetConnectionCase();
+            return noInternetConnectionCase(inputSearch);
         }
         else if(isSearchedCityFromAutocomplete(inputSearch)){
             return searchedCityFromAutocompleteCase(inputSearch);
@@ -44,9 +49,15 @@ public class WeatherCases {
         }
     }
 
-    private LiveData<Weather> noInternetConnectionCase(){
+    private LiveData<Weather> noInternetConnectionCase(String inputSearch){
         MutableLiveData<Weather> result = new MutableLiveData<>();
 
+        setValueLastCachedWeather(result);
+        tryToSetCachedCityWeather(inputSearch, result);
+
+        return result;
+    }
+    private void setValueLastCachedWeather(MutableLiveData<Weather> result) {
         LiveData<Weather> lastCached = repository.getLastCachedWeatherAsync();
 
         lastCached.observeForever(new Observer<Weather>() {
@@ -54,13 +65,31 @@ public class WeatherCases {
             public void onChanged(Weather weather) {
                 lastCached.removeObserver(this);
 
-                weather.setErrorMessage(NO_INTERNET + "The current data is from " + weather.getRecordMoment());
+                weather.setErrorMessage(NO_INTERNET_LATEST_CACHE + format.format(weather.getRecordMoment()));
                 result.setValue(weather);
             }
         });
-
-        return result;
     }
+    private void tryToSetCachedCityWeather(String inputSearch, MutableLiveData<Weather> result) {
+        if (isSearchedCityFromAutocomplete(inputSearch)){
+            City city = createCity(inputSearch);
+
+            LiveData<Weather> cache = repository.getWeatherCacheAsync(city);
+
+            cache.observeForever(new Observer<Weather>() {
+                @Override
+                public void onChanged(Weather weather) {
+                    cache.removeObserver(this);
+
+                    if (weather != null){
+                        weather.setErrorMessage(NO_INTERNET_CITY_CACHE + format.format(weather.getRecordMoment()));
+                        result.setValue(weather);
+                    }
+                }
+            });
+        }
+    }
+
     private LiveData<Weather> searchedCityFromAutocompleteCase(String inputSearch){
         City city = createCity(inputSearch);
         LiveData<Weather> weather = repository.getWeatherAsync(city, getThirtyMinutesAgo());

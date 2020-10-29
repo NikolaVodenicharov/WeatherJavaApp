@@ -40,6 +40,13 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
+    public LiveData<Weather> getWeatherCacheAsync(City city) {
+        CoordinateEntity coordinate = weatherMapper.toCoordinateEntity(city.getLocation());
+
+        return loadWeatherFromDatabase(coordinate);
+    }
+
+    @Override
     public LiveData<Weather> getLastCachedWeatherAsync() {
         MutableLiveData<Weather> weatherLiveData = new MutableLiveData<>();
 
@@ -94,6 +101,28 @@ public class RepositoryImpl implements Repository {
             @Override
             public void onChanged(WeatherLocalDto weatherLocalDto) {
                 if (weatherLocalDto == null || weatherLocalDto.getRecordMoment().getTime() < minimumUpToDate.getTime()){
+                    return;
+                }
+
+                cityWeather.removeObserver(this);
+
+                Weather weather = weatherMapper.toWeather(weatherLocalDto);
+                weatherResult.setValue(weather);
+            }
+        });
+
+        return weatherResult;
+    }
+
+    private LiveData<Weather> loadWeatherFromDatabase(CoordinateEntity coordinate) {
+        MutableLiveData<Weather> weatherResult = new MutableLiveData<>();
+
+        LiveData<WeatherLocalDto> cityWeather = localDataSource.getWeather(coordinate);
+
+        cityWeather.observeForever(new Observer<WeatherLocalDto>() {
+            @Override
+            public void onChanged(WeatherLocalDto weatherLocalDto) {
+                if (weatherLocalDto == null){
                     return;
                 }
 

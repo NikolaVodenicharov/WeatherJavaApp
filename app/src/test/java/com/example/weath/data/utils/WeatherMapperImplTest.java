@@ -127,7 +127,7 @@ public class WeatherMapperImplTest {
 
         Assert.assertEquals("Houston", actual.getCityName());
 
-        Assert.assertEquals("(US)", actual.getCountryCode());
+        Assert.assertEquals("US", actual.getCountryCode());
 
         Assert.assertEquals(expected.forecast.get(0).skyCondition,
                 actual.getForecast().get(0).getSkyCondition().name());
@@ -162,7 +162,7 @@ public class WeatherMapperImplTest {
 
         Assert.assertEquals("Houston", actual.getCityName());
 
-        Assert.assertEquals("(US)", actual.getCountryCode());
+        Assert.assertEquals("US", actual.getCountryCode());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class WeatherMapperImplTest {
 
         Assert.assertEquals("Houston", actual.getCityName());
 
-        Assert.assertEquals("(US)", actual.getCountryCode());
+        Assert.assertEquals("US", actual.getCountryCode());
     }
 
     @Test

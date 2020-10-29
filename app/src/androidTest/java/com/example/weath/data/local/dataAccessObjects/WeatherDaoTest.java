@@ -328,6 +328,23 @@ public class WeatherDaoTest {
         forecastDayEntityAssertEquals(forecastDays.get(0), actual.forecast.get(0));
     }
 
+    @Test
+    public void deleteForecastDays_deleteCorrectEntity() throws InterruptedException {
+        WeatherEntity mockWeather = MockerHelper.mockWeatherEntity();
+        List<ForecastDayEntity> forecastDays = MockerHelper.mockForecastWithOneDay(mockWeather);
+
+        database.weatherDao().insertOrReplaceWeather(mockWeather);
+        database.weatherDao().insertOrReplaceForecast(forecastDays);
+
+        database.weatherDao().deleteForecastDays(mockWeather.cityNameWithCountryCode);
+
+        WeatherWithForecast result = LiveDataUtil.getValue(
+                database.weatherDao().getWeather
+                        (mockWeather.coordinate.latitude, mockWeather.coordinate.longitude));
+
+        Assert.assertEquals(0, result.forecast.size());
+    }
+
     private void forecastDayEntityAssertEquals(ForecastDayEntity expected, ForecastDayEntity actual) {
         Assert.assertEquals(expected.maximumTemperatureInCelsius, actual.maximumTemperatureInCelsius, ConstantsHelper.DELTA);
         Assert.assertEquals(expected.minimumTemperatureInCelsius, actual.minimumTemperatureInCelsius, ConstantsHelper.DELTA);

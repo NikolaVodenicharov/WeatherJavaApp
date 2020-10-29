@@ -21,7 +21,7 @@ public class Mockers {
         coordinate.longitude = 33.44;
 
         WeatherEntity weather = new WeatherEntity();
-        weather.cityNameWithCountryCode = "Houston (US)";
+        weather.cityNameWithCountryCode = "Houston US";
         weather.recordMoment = new Date();
         weather.skyCondition = SkyConditionDto.CLOUDS.name();
         weather.temperatureInCelsius = 25;

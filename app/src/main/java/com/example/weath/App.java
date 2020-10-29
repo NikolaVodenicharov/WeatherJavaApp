@@ -14,31 +14,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Application {
-    private static ConnectivityManager connectivityManager;
-    //public static MutableLiveData<Coordinate> lastKnownLocation;
-
     public static CitiesCollection citiesCollection;
     public static DeviceConnectivity deviceConnectivity;
-
     public static WeatherCases weatherCases;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        initializeConnectivityManager();
-
         initializeCitiesCollection();
         initializeDeviceConnectivity();
+        initializeWeatherCases();
+    }
 
+    private void initializeWeatherCases() {
         weatherCases = new WeatherCases(
                 RepositoryFactory.createRepository(this),
                 citiesCollection,
                 deviceConnectivity);
-    }
-
-    private void initializeConnectivityManager() {
-        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
     }
 
     private void initializeCitiesCollection() {
@@ -52,7 +45,7 @@ public class App extends Application {
     }
 
     private void initializeDeviceConnectivity() {
-        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
         deviceConnectivity = new DeviceConnectivityImpl(connectivityManager);
     }
