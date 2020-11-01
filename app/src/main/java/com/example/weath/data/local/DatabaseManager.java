@@ -32,11 +32,11 @@ public class DatabaseManager implements LocalDataSource {
             @Override
             public void run() {
                 WeatherEntity weatherEntity = weatherMapper.toWeatherEntity(weather);
-                database.weatherDao().insertOrReplaceWeather(weatherEntity);
+                List<ForecastDayEntity> forecast = weatherMapper.toForecastDayEntityCollection(weather);
 
                 database.weatherDao().deleteForecastDays(weatherEntity.cityNameWithCountryCode);
-                List<ForecastDayEntity> forecast = weatherMapper.toForecastDayEntityCollection(weather);
                 database.weatherDao().insertOrReplaceForecast(forecast);
+                database.weatherDao().insertOrReplaceWeather(weatherEntity);
             }
         });
     }

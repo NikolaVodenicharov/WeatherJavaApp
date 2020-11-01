@@ -21,13 +21,13 @@ public interface WeatherDao {
     void insertWeather(WeatherEntity entity);
 
     @Insert
-    void insertForecastDays (List<ForecastDayEntity> forecast);
+    void insertForecastDays(List<ForecastDayEntity> forecast);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertOrReplaceWeather(WeatherEntity entity);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertOrReplaceForecast (List<ForecastDayEntity> forecast);
+    void insertOrReplaceForecast(List<ForecastDayEntity> forecast);
 
     @Query("Select Exists (Select * From Weathers Where latitude == :latitude And longitude == :longitude)")
     LiveData<Boolean> isExisting(double latitude, double longitude);
