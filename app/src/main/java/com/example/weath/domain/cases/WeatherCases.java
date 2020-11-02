@@ -142,6 +142,7 @@ public class WeatherCases {
         boolean canUseCurrentLocation = deviceConnectivity.getLastKnownLocation() != null &&
                 deviceConnectivity.getLastKnownLocation().getValue() != null;
 
+
         if (canUseCurrentLocation){
             String cityNameAndCountryCode = cities.getCityNameAndCountryCode(deviceConnectivity.getLastKnownLocation().getValue());
             String cityName = extractCityName(cityNameAndCountryCode);

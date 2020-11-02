@@ -30,6 +30,7 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         App.deviceConnectivity.updateCurrentLocationAsync(this);
+
         initializeBindings();
         initializePager();
         initializeTabLayoutMediator();

@@ -47,6 +47,6 @@ public class App extends Application {
     private void initializeDeviceConnectivity() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-        deviceConnectivity = new DeviceConnectivityImpl(connectivityManager);
+        deviceConnectivity = new DeviceConnectivityImpl(connectivityManager, this);
     }
 }

@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Looper;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,11 +17,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.example.weath.domain.DeviceConnectivity;
 import com.example.weath.domain.models.Coordinate;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,10 +34,17 @@ public class DeviceConnectivityImpl implements DeviceConnectivity {
     private static final String NEED_LOCATION_PERMISSION_MESSAGE = "To get the weather of your current location we need location permission.";
 
     private ConnectivityManager connectivityManager;
-    private MutableLiveData<Coordinate> lastKnownLocation = new MutableLiveData<>();
 
-    public DeviceConnectivityImpl(ConnectivityManager connectivityManager) {
+    private FusedLocationProviderClient fusedLocation;
+    private MutableLiveData<Coordinate> currentLocation;
+    private LocationCallback locationCallback;
+
+    public DeviceConnectivityImpl(ConnectivityManager connectivityManager, Context context) {
         this.connectivityManager = connectivityManager;
+
+        initializeFusedLocationProviderClient(context);
+        initializeCurrentLocation(context);
+        initializeLocationCallback();
     }
 
     @Override
@@ -47,12 +57,10 @@ public class DeviceConnectivityImpl implements DeviceConnectivity {
 
         return isConnected;
     }
-
     @Override
     public LiveData<Coordinate> getLastKnownLocation() {
-        return lastKnownLocation;
+        return currentLocation;
     }
-
     public void onRequestPermissionsResult(Context context){
         boolean isLocationPermissionGranted = isLocationPermissionGranted(context);
         if (!isLocationPermissionGranted)
@@ -60,16 +68,13 @@ public class DeviceConnectivityImpl implements DeviceConnectivity {
             return;
         }
 
-        setLastKnownLocation(
-                requestLastKnownLocation(context));
+        startLocationUpdates();
 
         Toast.makeText(context, LOCATION_PERMISSION_GRANTED_MESSAGE, Toast.LENGTH_LONG).show();
     }
-
     public void updateCurrentLocationAsync(Activity activity){
         if (isLocationPermissionGranted(activity)){
-            LiveData<Coordinate> location = requestLastKnownLocation(activity);
-            setLastKnownLocation(location);
+            startLocationUpdates();
         }
         else{
             askForLocationPermissionAsync(activity);
@@ -79,40 +84,67 @@ public class DeviceConnectivityImpl implements DeviceConnectivity {
     }
 
     @SuppressLint("MissingPermission")
-    private MutableLiveData<Coordinate> requestLastKnownLocation(Context context) {
-        MutableLiveData<Coordinate> currentLocation = new MutableLiveData<>();
+    private void initializeCurrentLocation(Context context){
+        currentLocation = new MutableLiveData<>();
 
-        FusedLocationProviderClient fusedLocation = LocationServices.getFusedLocationProviderClient(context);
-
-        fusedLocation
-                .getLastLocation()
-                .addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
+        if (isLocationPermissionGranted(context)){
+            fusedLocation.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    if (task.isSuccessful() && task.getResult() != null){
                         Location location = task.getResult();
 
-                        if (location == null) {
-                            return;
-                        }
-
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-
-                        currentLocation.setValue(new Coordinate(latitude, longitude));
+                        currentLocation.setValue(
+                                new Coordinate(location.getLatitude(), location.getLongitude()));
                     }
-                });
-
-        return currentLocation;
+                }
+            });
+        }
     }
-    private void setLastKnownLocation(LiveData<Coordinate> location) {
-        location.observeForever(new Observer<Coordinate>() {
+    private void initializeFusedLocationProviderClient(Context context){
+        fusedLocation = LocationServices.getFusedLocationProviderClient(context);
+    }
+    private void initializeLocationCallback(){
+        locationCallback = new LocationCallback(){
             @Override
-            public void onChanged(Coordinate coordinate) {
-                location.removeObserver(this);
-
-                lastKnownLocation.setValue(coordinate);
+            public void onLocationResult(LocationResult locationResult){
+                setCurrentLocationOnLocationResult(locationResult);
             }
-        });
+        };
+    }
+    private void setCurrentLocationOnLocationResult(LocationResult locationResult){
+        if (locationResult == null){
+            return;
+        }
+
+
+        Location location = locationResult.getLastLocation();
+
+        currentLocation.setValue(
+                new Coordinate(location.getLatitude(), location.getLongitude()));
+
+        stopLocationUpdates();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates(){
+        fusedLocation.requestLocationUpdates(
+                createLocationRequest(),
+                locationCallback,
+                Looper.getMainLooper());
+    }
+    private void stopLocationUpdates() {
+        if (locationCallback !=null){
+            fusedLocation.removeLocationUpdates(locationCallback);
+        }
+    }
+
+    private LocationRequest createLocationRequest() {
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+        return locationRequest;
     }
 
     private void askForLocationPermissionAsync(Activity activity) {
